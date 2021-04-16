@@ -3,15 +3,8 @@ variable "region" {
 }
 
 variable "project-name" {
-  default = "curious-course-253212"
+  default = "crc-on-gcp"
 }
-
-variable "account_id" {
-  default = "terraform-service-account"
-}
-
-
-
 
 variable "vmcount" {
   default = "1"
