@@ -2,8 +2,8 @@ variable "region" {
   default = "us-central1-a"
 }
 
-variable "project-name" {
-  default = "crc-on-gcp"
+variable "project_id" {
+  default = ""
 }
 
 variable "vmcount" {
@@ -63,9 +63,5 @@ variable "docker_password" {
 }
 
 variable "ddns_password" {
-  default = ""
-}
-
-variable "crc_pull_secret" {
   default = ""
 }

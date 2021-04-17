@@ -35,12 +35,12 @@ data "template_file" "default" {
   template = "${file("${path.module}/init.tpl")}"
   vars = {
     ddns_enabled = "${var.ddns_enabled}"
-  ddns_login = "${var.ddns_login}"
-  ddns_password = "${var.ddns_password}"
-  ddns_hostname = "${var.ddns_hostname}"
-  docker_login = "${var.docker_login}"
-  docker_password = "${var.docker_password}"
-  crc_pull_secret = "${file("${path.module}/pull-secret.txt")}"
+    ddns_login = "${var.ddns_login}"
+    ddns_password = "${var.ddns_password}"
+    ddns_hostname = "${var.ddns_hostname}"
+    docker_login = "${var.docker_login}"
+    docker_password = "${var.docker_password}"
+    crc_pull_secret = "${file("${path.module}/pull-secret.txt")}"
   }
 }
 
