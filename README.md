@@ -2,7 +2,7 @@
 
 This repository provides an automated way to provision CRC in GCP.
 
-Access [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal) and run the following commands:
+Go to [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal) and run the following commands:
 
 Create a new project:
 ```bash
@@ -42,9 +42,12 @@ gcloud iam service-accounts keys create "terraform.key.json" --iam-account "terr
 gcloud projects add-iam-policy-binding $TF_VAR_PROJECT_ID --member "serviceAccount:terraformuser@$TF_VAR_PROJECT_ID.iam.gserviceaccount.com" --role 'roles/owner'
 ```
 
-```bash
+Create pull-secret.txt. Go to [https://cloud.redhat.com/openshift/create/local](https://cloud.redhat.com/openshift/create/local]) >
+`Copy pull secret` and paste below:
+
+```
 cat >pull-secret.txt <<EOL
-coloque aqui o conteúdo do pull-secret.txt
+PASTE HERE
 EOL
 ```
 
