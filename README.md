@@ -1,10 +1,10 @@
-## CRC (CodeReady Containers) on GCP (Google Cloud Platform)
+# CRC (CodeReady Containers) on GCP (Google Cloud Platform)
 
 This repository provides an automated way 
 to provision [CRC](https://developers.redhat.com/products/codeready-containers/overview) 
 on [GCP](https://cloud.google.com/).
 
-### Setting Up Your Development Environment
+## <a name="SettingUp">Setting Up Your Development Environment</a>
 
 Go to [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal) and run the following commands:
 
@@ -95,7 +95,7 @@ Apr 17 16:16:51 crc-build-1 runuser[51541]: The console will open in your defaul
 
 At this point your environment is ready!
 
-### crc and oc command line tools
+## crc and oc command line tools
 
 The `crcuser` operating system user runs CRC.
 The password for `crcuser` is `password`.
@@ -142,20 +142,56 @@ NAME                 STATUS   ROLES           AGE   VERSION
 crc-ctj2r-master-0   Ready    master,worker   74d   v1.19.0+1833054
 ```
 
-### Access OpenShift Console from your laptop
+## DDNS (Dynamic DNS)
 
-TODO: ssh port forward and hosts file
+The current configuration uses an ephemeral IP in the GCP instance. 
+This means that when the machine is initialized, 
+a new IP can be assigned.
 
-### DDNS (Dynamic DNS)
+Instead of working with IP, it is more practical to use a DNS. 
+To do this, we can optionally configure a free DDNS (Dynamic DNS) 
+service, for example, 
+[https://freedns.afraid.org/](https://freedns.afraid.org/)
 
-TODO: doc about https://freedns.afraid.org/subdomain/
+When we set up DDNS, we also need a 
+[Docker Hub](https://hub.docker.com/) account.
 
-### Troubleshooting
+Set the following variables in `variable.tf`:
+* ddns_enabled (value true)
+* ddns_login
+* ddns_hostname
+* docker_login
 
-#### Change CRC version
+Sensitive variables such as passwords must be set in `secrets.tfvars`:
+* ddns_password
+* docker_password
+
+If your environment is already provisioned, 
+you need to [destroy it](#Cleanup) and then [recreate it](#SettingUp).
+
+
+## Access OpenShift Console from your laptop
+
+### SSH port fordward
+
+
+
+### add hosts file
+
+### Manual
+
+### 
+ 
+
+
+
+## Troubleshooting
+
+### Change CRC version
 TODO
 
-### Cleanup
+
+## <a name="Cleanup">Cleanup</a>
 
 Go to [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal)
 and run the following commands:
