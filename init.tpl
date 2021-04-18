@@ -128,7 +128,7 @@ sudo cat >aut.yml <<EOL
     - name: start crc
       systemd: state=started name=crc daemon_reload=yes enabled=yes
     - name: Change PATH
-      shell: echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc" > /etc/environment
+      shell: echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" > /etc/environment
       become: true
 
 EOL
