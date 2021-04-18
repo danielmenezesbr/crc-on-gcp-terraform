@@ -96,10 +96,6 @@ At this point your environment is ready.
 The `crcuser` operating system user runs CRC.
 The password for `crcuser` is `password`.
 
-If you want to use [`oc`](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html) 
-after enter into via SSH 
-use the user crcuser. For example:
-
 After accessing the instance via SSH, 
 change to the `crcuser` user if you 
 want to run `crc` or  [`oc`](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html). 
