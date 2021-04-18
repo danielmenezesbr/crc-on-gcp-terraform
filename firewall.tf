@@ -1,6 +1,6 @@
 resource "google_compute_firewall" "ssh" {
   name    = "${var.network}-firewall-ssh"
-  network = "${google_compute_network.vagrant_network.name}"
+  network = "${google_compute_network.crc_network.name}"
 
   allow {
     protocol = "tcp"
@@ -13,7 +13,7 @@ resource "google_compute_firewall" "ssh" {
 
 resource "google_compute_firewall" "http" {
   name    = "${var.network}-firewall-http"
-  network = "${google_compute_network.vagrant_network.name}"
+  network = "${google_compute_network.crc_network.name}"
 
   allow {
     protocol = "tcp"
@@ -26,7 +26,7 @@ resource "google_compute_firewall" "http" {
 
 resource "google_compute_firewall" "https" {
   name    = "${var.network}-firewall-https"
-  network = "${google_compute_network.vagrant_network.name}"
+  network = "${google_compute_network.crc_network.name}"
 
   allow {
     protocol = "tcp"
@@ -39,7 +39,7 @@ resource "google_compute_firewall" "https" {
 
 resource "google_compute_firewall" "icmp" {
   name    = "${var.network}-firewall-icmp"
-  network = "${google_compute_network.vagrant_network.name}"
+  network = "${google_compute_network.crc_network.name}"
 
   allow {
     protocol = "icmp"
@@ -51,7 +51,7 @@ resource "google_compute_firewall" "icmp" {
 
 resource "google_compute_firewall" "firewall-openshift-console" {
   name    = "${var.network}-firewall-openshift-console"
-  network = "${google_compute_network.vagrant_network.name}"
+  network = "${google_compute_network.crc_network.name}"
 
   allow {
     protocol = "tcp"
@@ -64,7 +64,7 @@ resource "google_compute_firewall" "firewall-openshift-console" {
 
 resource "google_compute_firewall" "firewall-secure-forward" {
   name    = "${var.network}-firewall-secure-forward"
-  network = "${google_compute_network.vagrant_network.name}"
+  network = "${google_compute_network.crc_network.name}"
 
   allow {
     protocol = "tcp"

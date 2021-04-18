@@ -72,7 +72,7 @@ terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" 
 
 Access the instance via SSH:
 ```bash
-gcloud compute ssh vagrant-build-1 --zone=us-central1-a --quiet
+gcloud compute ssh crc-build-1 --zone=us-central1-a --quiet
 ```
 
 Wait for the message "Started the OpenShift cluster"
@@ -83,12 +83,12 @@ sudo tail -f /var/log/messages -n +1 | grep runuser
 
 ```
 ...
-Apr 17 16:16:51 vagrant-build-1 runuser[51541]: Started the OpenShift cluster
-Apr 17 16:16:51 vagrant-build-1 runuser[51541]: To access the cluster, first set up your environment by following the instructions returned by executing 'crc oc-env'.
-Apr 17 16:16:51 vagrant-build-1 runuser[51541]: Then you can access your cluster by running 'oc login -u developer -p developer https://api.crc.testing:6443'.
-Apr 17 16:16:51 vagrant-build-1 runuser[51541]: To login as a cluster admin, run 'oc login -u kubeadmin -p ABCD-EFG-hLQZX-VI9Kg https://api.crc.testing:6443'.
-Apr 17 16:16:51 vagrant-build-1 runuser[51541]: You can also run 'crc console' and use the above credentials to access the OpenShift web console.
-Apr 17 16:16:51 vagrant-build-1 runuser[51541]: The console will open in your default browser.
+Apr 17 16:16:51 crc-build-1 runuser[51541]: Started the OpenShift cluster
+Apr 17 16:16:51 crc-build-1 runuser[51541]: To access the cluster, first set up your environment by following the instructions returned by executing 'crc oc-env'.
+Apr 17 16:16:51 crc-build-1 runuser[51541]: Then you can access your cluster by running 'oc login -u developer -p developer https://api.crc.testing:6443'.
+Apr 17 16:16:51 crc-build-1 runuser[51541]: To login as a cluster admin, run 'oc login -u kubeadmin -p ABCD-EFG-hLQZX-VI9Kg https://api.crc.testing:6443'.
+Apr 17 16:16:51 crc-build-1 runuser[51541]: You can also run 'crc console' and use the above credentials to access the OpenShift web console.
+Apr 17 16:16:51 crc-build-1 runuser[51541]: The console will open in your default browser.
 ```
 
 At this point your environment is ready.

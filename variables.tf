@@ -11,7 +11,7 @@ variable "vmcount" {
 }
 
 variable "instance-name" {
-  default = "vagrant-build"
+  default = "crc-build"
 }
 
 variable "subnetwork-region" {
@@ -19,7 +19,7 @@ variable "subnetwork-region" {
 }
 
 variable "network" {
-  default = "vagrant-network"
+  default = "crc-network"
 }
 
 variable "vm_type" {
@@ -31,11 +31,11 @@ variable "os" {
 }
 
 variable "image-name" {
-  default = "vagrantimg"
+  default = "crcimg"
 }
 
 variable "disk-name" {
-  default = "vagrantdisk"
+  default = "crcdisk"
 }
 
 variable "disk-size" {

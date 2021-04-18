@@ -9,7 +9,7 @@ sudo cat /var/log/messages | grep runuser
 */
 
 
-resource "google_compute_disk" "vagrantdisk" {
+resource "google_compute_disk" "crcdisk" {
   name  = "${var.disk-name}"
   type  = "pd-standard"
   zone  = "${var.region}"
@@ -20,9 +20,9 @@ resource "google_compute_disk" "vagrantdisk" {
   }
 }
 
-resource "google_compute_image" "vagrantimg" {
+resource "google_compute_image" "crcimg" {
   name = "${var.image-name}"
-  source_disk = "${google_compute_disk.vagrantdisk.self_link}"
+  source_disk = "${google_compute_disk.crcdisk.self_link}"
   licenses = [
     "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx",
   ]
@@ -44,7 +44,7 @@ data "template_file" "default" {
   }
 }
 
-resource "google_compute_instance" "vagrant-build-box" {
+resource "google_compute_instance" "crc-build-box" {
   count = "${var.vmcount}"
   name = "${var.instance-name}-${count.index + 1}"
   machine_type = "${var.vm_type}"
@@ -69,7 +69,7 @@ resource "google_compute_instance" "vagrant-build-box" {
 
   boot_disk {
     initialize_params {
-      image = "${google_compute_image.vagrantimg.self_link}"
+      image = "${google_compute_image.crcimg.self_link}"
       type  = "pd-standard"
       size  = "${var.disk-size}"
     }
@@ -83,7 +83,7 @@ resource "google_compute_instance" "vagrant-build-box" {
   metadata_startup_script = "${data.template_file.default.rendered}"
 
   network_interface {
-    subnetwork = "${google_compute_subnetwork.vagrant_network_subnetwork.name}"
+    subnetwork = "${google_compute_subnetwork.crc_network_subnetwork.name}"
 
     access_config {
       // Ephemeral IP
