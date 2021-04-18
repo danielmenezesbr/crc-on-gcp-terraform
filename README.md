@@ -68,7 +68,7 @@ DDNS setup is optional.
 
 Create a subdomain like this:
 
-![subdomain](https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/[branch]/ddns-subdomain.png?raw=true)
+![subdomain](https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/master/ddns-subdomain.png?raw=true)
 
 
 When we set up DDNS, we also need a 
