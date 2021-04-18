@@ -74,15 +74,6 @@ sudo cat >aut.yml <<EOL
     - name: pull image troglobit/inadyn:latest
       docker_image:
         name: troglobit/inadyn:latest
-#    - name: Inadyn container
-#      docker_container:
-#        name: inadyn
-#        image: troglobit/inadyn:latest
-#        state: started
-#        recreate: yes
-#        restart_policy: unless-stopped
-#        volumes:
-#          - "{{playbook_dir}}/inadyn.conf:/etc/inadyn.conf"
     - name: install myservice systemd unit file
       template: src=myservice.j2 dest=/etc/systemd/system/myservice.service
     - name: start myservice
@@ -132,11 +123,13 @@ sudo cat >aut.yml <<EOL
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set memory 20000'
     - name: crc config set pull-secret-file
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set pull-secret-file /home/crcuser/pull-secret.txt'
-#    - name: crc start
-#      command: runuser -l crcuser -c '/home/crcuser/crc/crc start'
     - name: install crc systemd unit file
       template: src=crc.j2 dest=/etc/systemd/system/crc.service
     - name: start crc
       systemd: state=started name=crc daemon_reload=yes enabled=yes
+    - name: Change PATH
+      shell: echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc" > /etc/environment
+      become: true
+
 EOL
 sudo ansible-playbook aut.yml #to check ansible logs: sudo journalctl -u google-startup-scripts.service -f
