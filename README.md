@@ -4,6 +4,8 @@ This repository provides an automated way
 to provision [CRC](https://developers.redhat.com/products/codeready-containers/overview) 
 on [GCP](https://cloud.google.com/).
 
+### Setting Up Your Development Environment
+
 Go to [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal) and run the following commands:
 
 Create new project:
@@ -91,12 +93,14 @@ Apr 17 16:16:51 crc-build-1 runuser[51541]: You can also run 'crc console' and u
 Apr 17 16:16:51 crc-build-1 runuser[51541]: The console will open in your default browser.
 ```
 
-At this point your environment is ready.
+At this point your environment is ready!
+
+### crc and oc command line tools
 
 The `crcuser` operating system user runs CRC.
 The password for `crcuser` is `password`.
 
-After accessing the instance via SSH, 
+After accessing the instance via gcloud/SSH, 
 change to the `crcuser` user if you 
 want to run `crc` or  [`oc`](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html). 
 For example:
@@ -136,4 +140,32 @@ oc get nodes
 ```
 NAME                 STATUS   ROLES           AGE   VERSION
 crc-ctj2r-master-0   Ready    master,worker   74d   v1.19.0+1833054
+```
+
+### Access OpenShift Console from your laptop
+
+TODO: ssh port forward and hosts file
+
+### DDNS (Dynamic DNS)
+
+TODO: doc about https://freedns.afraid.org/subdomain/
+
+### Troubleshooting
+
+#### Change CRC version
+TODO
+
+### Cleanup
+
+Go to [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal)
+and run the following commands:
+
+```
+export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
+cd ~/crc-on-gcp-terraform/
+terraform destroy -auto-approve
+gcloud projects delete $TF_VAR_PROJECT_ID --quiet
+cd ~
+rm terraform*
+rm crc-on-gcp-terraform/ -Rf
 ```
