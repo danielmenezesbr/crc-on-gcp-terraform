@@ -75,7 +75,7 @@ Access the instance via SSH:
 gcloud compute ssh crc-build-1 --zone=us-central1-a --quiet
 ```
 
-Wait for the message "Started the OpenShift cluster"
+Wait about 25 minutes for the message "Started the OpenShift cluster"
 
 ``` 
 sudo tail -f /var/log/messages -n +1 | grep runuser
