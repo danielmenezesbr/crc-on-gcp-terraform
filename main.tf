@@ -1,7 +1,7 @@
 /*
 terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
-terraform apply -var-file="secrets.tfvars"
-terraform destroy
+terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
+terraform destroy -auto-approve
 sudo journalctl -u google-startup-scripts.service -f
 sudo journalctl -u crc.service -f
 sudo tail -f /var/log/messages -n +1 | grep runuser
