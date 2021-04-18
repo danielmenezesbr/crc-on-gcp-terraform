@@ -55,17 +55,43 @@ PASTE HERE
 EOL
 ```
 
+The current configuration uses an ephemeral IP in the GCP instance. 
+This means that when the machine is initialized, 
+a new IP can be assigned.
 
-Adjust the parameters in `variables.tf` if necessary.
+Instead of working with IP, it is more practical to use a DNS. 
+To do this, we can optionally configure a free DDNS (Dynamic DNS) 
+service, for example, 
+[https://freedns.afraid.org/](https://freedns.afraid.org/)
 
-Sensitive parameters such as passwords can be stored in the `secrets.tfvars`
+DDNS setup is optional.
+
+Create a subdomain like this:
+
+![subdomain](https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/[branch]/ddns-subdomain.png?raw=true)
+
+
+When we set up DDNS, we also need a 
+[Docker Hub](https://hub.docker.com/) account.
+
+Set the following variables in `variable.tf`:
+* ddns_enabled (value true)
+* ddns_login
+* ddns_hostname
+* docker_login
+
+Sensitive variables such as passwords must be set in `secrets.tfvars`:
+* ddns_password
+* docker_password
 
 ```bash
 cat >secrets.tfvars <<EOL
-ddns_password = ""  # optional: password for freedns.afraid.org (Dynamic DNS)
-docker_password = "" # optional: password for dockerhub
+ddns_password = "YOUR_PASSWORD"  # optional: password for freedns.afraid.org (Dynamic DNS)
+docker_password = "YOUR_PASSWORD" # optional: password for dockerhub
 EOL
 ```
+
+Adjust other parameters in `variables.tf` if necessary.
 
 Provision the environment:
 ```bash
@@ -144,27 +170,7 @@ crc-ctj2r-master-0   Ready    master,worker   74d   v1.19.0+1833054
 
 ## DDNS (Dynamic DNS)
 
-The current configuration uses an ephemeral IP in the GCP instance. 
-This means that when the machine is initialized, 
-a new IP can be assigned.
 
-Instead of working with IP, it is more practical to use a DNS. 
-To do this, we can optionally configure a free DDNS (Dynamic DNS) 
-service, for example, 
-[https://freedns.afraid.org/](https://freedns.afraid.org/)
-
-When we set up DDNS, we also need a 
-[Docker Hub](https://hub.docker.com/) account.
-
-Set the following variables in `variable.tf`:
-* ddns_enabled (value true)
-* ddns_login
-* ddns_hostname
-* docker_login
-
-Sensitive variables such as passwords must be set in `secrets.tfvars`:
-* ddns_password
-* docker_password
 
 If your environment is already provisioned, 
 you need to [destroy it](#Cleanup) and then [recreate it](#SettingUp).
@@ -179,10 +185,6 @@ you need to [destroy it](#Cleanup) and then [recreate it](#SettingUp).
 ### add hosts file
 
 ### Manual
-
-### 
- 
-
 
 
 ## Troubleshooting
