@@ -1,10 +1,12 @@
-###### CRC (CodeReady Containers) on GCP (Google Cloud Platform)
+## CRC (CodeReady Containers) on GCP (Google Cloud Platform)
 
-This repository provides an automated way to provision CRC in GCP.
+This repository provides an automated way 
+to provision [CRC](https://developers.redhat.com/products/codeready-containers/overview) 
+on [GCP](https://cloud.google.com/).
 
 Go to [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal) and run the following commands:
 
-Create a new project:
+Create new project:
 ```bash
 export TF_VAR_PROJECT_ID=$(python3 -c 'import uuid; print("c" + str(uuid.uuid4().hex[:29]))')
 echo "Project ID:" $TF_VAR_PROJECT_ID
@@ -12,7 +14,7 @@ gcloud projects create $TF_VAR_PROJECT_ID --name="CRConGCP" --labels=type=crc --
 gcloud config set project $TF_VAR_PROJECT_ID
 ```
 
-Link the new project with a billing account:
+Link new project to a billing account:
 
 ```bash
 export ACCOUNT_ID=$(gcloud alpha billing accounts list --filter='open:TRUE' --format='value(ACCOUNT_ID)' --limit=1)
@@ -20,12 +22,12 @@ echo "Billing ACCOUNT ID:" $ACCOUNT_ID
 gcloud alpha billing projects link $TF_VAR_PROJECT_ID --billing-account $ACCOUNT_ID
 ```
 
+Enable compute API:
 ```bash
 gcloud services enable compute.googleapis.com
 ```
 
 Download and config Terraform:
-
 ```bash
 wget https://releases.hashicorp.com/terraform/0.13.6/terraform_0.13.6_linux_amd64.zip
 unzip terraform_0.13.6_linux_amd64.zip
