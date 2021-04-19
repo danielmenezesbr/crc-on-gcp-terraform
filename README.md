@@ -190,7 +190,6 @@ TODO:
 
 ## Access OpenShift Console from your laptop
 
-
 ### SSH port fordward
 
 After installing the [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
@@ -198,12 +197,10 @@ on your laptop, execute the commands in order to forward the
 local ports 80 and 443 to the IP which CRC meets the requests.
 
 ```
+gcloud auth login
 export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
 gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.130.11:80 -L 443:192.168.130.11:443 -N
 ```
-
-Tip for Windows users: use a shell bash like "Git Bash" to execute 
-the previous commands 
 
 ### add hosts file
 
@@ -223,7 +220,7 @@ your laptop, appropriately change the hosts file.
 ## Troubleshooting
 
 ### Change CRC version
-TODO
+TODO:
 
 
 ## <a name="Cleanup">Cleanup</a>
