@@ -74,11 +74,10 @@ resource "google_compute_instance" "crc-build-box" {
       size  = "${var.disk-size}"
     }
   }
-  
-  #hostname = "${var.instance-name}"
-  #metadata {
-  #  hostname = "${var.instance-name}"
-  #}
+
+  metadata = {
+    ssh-keys = "crcuser:${file("crcuser_key.pub")}"
+  }
   
   metadata_startup_script = "${data.template_file.default.rendered}"
 

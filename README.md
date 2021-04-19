@@ -55,6 +55,20 @@ PASTE HERE
 EOL
 ```
 
+We will generate the ssh keys which we will use later to access 
+our instance from our laptop.
+
+```
+ssh-keygen -t rsa -f crcuser_key -C crcuser -q -N ""
+```
+
+The previous command generates two files:
+* `crcuser_key`: private key which we can use to access the instance 
+remotely with an ssh client
+* `crcuser_key.pub`: public key that will be included in our instance.
+
+### DDNS (optinal)
+
 The current configuration uses an ephemeral IP in the GCP instance. 
 This means that when the machine is initialized, 
 a new IP can be assigned.
@@ -86,12 +100,14 @@ Sensitive variables such as passwords must be set in `secrets.tfvars`:
 
 ```bash
 cat >secrets.tfvars <<EOL
-ddns_password = "YOUR_PASSWORD"  # optional: password for freedns.afraid.org (Dynamic DNS)
-docker_password = "YOUR_PASSWORD" # optional: password for dockerhub
+ddns_password = "YOUR_PASSWORD"
+docker_password = "YOUR_PASSWORD"
 EOL
 ```
 
 Adjust other parameters in `variables.tf` if necessary.
+
+### Terraform
 
 Provision the environment:
 ```bash
@@ -170,21 +186,38 @@ crc-ctj2r-master-0   Ready    master,worker   74d   v1.19.0+1833054
 
 ## DDNS (Dynamic DNS)
 
-
-
-If your environment is already provisioned, 
-you need to [destroy it](#Cleanup) and then [recreate it](#SettingUp).
-
+TODO:
 
 ## Access OpenShift Console from your laptop
 
+
 ### SSH port fordward
 
+After installing the [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
+on your laptop, execute the commands in order to forward the 
+local ports 80 and 443 to the IP which CRC meets the requests.
 
+```
+export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
+gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.130.11:80 -L 443:192.168.130.11:443 -N
+```
+
+Tip for Windows users: use a shell bash like "Git Bash" to execute 
+the previous commands 
 
 ### add hosts file
 
-### Manual
+Add at least the following information to the hosts file:
+
+```
+127.0.0.1 api.crc.testing
+127.0.0.1 oauth-openshift.apps-crc.testing
+127.0.0.1 console-openshift-console.apps-crc.testing
+127.0.0.1 default-route-openshift-image-registry.apps-crc.testing
+```
+
+Whenever you create a route on the OCP and you want to access from 
+your laptop, appropriately change the hosts file.
 
 
 ## Troubleshooting
