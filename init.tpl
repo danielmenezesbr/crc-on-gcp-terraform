@@ -6,16 +6,7 @@ ansible-galaxy collection install community.docker;
 mkdir /etc/ansible-provision;
 cd /etc/ansible-provision;
 sudo cat >inadyn.conf <<EOL
-# In-A-Dyn v2.0 configuration file format
-period = 300
-
-# The FreeDNS username must be in lower case and
-# the password (max 16 chars) is case sensitive
-provider freedns.afraid.org {
-    username = ${ddns_login}
-    password = ${ddns_password}
-    hostname = ${ddns_hostname}
-}
+${file_inadyn_conf}
 EOL
 sudo cat >myservice.j2 <<EOL
 [Unit]
