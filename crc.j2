@@ -1,0 +1,11 @@
+[Unit]
+Description=CRC
+Requires=libvirtd.service
+After=libvirtd.service
+TimeoutSec=0
+[Service]
+Restart=no
+ExecStart=/usr/sbin/runuser -l crcuser -c '/home/crcuser/crc/crc start'
+
+[Install]
+WantedBy=multi-user.target

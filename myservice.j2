@@ -1,0 +1,11 @@
+[Unit]
+Description=Redis container2
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker run --rm -v "/etc/ansible-provision/inadyn.conf:/etc/inadyn.conf" troglobit/inadyn:latest
+
+[Install]
+WantedBy=multi-user.target
