@@ -41,6 +41,8 @@ data "template_file" "default" {
     docker_login = "${var.docker_login}"
     docker_password = "${var.docker_password}"
     crc_pull_secret = "${file("${path.module}/pull-secret.txt")}"
+    crc_memory = "${var.crc_memory}"
+    crc_monitoring_enabled = "${var.crc_monitoring_enabled}"
   }
 }
 

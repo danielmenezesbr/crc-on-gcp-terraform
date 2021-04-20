@@ -43,7 +43,7 @@ variable "disk-size" {
 }
 
 variable "ddns_enabled" {
-  default = "true"
+  default = "false"
 }
 
 variable "ddns_login" {
@@ -56,6 +56,14 @@ variable "ddns_hostname" {
 
 variable "docker_login" {
   default = "danielmenezesbr"
+}
+
+variable "crc_memory" {
+  default = "20000"
+}
+
+variable "crc_monitoring_enabled" {
+  default = "false"
 }
 
 variable "docker_password" {

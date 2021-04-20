@@ -47,6 +47,7 @@ sudo cat >aut.yml <<EOL
 - hosts: localhost
   vars:
     password: password
+    ddns_enabled: ${ddns_enabled}
   tasks:
  
     - name: setup yum-utils
@@ -71,13 +72,17 @@ sudo cat >aut.yml <<EOL
       community.docker.docker_login:
         username: ${docker_login}
         password: ${docker_password}
+      when: ddns_enabled
     - name: pull image troglobit/inadyn:latest
       docker_image:
         name: troglobit/inadyn:latest
+      when: ddns_enabled
     - name: install myservice systemd unit file
       template: src=myservice.j2 dest=/etc/systemd/system/myservice.service
+      when: ddns_enabled
     - name: start myservice
       systemd: state=started name=myservice daemon_reload=yes enabled=yes
+      when: ddns_enabled
     - name: NetworkManager
       yum: name=NetworkManager state=present
     - name: Make sure we have a 'libvirt' group
@@ -120,7 +125,9 @@ sudo cat >aut.yml <<EOL
     - name: crc setup
       command: runuser -l crcuser -c '/home/crcuser/crc/crc setup'
     - name: crc config set memory
-      command: runuser -l crcuser -c '/home/crcuser/crc/crc config set memory 20000'
+      command: runuser -l crcuser -c '/home/crcuser/crc/crc config set memory ${crc_memory}'
+    - name: crc config set memory
+          command: runuser -l crcuser -c '/home/crcuser/crc/crc config set enable-cluster-monitoring ${crc_monitoring_enabled}'
     - name: crc config set pull-secret-file
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set pull-secret-file /home/crcuser/pull-secret.txt'
     - name: install crc systemd unit file

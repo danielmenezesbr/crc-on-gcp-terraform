@@ -80,7 +80,7 @@ service, for example,
 
 DDNS setup is optional.
 
-Create a subdomain like this:
+Create a subdomain that looks like this:
 
 ![subdomain](https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/master/ddns-subdomain.png?raw=true)
 
@@ -202,6 +202,13 @@ export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --forma
 gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.130.11:80 -L 443:192.168.130.11:443 -N
 ```
 
+Tip for Windows users: use a shell bash like "Git Bash" to execute 
+the previous commands. Also, install Python 3.9 manually and set 
+CLOUDSDK_PYTHON after opening Git Bash: 
+`export CLOUDSDK_PYTHON='/c/Python39/python.exe'`
+
+TODO: talk about autossh 
+
 ### add hosts file
 
 Add at least the following information to the hosts file:
@@ -215,6 +222,8 @@ Add at least the following information to the hosts file:
 
 Whenever you create a route on the OCP and you want to access from 
 your laptop, appropriately change the hosts file.
+
+TODO: talk about dnsmasq
 
 
 ## Troubleshooting
