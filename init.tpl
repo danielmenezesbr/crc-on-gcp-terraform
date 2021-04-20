@@ -127,7 +127,7 @@ sudo cat >aut.yml <<EOL
     - name: crc config set memory
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set memory ${crc_memory}'
     - name: crc config set memory
-          command: runuser -l crcuser -c '/home/crcuser/crc/crc config set enable-cluster-monitoring ${crc_monitoring_enabled}'
+      command: runuser -l crcuser -c '/home/crcuser/crc/crc config set enable-cluster-monitoring ${crc_monitoring_enabled}'
     - name: crc config set pull-secret-file
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set pull-secret-file /home/crcuser/pull-secret.txt'
     - name: install crc systemd unit file
