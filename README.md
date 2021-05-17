@@ -33,7 +33,7 @@ Download and config Terraform:
 ```bash
 wget https://releases.hashicorp.com/terraform/0.13.6/terraform_0.13.6_linux_amd64.zip
 unzip terraform_0.13.6_linux_amd64.zip
-export PATH=$PATH:~
+export PATH=~:$PATH
 git clone https://github.com/danielmenezesbr/crc-on-gcp-terraform
 cd crc-on-gcp-terraform
 terraform init
