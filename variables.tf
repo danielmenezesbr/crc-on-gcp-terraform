@@ -1,3 +1,11 @@
+variable "crc_enabled" {
+  default = "true"
+}
+
+variable "snc_enabled" {
+  default = "false"
+}
+
 variable "region" {
   default = "us-central1-a"
 }
