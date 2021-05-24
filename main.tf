@@ -1,5 +1,7 @@
 /*
-terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
+export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
+export PATH=~:$PATH
+terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
 terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
 terraform destroy -auto-approve
 sudo journalctl -u google-startup-scripts.service -f
@@ -56,6 +58,8 @@ data "template_file" "aut_yml" {
     ddns_enabled = "${var.ddns_enabled}"
     docker_login = "${var.docker_login}"
     docker_password = "${var.docker_password}"
+    crc_enabled: "${var.crc_enabled}"
+    snc_enabled: "${var.snc_enabled}"
     crc_pull_secret = "${file("${path.module}/pull-secret.txt")}"
     crc_memory = "${var.crc_memory}"
     crc_monitoring_enabled = "${var.crc_monitoring_enabled}"
@@ -82,7 +86,7 @@ resource "google_compute_instance" "crc-build-box" {
   
   scheduling {
     automatic_restart = false
-    preemptible = true
+    #preemptible = true
   }
 
   boot_disk {

@@ -1,5 +1,5 @@
 variable "crc_enabled" {
-  default = "true"
+  default = "tue"
 }
 
 variable "snc_enabled" {

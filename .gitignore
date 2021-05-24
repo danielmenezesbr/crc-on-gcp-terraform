@@ -5,6 +5,8 @@
 ### CRC ###
 pull-secret.txt
 *.json
+crcuser_key
+crcuser_key.pub
 
 ### Ansible ###
 *.retry

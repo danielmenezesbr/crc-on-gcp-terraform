@@ -1,11 +1,15 @@
 - hosts: localhost
   vars:
     password: password
+    crc_enabled: ${crc_enabled}
+    snc_enabled: ${snc_enabled}
     ddns_enabled: ${ddns_enabled}
   tasks:
 
     - name: setup yum-utils
       yum: name=yum-utils state=present
+    - name: setup git
+      yum: name=git state=present
     - name: setup device-mapper-persistent-data
       yum: name=device-mapper-persistent-data state=present
     - name: setup lvm2
@@ -71,23 +75,72 @@
         group: crcuser
         owner: crcuser
         creates: /home/crcuser/crc/
+      when: crc_enabled
     - name: Rename crc directory
       command: mv /home/crcuser/crc-linux-1.22.0-amd64/ /home/crcuser/crc/
+      when: crc_enabled
     - name: crc consent-telemetry
       become_user: crcuser
       command: /home/crcuser/crc/crc config set consent-telemetry no
+      when: crc_enabled
     - name: crc setup
       command: runuser -l crcuser -c '/home/crcuser/crc/crc setup'
+      when: crc_enabled
     - name: crc config set memory
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set memory ${crc_memory}'
+      when: crc_enabled
     - name: crc config set enable-cluster-monitoring
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set enable-cluster-monitoring ${crc_monitoring_enabled}'
+      when: crc_enabled
     - name: crc config set pull-secret-file
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set pull-secret-file /home/crcuser/pull-secret.txt'
+      when: crc_enabled
     - name: install crc systemd unit file
       template: src=crc.j2 dest=/etc/systemd/system/crc.service
+      when: crc_enabled
     - name: start crc
       systemd: state=started name=crc daemon_reload=yes enabled=yes
-    - name: Change PATH
+      when: crc_enabled
+    - name: Change PATH CRC
       shell: echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" > /etc/environment
       become: true
+      when: crc_enabled
+    - name: SNC deps pre-install
+      shell: |
+        dnf -y module install virt
+        dnf -y install virt-install virt-viewer
+        echo -e 'listen_tls = 0\nlisten_tcp = 1\ntcp_port = "16509"\nauth_tcp = "none"' | tee -a /etc/libvirt/libvirtd.conf
+        sed -i 's/LIBVIRTD_ARGS="--timeout 120"/#LIBVIRTD_ARGS="--timeout 120"/' /etc/sysconfig/libvirtd
+        sed -i 's/#LIBVIRTD_ARGS="--listen"/LIBVIRTD_ARGS="--listen"/' /etc/sysconfig/libvirtd
+        systemctl mask libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tls.socket libvirtd-tcp.socket
+        echo "net.ipv4.ip_forward = 1" | tee /etc/sysctl.d/99-ipforward.conf
+        sysctl -p /etc/sysctl.d/99-ipforward.conf
+    - name: libvirtd service
+      systemd: state=started name=libvirtd daemon_reload=yes enabled=yes
+    - name: SNC pre-install
+      shell: |
+        mkdir /home/crcuser/snc
+        git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
+        cd /home/crcuser/snc
+        cat <<EOF > install.sh
+        export OPENSHIFT_VERSION="4.6.18"
+        export OPENSHIFT_PULL_SECRET_PATH="/home/crcuser/pull-secret.txt"
+        export CRC_BASE_DOMAIN="127.0.0.1.nip.io"
+        nohup ./snc.sh 2>&1 &
+        EOF
+        chmod +x install.sh
+      become: yes
+      become_user: "crcuser"
+      when: snc_enabled
+    - name: SNC install
+      ansible.builtin.shell: /home/crcuser/snc/install.sh &> install.out
+      args:
+        chdir: /home/crcuser/snc
+      become: yes
+      become_user: "crcuser"
+      when: snc_enabled
+    - name: Change PATH SNC
+      shell: |
+        echo "PATH=$PATH:/home/crcuser/snc/openshift-clients/linux" > /etc/environment
+        echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" > /etc/environment
+      when: snc_enabled
