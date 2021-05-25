@@ -2,6 +2,8 @@
 
 // set asciidoc attributes
 :toc:       macro
+:toclevels: 5
+:sectnumlevels: 5
 :numbered:  1
 :data-uri:  1
 :icons:     1
