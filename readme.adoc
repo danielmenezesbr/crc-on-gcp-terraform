@@ -14,10 +14,19 @@
 :sectlinks: 1
 //:sectanchors: 1
 
+
+toc::[]
+
+<<<
+:numbered:
+
+<<<
+
 == CRC (CodeReady Containers) on GCP (Google Cloud Platform)
 
 This repository provides an automated way to provision
 https://developers.redhat.com/products/codeready-containers/overview[CRC]
+ / https://github.com/code-ready/snc[SNC]
 on https://cloud.google.com/[GCP].
 
 === CRC vs SNC
