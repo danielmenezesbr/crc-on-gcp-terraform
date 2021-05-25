@@ -1,5 +1,5 @@
 variable "crc_enabled" {
-  default = "tue"
+  default = "true"
 }
 
 variable "snc_enabled" {
@@ -80,4 +80,14 @@ variable "docker_password" {
 
 variable "ddns_password" {
   default = ""
+}
+
+locals {
+  validate_fet_code_cnd = var.crc_enabled == var.snc_enabled
+  validate_fet_code_msg = "Error. crc_enabled and snc_enabled have the same value."
+  validate_fet_code_chk = regex(
+      "^${local.validate_fet_code_msg}$",
+      ( !local.validate_fet_code_cnd
+        ? local.validate_fet_code_msg
+        : "" ) )
 }

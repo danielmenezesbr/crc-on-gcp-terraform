@@ -1,134 +1,170 @@
-# CRC (CodeReady Containers) on GCP (Google Cloud Platform)
+// vim: set syntax=asciidoc:
 
-This repository provides an automated way 
-to provision [CRC](https://developers.redhat.com/products/codeready-containers/overview) 
-on [GCP](https://cloud.google.com/).
+// set asciidoc attributes
+:toc:       macro
+:numbered:  1
+:data-uri:  1
+:icons:     1
+:sectids:   1
+:iconsdir: /usr/local/etc/asciidoc/images/icons
 
-## CRC vs SNC
+// create blank lines, from: http://bit.ly/1PeszRa
+:blank: pass:[ +]
+
+:sectlinks: 1
+//:sectanchors: 1
+
+== CRC (CodeReady Containers) on GCP (Google Cloud Platform)
+
+This repository provides an automated way to provision
+https://developers.redhat.com/products/codeready-containers/overview[CRC]
+on https://cloud.google.com/[GCP].
+
+=== CRC vs SNC
+
 TODO:
 
-## <a name="SettingUp">Setting Up Your Development Environment</a>
 
-Go to [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal) and run the following commands:
+=== Setting Up Your Development Environment
+
+Go to https://shell.cloud.google.com/?hl=en_US&show=terminal[Cloud
+Shell] and run the following commands:
 
 Create new project:
-```bash
+
+[source,bash]
+----
 export TF_VAR_PROJECT_ID=$(python3 -c 'import uuid; print("c" + str(uuid.uuid4().hex[:29]))')
 echo "Project ID:" $TF_VAR_PROJECT_ID
 gcloud projects create $TF_VAR_PROJECT_ID --name="CRConGCP" --labels=type=crc --format="json" --quiet
 gcloud config set project $TF_VAR_PROJECT_ID
-```
+----
 
 Link new project to a billing account:
 
-```bash
+[source,bash]
+----
 export ACCOUNT_ID=$(gcloud alpha billing accounts list --filter='open:TRUE' --format='value(ACCOUNT_ID)' --limit=1)
 echo "Billing ACCOUNT ID:" $ACCOUNT_ID
 gcloud alpha billing projects link $TF_VAR_PROJECT_ID --billing-account $ACCOUNT_ID
-```
+----
 
 Enable compute API:
-```bash
+
+[source,bash]
+----
 gcloud services enable compute.googleapis.com
-```
+----
 
 Download and config Terraform:
-```bash
+
+[source,bash]
+----
 wget https://releases.hashicorp.com/terraform/0.13.6/terraform_0.13.6_linux_amd64.zip
 unzip terraform_0.13.6_linux_amd64.zip
 export PATH=~:$PATH
 git clone https://github.com/danielmenezesbr/crc-on-gcp-terraform
 cd crc-on-gcp-terraform
 terraform init
-```
+----
 
-Create a [service account](https://cloud.google.com/iam/docs/service-accounts). Terraform uses the service account to provision the environment in GCP.
-```bash
+Create a https://cloud.google.com/iam/docs/service-accounts[service
+account]. Terraform uses the service account to provision the
+environment in GCP.
+
+[source,bash]
+----
 gcloud iam service-accounts create terraformuser
 gcloud iam service-accounts keys create "terraform.key.json" --iam-account "terraformuser@$TF_VAR_PROJECT_ID.iam.gserviceaccount.com"
 gcloud projects add-iam-policy-binding $TF_VAR_PROJECT_ID --member "serviceAccount:terraformuser@$TF_VAR_PROJECT_ID.iam.gserviceaccount.com" --role 'roles/owner'
-```
+----
 
-Create pull-secret.txt. Go to [https://cloud.redhat.com/openshift/create/local](https://cloud.redhat.com/openshift/create/local]) >
-`Copy pull secret` and paste below:
+Create pull-secret.txt. Go to
+https://cloud.redhat.com/openshift/create/local][https://cloud.redhat.com/openshift/create/local]
+> `Copy pull secret` and paste below:
 
-```
+....
 cat >pull-secret.txt <<EOL
 PASTE HERE
 EOL
-```
+....
 
-We will generate the ssh keys which we will use later to access 
-our instance from our laptop.
+We will generate the ssh keys which we will use later to access our
+instance from our laptop.
 
-```
+....
 ssh-keygen -t rsa -f crcuser_key -C crcuser -q -N ""
-```
+....
 
 The previous command generates two files:
-* `crcuser_key`: private key which we can use to access the instance 
+
+* `crcuser_key`: private key which we can use to access the instance
 remotely with an ssh client
 * `crcuser_key.pub`: public key that will be included in our instance.
 
-### DDNS (optinal)
+==== DDNS (optinal)
 
-The current configuration uses an ephemeral IP in the GCP instance. 
-This means that when the machine is initialized, 
-a new IP can be assigned.
+The current configuration uses an ephemeral IP in the GCP instance. This
+means that when the machine is initialized, a new IP can be assigned.
 
-Instead of working with IP, it is more practical to use a DNS. 
-To do this, we can optionally configure a free DDNS (Dynamic DNS) 
-service, for example, 
-[https://freedns.afraid.org/](https://freedns.afraid.org/)
+Instead of working with IP, it is more practical to use a DNS. To do
+this, we can optionally configure a free DDNS (Dynamic DNS) service, for
+example, https://freedns.afraid.org/[https://freedns.afraid.org/]
 
 DDNS setup is optional.
 
 Create a subdomain that looks like this:
 
-![subdomain](https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/master/ddns-subdomain.png?raw=true)
+image:https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/master/ddns-subdomain.png?raw=true[subdomain]
 
-
-When we set up DDNS, we also need a 
-[Docker Hub](https://hub.docker.com/) account.
+When we set up DDNS, we also need a https://hub.docker.com/[Docker Hub]
+account.
 
 Set the following variables in `variable.tf`:
+
 * ddns_enabled (value true)
 * ddns_login
 * ddns_hostname
 * docker_login
 
 Sensitive variables such as passwords must be set in `secrets.tfvars`:
+
 * ddns_password
 * docker_password
 
-```bash
+[source,bash]
+----
 cat >secrets.tfvars <<EOL
 ddns_password = "YOUR_PASSWORD"
 docker_password = "YOUR_PASSWORD"
 EOL
-```
+----
 
 Adjust other parameters in `variables.tf` if necessary.
 
-### Terraform
+==== Terraform
 
 Provision the environment:
-```bash
+
+[source,bash]
+----
 terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
-```
+----
 
 Access the instance via SSH:
-```bash
+
+[source,bash]
+----
 gcloud compute ssh crc-build-1 --zone=us-central1-a --quiet
-```
+----
 
 Wait about 25 minutes for the message "Started the OpenShift cluster"
 
-``` 
+....
 sudo tail -f /var/log/messages -n +1 | grep runuser
-```
+....
 
-```
+....
 ...
 Apr 17 16:16:51 crc-build-1 runuser[51541]: Started the OpenShift cluster
 Apr 17 16:16:51 crc-build-1 runuser[51541]: To access the cluster, first set up your environment by following the instructions returned by executing 'crc oc-env'.
@@ -136,139 +172,143 @@ Apr 17 16:16:51 crc-build-1 runuser[51541]: Then you can access your cluster by 
 Apr 17 16:16:51 crc-build-1 runuser[51541]: To login as a cluster admin, run 'oc login -u kubeadmin -p ABCD-EFG-hLQZX-VI9Kg https://api.crc.testing:6443'.
 Apr 17 16:16:51 crc-build-1 runuser[51541]: You can also run 'crc console' and use the above credentials to access the OpenShift web console.
 Apr 17 16:16:51 crc-build-1 runuser[51541]: The console will open in your default browser.
-```
+....
 
 At this point your environment is ready!
 
-## crc and oc command line tools
+=== crc and oc command line tools
 
-The `crcuser` operating system user runs CRC.
-The password for `crcuser` is `password`.
+The `crcuser` operating system user runs CRC. The password for `crcuser`
+is `password`.
 
-After accessing the instance via gcloud/SSH, 
-change to the `crcuser` user if you 
-want to run `crc` or  [`oc`](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html). 
+After accessing the instance via gcloud/SSH, change to the `crcuser`
+user if you want to run `crc` or
+https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html[`oc`].
 For example:
 
-```
+....
 su - crcuser
-```
+....
 
-```
+....
 crc status
-```
+....
 
-```
+....
 CRC VM:          Running
 OpenShift:       Starting (v4.6.15)
 Disk Usage:      13.16GB of 32.72GB (Inside the CRC VM)
 Cache Usage:     14.31GB
 Cache Directory: /home/crcuser/.crc/cache
-```
+....
 
-```
+....
 oc login -u kubeadmin -p $(crc console --credentials | awk -F "kubeadmin" '{print $2}' | cut -c 5- | rev | cut -c31- | rev) https://api.crc.testing:6443
-```
+....
 
-```
+....
 Login successful.
 
 You have access to 58 projects, the list has been suppressed. You can list all projects with ' projects'
 
 Using project "default".
-```
+....
 
-```
+....
 oc get nodes
-```
+....
 
-```
+....
 NAME                 STATUS   ROLES           AGE   VERSION
 crc-ctj2r-master-0   Ready    master,worker   74d   v1.19.0+1833054
-```
+....
 
-## DDNS (Dynamic DNS)
+=== DDNS (Dynamic DNS)
 
 TODO:
 
-## Access OpenShift Console from your laptop
+=== Access OpenShift Console from your laptop
 
-### SSH port fordward
+==== SSH port fordward
 
-After installing the [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
-on your laptop, execute the commands in order to forward the 
-local ports 80 and 443 to the IP which CRC meets the requests.
+After installing the https://cloud.google.com/sdk/docs/install[Google
+Cloud SDK (gcloud)] on your laptop, execute the commands in order to
+forward the local ports 80 and 443 to the IP which CRC meets the
+requests.
 
-```
+....
 gcloud auth login
-```
+....
 
-```
+....
 export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
-```
+....
 
 For CRC:
-```
+
+....
 gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.130.11:80 -L 443:192.168.130.11:443 -N
-```
+....
 
 For SNC:
-```
-gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.126.11:80 -L 443:192.168.126.11:443 -N
-```
 
-Tip for Windows users: use a shell bash like "Git Bash" to execute 
-the previous commands. Also, install Python 3.9 manually and set 
-CLOUDSDK_PYTHON after opening Git Bash: 
+....
+gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.126.11:80 -L 443:192.168.126.11:443 -N
+....
+
+Tip for Windows users: use a shell bash like "Git Bash" to execute the
+previous commands. Also, install Python 3.9 manually and set
+CLOUDSDK_PYTHON after opening Git Bash:
 `export CLOUDSDK_PYTHON='/c/Python39/python.exe'`
 
-TODO: talk about autossh 
+TODO: talk about autossh
 
-### add hosts file
+==== add hosts file
 
-#### For CRC
+===== For CRC
 
 Add at least the following information to the hosts file:
 
-```
+....
 127.0.0.1 api.crc.testing
 127.0.0.1 oauth-openshift.apps-crc.testing
 127.0.0.1 console-openshift-console.apps-crc.testing
 127.0.0.1 default-route-openshift-image-registry.apps-crc.testing
-```
+....
 
-Whenever you create a route on the OCP and you want to access from 
-your laptop, appropriately change the hosts file.
+Whenever you create a route on the OCP and you want to access from your
+laptop, appropriately change the hosts file.
 
 TODO: talk about dnsmasq
 
-#### For SNC
+===== For SNC
 
-SNC configuration uses subdomain 127.0.0.1.nip.io. This means that when accessing the instance remotely there is no need to change the hosts file as * .127.0.0.1.nip.io will be resolved to 127.0.0.1
+SNC configuration uses subdomain 127.0.0.1.nip.io. This means that when
+accessing the instance remotely there is no need to change the hosts
+file as * .127.0.0.1.nip.io will be resolved to 127.0.0.1
 
-### OpenShift Web Console
+==== OpenShift Web Console
 
-##### For CRC
+===== For CRC
 
-[https://console-openshift-console.apps-crc.testing/](https://console-openshift-console.apps-crc.testing/)
+https://console-openshift-console.apps-crc.testing/[https://console-openshift-console.apps-crc.testing/]
 
-##### For SNC
+===== For SNC
 
-[https://console-openshift-console.apps-crc.127.0.0.1.nip.io/](https://console-openshift-console.apps-crc.127.0.0.1.nip.io/)
+https://console-openshift-console.apps-crc.127.0.0.1.nip.io/[https://console-openshift-console.apps-crc.127.0.0.1.nip.io/]
 
+=== Troubleshooting
 
-## Troubleshooting
+==== Change CRC version
 
-### Change CRC version
 TODO:
 
+=== Cleanup
 
-## <a name="Cleanup">Cleanup</a>
+Go to https://shell.cloud.google.com/?hl=en_US&show=terminal[Cloud
+Shell] and run the following commands:
 
-Go to [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal)
-and run the following commands:
-
-```
+....
 export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
 cd ~/crc-on-gcp-terraform/
 terraform destroy -auto-approve
@@ -276,4 +316,4 @@ gcloud projects delete $TF_VAR_PROJECT_ID --quiet
 cd ~
 rm terraform*
 rm crc-on-gcp-terraform/ -Rf
-```
+....
