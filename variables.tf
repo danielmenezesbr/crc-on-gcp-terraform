@@ -6,6 +6,19 @@ variable "snc_enabled" {
   default = "false"
 }
 
+variable "gcp_vm_preemptible" {
+  default = "true"
+}
+
+variable "gcp_vm_type" {
+  default = "n1-standard-8"
+}
+
+variable "gcp_vm_disk_type" {
+  default = "pd-standard"
+  description = "pd-standard or pd-ssd"
+}
+
 variable "region" {
   default = "us-central1-a"
 }
@@ -28,10 +41,6 @@ variable "subnetwork-region" {
 
 variable "network" {
   default = "crc-network"
-}
-
-variable "vm_type" {
-  default = "n1-standard-8"
 }
 
 variable "os" {

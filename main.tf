@@ -69,11 +69,11 @@ data "template_file" "aut_yml" {
 }
 
 resource "google_compute_instance" "crc-build-box" {
-  count = "${var.vmcount}"
+  count = var.vmcount
   name = "${var.instance-name}-${count.index + 1}"
-  machine_type = "${var.vm_type}"
+  machine_type = var.gcp_vm_type
 
-  zone = "${var.region}"
+  zone = var.region
 
   #min_cpu_platform = "Intel Haswell"
 
@@ -88,14 +88,14 @@ resource "google_compute_instance" "crc-build-box" {
   
   scheduling {
     automatic_restart = false
-    #preemptible = true
+    preemptible = var.gcp_vm_preemptible
   }
 
   boot_disk {
     initialize_params {
       image = "${google_compute_image.crcimg.self_link}"
-      type  = "pd-standard"
-      size  = "${var.disk-size}"
+      type  = var.gcp_vm_disk_type
+      size  = var.disk-size
     }
   }
 
