@@ -17,7 +17,11 @@
 //:sectanchors: 1
 
 ifdef::env-github[]
-:imagesdir: foo/
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
 endif::[]
 
 toc::[]
@@ -309,7 +313,7 @@ Cache Directory: /home/crcuser/.crc/cache
 ====== For SNC
 
 It is not necessary to "oc login" because
-KUBE_CONFIG is already configured.
+`KUBECONFIG` is already configured.
 
 [source,bash]
 ----
