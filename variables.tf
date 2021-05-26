@@ -25,6 +25,12 @@ variable "region" {
 
 variable "project_id" {
   default = ""
+  validation {
+    condition = (
+    length(var.project_id) > 0
+    )
+    error_message = "project_id is required"
+  }
 }
 
 variable "vmcount" {
