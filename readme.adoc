@@ -126,7 +126,8 @@ Adjust other parameters in `variables.tf` if necessary.
 ////
 TODO:
 
-rename: see all var em main.tf and variables.tf
+ - see all var em main.tf and variables.tf
+ - auto-start SNC
 
  - Machine Type
  - IP ephemeral
@@ -224,6 +225,7 @@ tail -f /home/crcuser/snc/install.out
 
 [source,bash]
 ----
+...
 + oc get pod --no-headers --all-namespaces
 + grep -v Running
 + grep -v Completed
@@ -251,10 +253,7 @@ pod "revision-pruner-9-crc-2mx9v-master-0" deleted
 ./snc.sh: line 1: kill: (56811) - No such process
 + true
 ----
-<1> "return 0" indicates...
-
-
-TODO:
+<1> "return 0" indicates SNC is ready.
 
 == command line tools
 
@@ -291,11 +290,8 @@ You have access to 58 projects, the list has been suppressed. You can list all p
 Using project "default".
 ----
 
-====== For SNC
+crc command line is available:
 
-TODO:
-
-=== crc
 [source,bash]
 ----
 crc status
@@ -308,6 +304,29 @@ OpenShift:       Starting (v4.6.15)
 Disk Usage:      13.16GB of 32.72GB (Inside the CRC VM)
 Cache Usage:     14.31GB
 Cache Directory: /home/crcuser/.crc/cache
+----
+
+====== For SNC
+
+It is not necessary to "oc login" because
+KUBE_CONFIG is already configured.
+
+[source,bash]
+----
+oc get nodes
+----
+
+[source,bash]
+----
+NAME                 STATUS   ROLES           AGE   VERSION
+crc-2mx9v-master-0   Ready    master,worker   25h   v1.19.0+f173eb4
+----
+
+Show kubeadmin password:
+
+[source,bash]
+----
+cat /home/crcuser/snc/crc-tmp-install-data/auth/kubeadmin-password
 ----
 
 == Access OpenShift Console from your laptop
