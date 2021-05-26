@@ -2,8 +2,8 @@
 
 // set asciidoc attributes
 :toc:       macro
-:toclevels: 5
-:sectnumlevels: 5
+:toclevels: 10
+:sectnumlevels: 10
 :numbered:  1
 :data-uri:  1
 :icons:     1
@@ -16,27 +16,31 @@
 :sectlinks: 1
 //:sectanchors: 1
 
+ifdef::env-github[]
+:imagesdir: foo/
+endif::[]
 
 toc::[]
 
 <<<
 :numbered:
 
+
 <<<
 
-== CRC (CodeReady Containers) on GCP (Google Cloud Platform)
+= CRC (CodeReady Containers) / SNC (Single Node Cluster) on GCP (Google Cloud Platform)
 
 This repository provides an automated way to provision
 https://developers.redhat.com/products/codeready-containers/overview[CRC]
- / https://github.com/code-ready/snc[SNC]
+/ https://github.com/code-ready/snc[SNC]
 on https://cloud.google.com/[GCP].
 
-=== CRC vs SNC
+== CRC vs SNC
 
 TODO:
 
 
-=== Setting Up Your Development Environment
+== Setting Up Your Development Environment
 
 Go to https://shell.cloud.google.com/?hl=en_US&show=terminal[Cloud
 Shell] and run the following commands:
@@ -94,18 +98,20 @@ Create pull-secret.txt. Go to
 https://cloud.redhat.com/openshift/create/local][https://cloud.redhat.com/openshift/create/local]
 > `Copy pull secret` and paste below:
 
-....
+[source,bash]
+----
 cat >pull-secret.txt <<EOL
 PASTE HERE
 EOL
-....
+----
 
 We will generate the ssh keys which we will use later to access our
 instance from our laptop.
 
-....
+[source,bash]
+----
 ssh-keygen -t rsa -f crcuser_key -C crcuser -q -N ""
-....
+----
 
 The previous command generates two files:
 
@@ -113,7 +119,227 @@ The previous command generates two files:
 remotely with an ssh client
 * `crcuser_key.pub`: public key that will be included in our instance.
 
-==== DDNS (optinal)
+Adjust other parameters in `variables.tf` if necessary.
+
+=== Customizations
+
+////
+TODO:
+
+rename: see all var em main.tf and variables.tf
+
+ - Machine Type
+ - IP ephemeral
+ - Preemptive VM
+////
+
+|===
+|Parameter |Default |Description
+
+|CRC or SNC
+|CRC
+|To enabled SNC change variables.tf:
+
+Set false to crc_enabled and
+set true to snc_enabled
+
+|DDNS
+|disabled
+| <<link-ddns, DDNS setup>>
+
+|===
+
+
+=== Terraform
+
+Provision the environment:
+
+[source,bash]
+----
+terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
+----
+
+Access the instance via SSH:
+
+[source,bash]
+----
+gcloud compute ssh crc-build-1 --zone=us-central1-a --quiet
+----
+
+=== Checking if the environment is ready
+
+==== For CRC
+
+Wait about 25 minutes for the message "Started the OpenShift cluster"
+
+[source,bash]
+----
+sudo tail -f /var/log/messages -n +1 | grep runuser
+----
+
+[source,bash]
+----
+...
+Apr 17 16:16:51 crc-build-1 runuser[51541]: Started the OpenShift cluster
+Apr 17 16:16:51 crc-build-1 runuser[51541]: To access the cluster, first set up your environment by following the instructions returned by executing 'crc oc-env'.
+Apr 17 16:16:51 crc-build-1 runuser[51541]: Then you can access your cluster by running 'oc login -u developer -p developer https://api.crc.testing:6443'.
+Apr 17 16:16:51 crc-build-1 runuser[51541]: To login as a cluster admin, run 'oc login -u kubeadmin -p ABCD-EFG-hLQZX-VI9Kg https://api.crc.testing:6443'.
+Apr 17 16:16:51 crc-build-1 runuser[51541]: You can also run 'crc console' and use the above credentials to access the OpenShift web console.
+Apr 17 16:16:51 crc-build-1 runuser[51541]: The console will open in your default browser.
+----
+
+At this point your CRC environment is ready!
+
+==== For SNC
+
+TODO:
+
+== command line tools
+
+=== oc
+
+The `crcuser` operating system user runs CRC / SNC. The password for `crcuser`
+is `password`.
+
+After accessing the instance via gcloud/SSH, change to the `crcuser`
+user if you want to run `crc` or
+https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html[`oc`].
+For example:
+
+[source,bash]
+----
+su - crcuser
+----
+
+===== oc login
+
+====== For CRC
+
+[source,bash]
+----
+oc login -u kubeadmin -p $(crc console --credentials | awk -F "kubeadmin" '{print $2}' | cut -c 5- | rev | cut -c31- | rev) https://api.crc.testing:6443
+----
+
+[source,bash]
+----
+Login successful.
+
+You have access to 58 projects, the list has been suppressed. You can list all projects with ' projects'
+
+Using project "default".
+----
+
+====== For SNC
+
+TODO:
+
+=== crc
+[source,bash]
+----
+crc status
+----
+
+[source,bash]
+----
+CRC VM:          Running
+OpenShift:       Starting (v4.6.15)
+Disk Usage:      13.16GB of 32.72GB (Inside the CRC VM)
+Cache Usage:     14.31GB
+Cache Directory: /home/crcuser/.crc/cache
+----
+
+== Access OpenShift Console from your laptop
+
+=== SSH port fordward
+
+After installing the https://cloud.google.com/sdk/docs/install[Google
+Cloud SDK (gcloud)] on your laptop, execute the commands in order to
+forward the local ports 80 and 443 to the IP which CRC meets the
+requests.
+
+[source,bash]
+----
+gcloud auth login
+----
+
+[source,bash]
+----
+export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
+----
+
+==== For CRC
+
+[source,bash]
+----
+gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.130.11:80 -L 443:192.168.130.11:443 -N
+----
+
+==== For SNC
+
+[source,bash]
+----
+gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.126.11:80 -L 443:192.168.126.11:443 -N
+----
+[NOTE]
+====
+Tip for Windows users: use a shell bash like "Git Bash" to execute the
+previous commands. Also, install Python 3.9 manually and set
+CLOUDSDK_PYTHON after opening Git Bash:
+
+[source,bash]
+----
+export CLOUDSDK_PYTHON='/c/Python39/python.exe'
+----
+====
+
+TODO: talk about autossh
+
+=== add hosts file
+
+==== For CRC
+
+Add at least the following information to the hosts file:
+
+[source,bash]
+----
+127.0.0.1 api.crc.testing
+127.0.0.1 oauth-openshift.apps-crc.testing
+127.0.0.1 console-openshift-console.apps-crc.testing
+127.0.0.1 default-route-openshift-image-registry.apps-crc.testing
+----
+
+Whenever you create a route on the OCP and you want to access from your
+laptop, appropriately change the hosts file.
+
+TODO: talk about dnsmasq
+
+==== For SNC
+
+SNC configuration uses subdomain 127.0.0.1.nip.io. This means that when
+accessing the instance remotely there is no need to change the hosts
+file as * .127.0.0.1.nip.io will be resolved to 127.0.0.1
+
+=== OpenShift Web Console
+
+==== For CRC
+
+https://console-openshift-console.apps-crc.testing/[https://console-openshift-console.apps-crc.testing/]
+
+==== For SNC
+
+https://console-openshift-console.apps-crc.127.0.0.1.nip.io/[https://console-openshift-console.apps-crc.127.0.0.1.nip.io/]
+
+== Troubleshooting
+
+=== Change CRC version
+
+TODO:
+
+== Advanced configurations
+
+[[link-ddns]]
+
+=== DDNS (optinal)
 
 The current configuration uses an ephemeral IP in the GCP instance. This
 means that when the machine is initialized, a new IP can be assigned.
@@ -151,175 +377,13 @@ docker_password = "YOUR_PASSWORD"
 EOL
 ----
 
-Adjust other parameters in `variables.tf` if necessary.
-
-==== Terraform
-
-Provision the environment:
-
-[source,bash]
-----
-terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
-----
-
-Access the instance via SSH:
-
-[source,bash]
-----
-gcloud compute ssh crc-build-1 --zone=us-central1-a --quiet
-----
-
-Wait about 25 minutes for the message "Started the OpenShift cluster"
-
-....
-sudo tail -f /var/log/messages -n +1 | grep runuser
-....
-
-....
-...
-Apr 17 16:16:51 crc-build-1 runuser[51541]: Started the OpenShift cluster
-Apr 17 16:16:51 crc-build-1 runuser[51541]: To access the cluster, first set up your environment by following the instructions returned by executing 'crc oc-env'.
-Apr 17 16:16:51 crc-build-1 runuser[51541]: Then you can access your cluster by running 'oc login -u developer -p developer https://api.crc.testing:6443'.
-Apr 17 16:16:51 crc-build-1 runuser[51541]: To login as a cluster admin, run 'oc login -u kubeadmin -p ABCD-EFG-hLQZX-VI9Kg https://api.crc.testing:6443'.
-Apr 17 16:16:51 crc-build-1 runuser[51541]: You can also run 'crc console' and use the above credentials to access the OpenShift web console.
-Apr 17 16:16:51 crc-build-1 runuser[51541]: The console will open in your default browser.
-....
-
-At this point your environment is ready!
-
-=== crc and oc command line tools
-
-The `crcuser` operating system user runs CRC. The password for `crcuser`
-is `password`.
-
-After accessing the instance via gcloud/SSH, change to the `crcuser`
-user if you want to run `crc` or
-https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html[`oc`].
-For example:
-
-....
-su - crcuser
-....
-
-....
-crc status
-....
-
-....
-CRC VM:          Running
-OpenShift:       Starting (v4.6.15)
-Disk Usage:      13.16GB of 32.72GB (Inside the CRC VM)
-Cache Usage:     14.31GB
-Cache Directory: /home/crcuser/.crc/cache
-....
-
-....
-oc login -u kubeadmin -p $(crc console --credentials | awk -F "kubeadmin" '{print $2}' | cut -c 5- | rev | cut -c31- | rev) https://api.crc.testing:6443
-....
-
-....
-Login successful.
-
-You have access to 58 projects, the list has been suppressed. You can list all projects with ' projects'
-
-Using project "default".
-....
-
-....
-oc get nodes
-....
-
-....
-NAME                 STATUS   ROLES           AGE   VERSION
-crc-ctj2r-master-0   Ready    master,worker   74d   v1.19.0+1833054
-....
-
-=== DDNS (Dynamic DNS)
-
-TODO:
-
-=== Access OpenShift Console from your laptop
-
-==== SSH port fordward
-
-After installing the https://cloud.google.com/sdk/docs/install[Google
-Cloud SDK (gcloud)] on your laptop, execute the commands in order to
-forward the local ports 80 and 443 to the IP which CRC meets the
-requests.
-
-....
-gcloud auth login
-....
-
-....
-export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
-....
-
-For CRC:
-
-....
-gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.130.11:80 -L 443:192.168.130.11:443 -N
-....
-
-For SNC:
-
-....
-gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.126.11:80 -L 443:192.168.126.11:443 -N
-....
-
-Tip for Windows users: use a shell bash like "Git Bash" to execute the
-previous commands. Also, install Python 3.9 manually and set
-CLOUDSDK_PYTHON after opening Git Bash:
-`export CLOUDSDK_PYTHON='/c/Python39/python.exe'`
-
-TODO: talk about autossh
-
-==== add hosts file
-
-===== For CRC
-
-Add at least the following information to the hosts file:
-
-....
-127.0.0.1 api.crc.testing
-127.0.0.1 oauth-openshift.apps-crc.testing
-127.0.0.1 console-openshift-console.apps-crc.testing
-127.0.0.1 default-route-openshift-image-registry.apps-crc.testing
-....
-
-Whenever you create a route on the OCP and you want to access from your
-laptop, appropriately change the hosts file.
-
-TODO: talk about dnsmasq
-
-===== For SNC
-
-SNC configuration uses subdomain 127.0.0.1.nip.io. This means that when
-accessing the instance remotely there is no need to change the hosts
-file as * .127.0.0.1.nip.io will be resolved to 127.0.0.1
-
-==== OpenShift Web Console
-
-===== For CRC
-
-https://console-openshift-console.apps-crc.testing/[https://console-openshift-console.apps-crc.testing/]
-
-===== For SNC
-
-https://console-openshift-console.apps-crc.127.0.0.1.nip.io/[https://console-openshift-console.apps-crc.127.0.0.1.nip.io/]
-
-=== Troubleshooting
-
-==== Change CRC version
-
-TODO:
-
-=== Cleanup
+== Cleanup
 
 Go to https://shell.cloud.google.com/?hl=en_US&show=terminal[Cloud
 Shell] and run the following commands:
 
-....
+[source,bash]
+----
 export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
 cd ~/crc-on-gcp-terraform/
 terraform destroy -auto-approve
@@ -327,4 +391,5 @@ gcloud projects delete $TF_VAR_PROJECT_ID --quiet
 cd ~
 rm terraform*
 rm crc-on-gcp-terraform/ -Rf
-....
+[source,bash]
+----

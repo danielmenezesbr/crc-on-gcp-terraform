@@ -66,8 +66,17 @@ variable "docker_login" {
   default = "danielmenezesbr"
 }
 
-variable "crc_memory" {
+variable "crc_snc_memory" {
   default = "20000"
+}
+
+variable "crc_snc_cpus" {
+  default = "7"
+}
+
+variable "snc_disk_size" {
+  default = "33285996544" # 31 GiB
+  description = "disk size"
 }
 
 variable "crc_monitoring_enabled" {

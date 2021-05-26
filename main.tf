@@ -61,7 +61,9 @@ data "template_file" "aut_yml" {
     crc_enabled: "${var.crc_enabled}"
     snc_enabled: "${var.snc_enabled}"
     crc_pull_secret = "${file("${path.module}/pull-secret.txt")}"
-    crc_memory = "${var.crc_memory}"
+    crc_snc_memory = "${var.crc_snc_memory}"
+    crc_snc_cpus = "${var.crc_snc_cpus}"
+    snc_disk_size = "${var.snc_disk_size}"
     crc_monitoring_enabled = "${var.crc_monitoring_enabled}"
   }
 }
