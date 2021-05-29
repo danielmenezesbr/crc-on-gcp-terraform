@@ -29,7 +29,7 @@ variable "project_id" {
     condition = (
     length(var.project_id) > 0
     )
-    error_message = "project_id is required"
+    error_message = "The project_id is required."
   }
 }
 
