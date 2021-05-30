@@ -108,8 +108,8 @@
     - name: SNC pre-install
       shell: |
         mkdir /home/crcuser/snc
-        #git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
-        git clone --branch fix-hardcoded-api.crc.testing https://github.com/danielmenezesbr/snc /home/crcuser/snc
+        git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
+        #git clone --branch fix-hardcoded-api.crc.testing https://github.com/danielmenezesbr/snc /home/crcuser/snc
         cd /home/crcuser/snc
         sed -i 's/domainMemory = 14336/domainMemory = ${crc_snc_memory}/' snc.sh
         sed -i 's/domainVcpu = 6/domainVcpu = ${crc_snc_cpus}/' snc.sh
