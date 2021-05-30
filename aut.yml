@@ -100,7 +100,6 @@
         systemctl mask libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tls.socket libvirtd-tcp.socket
         echo "net.ipv4.ip_forward = 1" | tee /etc/sysctl.d/99-ipforward.conf
         sysctl -p /etc/sysctl.d/99-ipforward.conf
-        echo "192.168.126.11 api.crc.127.0.0.1.nip.io" >> /etc/hosts
       when: snc_enabled
     - name: libvirtd service
       systemd: state=started name=libvirtd daemon_reload=yes enabled=yes
@@ -111,6 +110,9 @@
         git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
         #git clone --branch fix-hardcoded-api.crc.testing https://github.com/danielmenezesbr/snc /home/crcuser/snc
         cd /home/crcuser/snc
+        #patch for work with *.nip.io
+        sed -i '/if echo ${ping_status}/c\        if false; then' snc-library.sh
+        #vm customizations
         sed -i 's/domainMemory = 14336/domainMemory = ${crc_snc_memory}/' snc.sh
         sed -i 's/domainVcpu = 6/domainVcpu = ${crc_snc_cpus}/' snc.sh
         sed -i 's/volumeSize = 33285996544/volumeSize = ${snc_disk_size}/' snc.sh
