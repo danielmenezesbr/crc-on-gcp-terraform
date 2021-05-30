@@ -116,6 +116,7 @@
         sed -i 's/volumeSize = 33285996544/volumeSize = ${snc_disk_size}/' snc.sh
         cat <<EOF > install.sh
         export OPENSHIFT_VERSION="4.6.18"
+        export MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp"
         export OPENSHIFT_PULL_SECRET_PATH="/home/crcuser/pull-secret.txt"
         export CRC_BASE_DOMAIN="127.0.0.1.nip.io"
         nohup ./snc.sh 2>&1 &
