@@ -95,7 +95,7 @@ resource "google_compute_instance" "crc-build-box" {
     initialize_params {
       image = "${google_compute_image.crcimg.self_link}"
       type  = var.gcp_vm_disk_type
-      size  = var.disk-size
+      size  = var.gcp_vm_disk_size
     }
   }
 

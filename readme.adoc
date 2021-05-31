@@ -133,20 +133,48 @@ TODO:
  - see all var em main.tf and variables.tf
  - auto-start SNC
 
- - Machine Type
  - IP ephemeral
- - Preemptive VM
 ////
 
 |===
 |Parameter |Default |Description
 
-|CRC or SNC
-|CRC
+|crc_enabled / snc_enabled
+|CRC is enabled by default:
+crc_enabled = true
+snc_enabled = false
 |To enabled SNC change variables.tf:
 
-Set false to crc_enabled and
-set true to snc_enabled
+Set `false` to `crc_enabled` and
+set `true` to `snc_enabled`
+
+|gcp_vm_preemptible
+|true
+|A preemptible VM is an instance that you can create and run at a much lower price than normal instances. However there are some limitations:
+
+* Compute Engine might stop preemptible instances at any time.
+
+* Compute Engine always stops preemptible instances after they run for 24 hours.
+
+* If the preemptive VM is stopped before the environment <<link-ready, is ready>>, you must <<link-cleanup, reacreate the enviroment>>.
+
+When can you live with these limitations, preemptive VM is a good choice for users who need to reduce spending.
+
+Check the https://cloud.google.com/compute/docs/instances/preemptible[documentation] for more information on preemptive VM.
+
+Set `false` if you want to use a normal VM.
+
+|gcp_vm_type
+|n1-standard-8
+|n1-standard-8 has 8 vCPUs and 30 GB memory
+
+|gcp_vm_disk_type
+|pd-standard
+|pd-standard or pd-ssd
+
+|gcp_vm_disk_size
+|50
+|Disk size (GB)
 
 |DDNS
 |disabled
@@ -171,6 +199,7 @@ Access the instance via SSH:
 gcloud compute ssh crc-build-1 --zone=us-central1-a --quiet
 ----
 
+[[link-ready]]
 === Checking if the environment is ready
 
 ==== For CRC
@@ -462,6 +491,18 @@ docker_password = "YOUR_PASSWORD"
 EOL
 ----
 
+[[link-reecreate]]
+=== Recreate environment in case of preemption before the environment is ready.
+
+[source,bash]
+----
+export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
+export PATH=~:$PATH
+terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
+terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
+----
+
+[[link-cleanup]]
 == Cleanup
 
 Go to https://shell.cloud.google.com/?hl=en_US&show=terminal[Cloud

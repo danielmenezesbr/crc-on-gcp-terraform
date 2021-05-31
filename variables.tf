@@ -61,7 +61,7 @@ variable "disk-name" {
   default = "crcdisk"
 }
 
-variable "disk-size" {
+variable "gcp_vm_disk_size" {
   default = "50"
 }
 
