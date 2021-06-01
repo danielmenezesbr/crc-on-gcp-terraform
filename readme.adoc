@@ -141,7 +141,9 @@ TODO:
 
 |crc_enabled / snc_enabled
 |CRC is enabled by default:
+
 crc_enabled = true
+
 snc_enabled = false
 |To enabled SNC change variables.tf:
 
@@ -493,6 +495,8 @@ EOL
 
 [[link-reecreate]]
 === Recreate environment in case of preemption before the environment is ready.
+
+Recreate environment in case of preemption before the environment <<link-ready,is ready>>.
 
 [source,bash]
 ----
