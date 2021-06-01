@@ -85,6 +85,7 @@ export PATH=~:$PATH
 git clone https://github.com/danielmenezesbr/crc-on-gcp-terraform
 cd crc-on-gcp-terraform
 terraform init
+jq ... INPUT > INPUT.tmp && mv INPUT.tmp vari
 ----
 
 Create a https://cloud.google.com/iam/docs/service-accounts[service
@@ -519,5 +520,4 @@ gcloud projects delete $TF_VAR_PROJECT_ID --quiet
 cd ~
 rm terraform*
 rm crc-on-gcp-terraform/ -Rf
-[source,bash]
 ----
