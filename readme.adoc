@@ -123,8 +123,6 @@ The previous command generates two files:
 remotely with an ssh client
 * `crcuser_key.pub`: public key that will be included in our instance.
 
-Adjust other parameters in `variables.tf` if necessary.
-
 === Customizations
 
 ////
@@ -132,7 +130,6 @@ TODO:
 
  - see all var em main.tf and variables.tf
  - auto-start SNC
-
  - IP ephemeral
 ////
 
@@ -184,6 +181,7 @@ Set `false` if you want to use a normal VM.
 
 |===
 
+Adjust other parameters in `variables.tf` if necessary.
 
 === Terraform
 
