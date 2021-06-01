@@ -57,6 +57,9 @@ export TF_VAR_PROJECT_ID=$(python3 -c 'import uuid; print("c" + str(uuid.uuid4()
 echo "Project ID:" $TF_VAR_PROJECT_ID
 gcloud projects create $TF_VAR_PROJECT_ID --name="CRConGCP" --labels=type=crc --format="json" --quiet
 gcloud config set project $TF_VAR_PROJECT_ID
+echo "export TF_VAR_PROJECT_ID=\"$TF_VAR_PROJECT_ID\"" >> ~/.bash_profile
+echo "export PATH=~:$PATH" >> ~/.bash_profile
+source ~/.bash_profile
 ----
 
 Link new project to a billing account:
@@ -194,7 +197,7 @@ Provision the environment:
 
 [source,bash]
 ----
-terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
+terraform apply -var-file="secrets.tfvars" -auto-approve
 ----
 
 Access the instance via SSH:
@@ -503,10 +506,8 @@ Recreate environment in case of preemption before the environment <<link-ready,i
 
 [source,bash]
 ----
-export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
-export PATH=~:$PATH
-terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
-terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
+terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
+terraform apply -var-file="secrets.tfvars" -auto-approve
 ----
 
 [[link-cleanup]]
@@ -517,7 +518,6 @@ Shell] and run the following commands:
 
 [source,bash]
 ----
-export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
 cd ~/crc-on-gcp-terraform/
 terraform destroy -auto-approve
 gcloud projects delete $TF_VAR_PROJECT_ID --quiet
