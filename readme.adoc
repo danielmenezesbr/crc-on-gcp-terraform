@@ -85,7 +85,11 @@ export PATH=~:$PATH
 git clone https://github.com/danielmenezesbr/crc-on-gcp-terraform
 cd crc-on-gcp-terraform
 terraform init
-jq ... INPUT > INPUT.tmp && mv INPUT.tmp vari
+cat >variables.auto.tfvars.json <<EOL
+{
+  "project_id": "$TF_VAR_PROJECT_ID"
+}
+EOL
 ----
 
 Create a https://cloud.google.com/iam/docs/service-accounts[service
