@@ -1,7 +1,7 @@
 /*
 export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
 export PATH=~:$PATH
-terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
+terraform destroy -auto-approve -var="project_id=$TF_VAR_PROJECT_ID" && terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
 terraform apply -var-file="secrets.tfvars" -var="project_id=$TF_VAR_PROJECT_ID" -auto-approve
 terraform destroy -auto-approve
 sudo journalctl -u google-startup-scripts.service -f
