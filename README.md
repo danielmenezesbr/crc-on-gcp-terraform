@@ -4,6 +4,9 @@ This repository provides an automated way
 to provision [CRC](https://developers.redhat.com/products/codeready-containers/overview) 
 on [GCP](https://cloud.google.com/).
 
+## CRC vs SNC
+TODO:
+
 ## <a name="SettingUp">Setting Up Your Development Environment</a>
 
 Go to [Cloud Shell](https://shell.cloud.google.com/?hl=en_US&show=terminal) and run the following commands:
@@ -198,8 +201,20 @@ local ports 80 and 443 to the IP which CRC meets the requests.
 
 ```
 gcloud auth login
+```
+
+```
 export TF_VAR_PROJECT_ID=$(gcloud projects list --filter='name:CRConGCP' --format='value(project_id)' --limit=1)
+```
+
+For CRC:
+```
 gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.130.11:80 -L 443:192.168.130.11:443 -N
+```
+
+For SNC:
+```
+gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.126.11:80 -L 443:192.168.126.11:443 -N
 ```
 
 Tip for Windows users: use a shell bash like "Git Bash" to execute 
@@ -210,6 +225,8 @@ CLOUDSDK_PYTHON after opening Git Bash:
 TODO: talk about autossh 
 
 ### add hosts file
+
+#### For CRC
 
 Add at least the following information to the hosts file:
 
@@ -224,6 +241,20 @@ Whenever you create a route on the OCP and you want to access from
 your laptop, appropriately change the hosts file.
 
 TODO: talk about dnsmasq
+
+#### For SNC
+
+SNC configuration uses subdomain 127.0.0.1.nip.io. This means that when accessing the instance remotely there is no need to change the hosts file as * .127.0.0.1.nip.io will be resolved to 127.0.0.1
+
+### OpenShift Web Console
+
+##### For CRC
+
+[https://console-openshift-console.apps-crc.testing/](https://console-openshift-console.apps-crc.testing/)
+
+##### For SNC
+
+[https://console-openshift-console.apps-crc.127.0.0.1.nip.io/](https://console-openshift-console.apps-crc.127.0.0.1.nip.io/)
 
 
 ## Troubleshooting
