@@ -2,10 +2,14 @@
 terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
 terraform apply -var-file="secrets.tfvars" -auto-approve
 terraform destroy -auto-approve
+# CRC and SNC
 sudo journalctl -u google-startup-scripts.service -f
+# CRC
 sudo journalctl -u crc.service -f
 sudo tail -f /var/log/messages -n +1 | grep runuser
 sudo cat /var/log/messages | grep runuser
+# SNC
+tail -f /home/crcuser/snc/install.out
 */
 
 

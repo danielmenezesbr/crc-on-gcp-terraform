@@ -457,6 +457,10 @@ https://console-openshift-console.apps-crc.127.0.0.1.nip.io/[https://console-ope
 
 TODO:
 
+=== Change OpenShift version
+
+TODO:
+
 == Advanced configurations
 
 [[link-ddns]]
