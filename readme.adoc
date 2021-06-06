@@ -93,6 +93,7 @@ cat >variables.auto.tfvars.json <<EOL
   "project_id": "$TF_VAR_PROJECT_ID"
 }
 EOL
+touch secrets.tfvars
 ----
 
 Create a https://cloud.google.com/iam/docs/service-accounts[service
@@ -204,7 +205,7 @@ Access the instance via SSH:
 
 [source,bash]
 ----
-gcloud compute ssh crc-build-1 --zone=us-central1-a --quiet
+gcloud compute ssh crc-build-1 --zone=us-central1-a --quiet --project=$TF_VAR_PROJECT_ID
 ----
 
 [[link-ready]]
