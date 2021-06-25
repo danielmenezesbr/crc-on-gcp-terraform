@@ -1,0 +1,407 @@
+- hosts: localhost
+  collections:
+    - community.kubernetes
+  vars:
+    elastic_version: "elasticsearch-operator.4.6.0-202106100456"
+    jaeger_version: "jaeger-operator.v1.20.3"
+    kiali_version: "kiali-operator.v1.24.7"
+    servicemesh_version: "servicemeshoperator.v2.0.5.2"
+  tasks:
+    - name: create a namespace for the service mesh operators
+      k8s:
+        state: present
+        definition:
+          apiVersion: project.openshift.io/v1
+          kind: Project
+          metadata:
+            name: service-mesh-operators
+
+    - name: create an OperatorGroup so that the CSVs will get installed
+      k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: service-mesh-operators
+            namespace: service-mesh-operators
+
+    - name: create the CatalogSource for the snapshot
+      k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: CatalogSource
+          metadata:
+            name: redhat-operators-snapshot
+            namespace: service-mesh-operators
+          spec:
+            sourceType: grpc
+            image: quay.io/danielmenezesbr/redhat-operators-index-snapshot:2021-06-23-BUILD-41-OCPv4.6
+            displayName: Red Hat Operators Snapshot
+    - name: create elastic subscription
+      k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: service-mesh-elastic
+            namespace: service-mesh-operators
+          spec:
+            channel: "4.6"
+            source: redhat-operators-snapshot
+            sourceNamespace: service-mesh-operators
+            name: elasticsearch-operator
+            startingCSV: "{{ elastic_version }}"
+            installPlanApproval: Manual
+    - name: wait for the status of the elastic subscription to not be empty
+      k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: Subscription
+        name: service-mesh-elastic
+        namespace: service-mesh-operators
+      register: operator_subscription_out
+      until:
+        - operator_subscription_out is defined
+        - operator_subscription_out.resources is defined
+        - operator_subscription_out.resources[0] is defined
+        - operator_subscription_out.resources[0].status is defined
+        - operator_subscription_out.resources[0].status.installplan is defined
+      retries: 30
+      delay: 20
+    - name: patch the installplan to approve it
+      k8s:
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: InstallPlan
+          metadata:
+            namespace: service-mesh-operators
+            name: "{{ operator_subscription_out.resources[0].status.installplan.name }}"
+          spec:
+            approved: true
+    - name: create Jaeger subscription
+      k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: service-mesh-jaeger
+            namespace: service-mesh-operators
+          spec:
+            channel: stable
+            source: redhat-operators-snapshot
+            sourceNamespace: service-mesh-operators
+            name: jaeger-product
+            startingCSV: "{{ jaeger_version }}"
+            installPlanApproval: Manual
+    - name: wait for the status of the jaeger subscription to not be empty
+      k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: Subscription
+        name: service-mesh-jaeger
+        namespace: service-mesh-operators
+      register: operator_subscription_out
+      until:
+        - operator_subscription_out is defined
+        - operator_subscription_out.resources is defined
+        - operator_subscription_out.resources[0] is defined
+        - operator_subscription_out.resources[0].status is defined
+        - operator_subscription_out.resources[0].status.installplan is defined
+      retries: 30
+      delay: 20
+
+    - name: patch the installplan to approve it
+      k8s:
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: InstallPlan
+          metadata:
+            namespace: service-mesh-operators
+            name: "{{ operator_subscription_out.resources[0].status.installplan.name }}"
+          spec:
+            approved: true
+
+    - name: create Kiali subscription
+      k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: service-mesh-kiali
+            namespace: service-mesh-operators
+          spec:
+            channel: stable
+            source: redhat-operators-snapshot
+            sourceNamespace: service-mesh-operators
+            name: kiali-ossm
+            startingCSV: "{{ kiali_version }}"
+            installPlanApproval: Manual
+
+    - name: wait for the status of the kiali subscription to not be empty
+      k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: Subscription
+        name: service-mesh-kiali
+        namespace: service-mesh-operators
+      register: operator_subscription_out
+      until:
+        - operator_subscription_out is defined
+        - operator_subscription_out.resources is defined
+        - operator_subscription_out.resources[0] is defined
+        - operator_subscription_out.resources[0].status is defined
+        - operator_subscription_out.resources[0].status.installplan is defined
+      retries: 30
+      delay: 20
+
+    - name: patch the installplan to approve it
+      k8s:
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: InstallPlan
+          metadata:
+            namespace: service-mesh-operators
+            name: "{{ operator_subscription_out.resources[0].status.installplan.name }}"
+          spec:
+            approved: true
+
+    - name: create Service Mesh Operator subscription
+      k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: service-mesh-operator
+            namespace: service-mesh-operators
+          spec:
+            channel: "1.0"
+            source: redhat-operators-snapshot
+            sourceNamespace: service-mesh-operators
+            name: servicemeshoperator
+            startingCSV: "{{ servicemesh_version }}"
+            installPlanApproval: Manual
+
+    - name: wait for the status of the servicemesh subscription to not be empty
+      k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: Subscription
+        name: service-mesh-operator
+        namespace: service-mesh-operators
+      register: operator_subscription_out
+      until:
+        - operator_subscription_out is defined
+        - operator_subscription_out.resources is defined
+        - operator_subscription_out.resources[0] is defined
+        - operator_subscription_out.resources[0].status is defined
+        - operator_subscription_out.resources[0].status.installplan is defined
+      retries: 30
+      delay: 20
+
+    - name: patch the installplan to approve it
+      k8s:
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: InstallPlan
+          metadata:
+            namespace: service-mesh-operators
+            name: "{{ operator_subscription_out.resources[0].status.installplan.name }}"
+          spec:
+            approved: true
+
+    - name: wait for the CSVs to exist
+      k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: ClusterServiceVersion
+        name: "{{ item }}"
+        namespace: service-mesh-operators
+      register: csv_exists_out
+      retries: 5
+      delay: 70
+      until: csv_exists_out.resources | length > 0
+      with_items:
+        - "{{ elastic_version }}"
+        - "{{ jaeger_version }}"
+        - "{{ kiali_version }}"
+        - "{{ servicemesh_version }}"
+
+    - name: wait for the CSVs to be Succeeded
+      k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: ClusterServiceVersion
+        name: "{{ item }}"
+        namespace: service-mesh-operators
+      register: csv_exists_out
+      retries: 5
+      delay: 70
+      until: csv_exists_out.resources[0].status.phase == "Succeeded"
+      with_items:
+        - "{{ elastic_version }}"
+        - "{{ jaeger_version }}"
+        - "{{ kiali_version }}"
+        - "{{ servicemesh_version }}"
+
+    - name: create a namespace for the service mesh control plane
+      k8s:
+        state: present
+        definition:
+          apiVersion: project.openshift.io/v1
+          kind: Project
+          metadata:
+            name: istio-system
+
+    #Avoid Internal error occurred: failed calling webhook \\\\\"smcp.mutation.maistra.io\\\\\": Post \\\\\"https://maistra-admission-controller.service-mesh-operators.svc:443/mutate-smcp?timeout=10s\\\\\": dial tcp 10.217.0.64:11999: connect: connection refuse"
+    - name: Wait for maistra.
+      pause:
+        minutes: 1
+
+    - name: create service mesh control plane
+      k8s:
+        wait: yes
+        wait_condition:
+          type: Ready
+          status: "True"
+        wait_timeout: 600
+        state: present
+        definition:
+          apiVersion: maistra.io/v2
+          kind: ServiceMeshControlPlane
+          metadata:
+            name: basic
+            namespace: istio-system
+          spec:
+            version: v2.0
+            tracing:
+              type: Jaeger
+              sampling: 10000 # 100%
+            policy:
+              type: Istiod
+            telemetry:
+              type: Istiod
+            addons:
+              prometheus:
+                enabled: true
+                install:
+                  retention: 24h
+              jaeger:
+                name: jaeger
+                install:
+                  storage:
+                    type: Memory
+              kiali:
+                name: kiali
+                enabled: true
+                install:
+                  dashboard:
+                    viewOnly: false
+                    enableGrafana: true
+                    enableTracing: true
+                    enablePrometheus: true
+              grafana:
+                enabled: true
+                install:
+                  config:
+                    env: # https://grafana.com/docs/grafana/latest/administration/configuration/
+                      GF_SMTP_ENABLED: "true"
+                      GF_SMTP_HOST: "smtp.sendgrid.net:465"
+                      GF_SMTP_USER: "apikey"
+                      GF_SMTP_PASSWORD: "KEY"
+                      GF_SMTP_FROM_ADDRESS: "EMAIL@gmail.com"
+                  persistence:
+                    storageClassName: ""
+                    accessMode: ReadWriteOnce
+      retries: 5
+      delay: 30
+    - name: create ServiceMeshMemberRoll with booknfo
+      k8s:
+        definition:
+          apiVersion: maistra.io/v1
+          kind: ServiceMeshMemberRoll
+          metadata:
+            name: default
+            namespace: istio-system
+          spec:
+            members: ['bookinfo']
+
+    - name: create a namespace for bookinfo
+      k8s:
+        state: present
+        definition:
+          apiVersion: project.openshift.io/v1
+          kind: Project
+          metadata:
+            name: bookinfo
+
+    - name: Download bookinfo.yaml
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/Maistra/istio/maistra-2.0/samples/bookinfo/platform/kube/bookinfo.yaml
+        dest: ./bookinfo.yaml
+        mode: '0664'
+
+    - name: Download bookinfo-gateway.yaml
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/Maistra/istio/maistra-2.0/samples/bookinfo/networking/bookinfo-gateway.yaml
+        dest: ./bookinfo-gateway.yaml
+        mode: '0664'
+
+    - name: Download destination-rule-all-mtls.yaml
+      ansible.builtin.get_url:
+        #without mTLS
+        #url: https://raw.githubusercontent.com/Maistra/istio/maistra-2.0/samples/bookinfo/networking/destination-rule-all.yaml
+        #with mTLS
+        url: https://raw.githubusercontent.com/Maistra/istio/maistra-2.0/samples/bookinfo/networking/destination-rule-all-mtls.yaml
+        dest: ./destination-rule-all-mtls.yaml
+        mode: '0664'
+
+    - name: bookinfo.yaml
+      k8s:
+        namespace: bookinfo
+        src: ./bookinfo.yaml
+
+    - name: bookinfo-gateway.yaml
+      k8s:
+        namespace: bookinfo
+        src: ./bookinfo-gateway.yaml
+    - name: destination-rule-all-mtls.yaml
+      k8s:
+        namespace: bookinfo
+        src: ./destination-rule-all-mtls.yaml
+
+    - name: wait for bookinfo pods
+      k8s_info:
+        kind: Pod
+        namespace: bookinfo
+      register: wait_out
+      until:
+        - wait_out is defined
+        - wait_out.resources is defined
+        - wait_out.resources[0] is defined
+        - wait_out.resources[1] is defined
+        - wait_out.resources[2] is defined
+        - wait_out.resources[3] is defined
+        - wait_out.resources[4] is defined
+        - wait_out.resources[5] is defined
+        - wait_out.resources[0].status.phase == 'Running'
+        - wait_out.resources[1].status.phase == 'Running'
+        - wait_out.resources[2].status.phase == 'Running'
+        - wait_out.resources[3].status.phase == 'Running'
+        - wait_out.resources[4].status.phase == 'Running'
+        - wait_out.resources[5].status.phase == 'Running'
+      retries: 30
+      delay: 20
+
+    - name: get bookinfo route
+      k8s_info:
+        kind: Route
+        name: istio-ingressgateway
+        namespace: istio-system
+      register: bookinfo_route
+
+    - name: check productpage
+      uri:
+        url: "http://{{bookinfo_route.resources[0].spec.host}}/productpage"
+        method: GET
+        validate_certs: no
+        status_code: [200]

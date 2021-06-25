@@ -464,6 +464,22 @@ TODO:
 
 == Advanced configurations
 
+=== Red Hat Openshift Service Mesh
+
+When environment <<link-ready,is ready>>,
+you can use a script to install
+Red Hat Openshift Service Mesh on OCP 4.6:
+
+[source,bash]
+----
+su - crcuser
+git clone https://github.com/danielmenezesbr/crc-on-gcp-terraform
+cd crc-on-gcp-terraform
+./servicemesh-install-OCPv46.sh
+----
+
+The script only works on OCP 4.6.
+
 [[link-ddns]]
 
 === DDNS (optinal)

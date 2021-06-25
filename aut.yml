@@ -39,7 +39,18 @@
         dest: "/home/crcuser/pull-secret.txt"
         content: |
           ${crc_pull_secret}
+    - name: install community.kubernetes collection
+      shell: |
+        ansible-galaxy collection install community.kubernetes
+        pip3 install --upgrade --user openshift
 #CRC
+    - name: Change PATH CRC
+      shell: |
+        echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" >> /etc/environment
+        echo "KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
+        echo "K8S_AUTH_KUBECONFIG=$KUBECONFIG" >> /etc/environment
+      become: true
+      when: crc_enabled
     - name: Download and Extract CRC
       become: "true"
       become_user: "crcuser"
@@ -80,15 +91,12 @@
     - name: start crc
       systemd: state=started name=crc daemon_reload=yes enabled=yes
       when: crc_enabled
-    - name: Change PATH CRC
-      shell: echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" > /etc/environment
-      become: true
-      when: crc_enabled
 #SNC
     - name: Change PATH SNC
       shell: |
         echo "PATH=$PATH:/home/crcuser/snc/openshift-clients/linux" >> /etc/environment
         echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/environment
+        echo "K8S_AUTH_KUBECONFIG=$KUBECONFIG" >> /etc/environment
       when: snc_enabled
     - name: SNC deps pre-install
       shell: |
