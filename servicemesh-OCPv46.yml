@@ -413,8 +413,8 @@
         - wait_out.resources[3].status.phase == 'Running'
         - wait_out.resources[4].status.phase == 'Running'
         - wait_out.resources[5].status.phase == 'Running'
-      retries: 5
-      delay: 20
+      retries: 10
+      delay: 30
 
     - name: get bookinfo route
       k8s_info:
