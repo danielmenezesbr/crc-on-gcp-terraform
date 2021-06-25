@@ -37,6 +37,7 @@
             namespace: service-mesh-operators
           spec:
             sourceType: grpc
+            # https://github.com/danielmenezesbr/redhat-operators-snapshot
             image: quay.io/danielmenezesbr/redhat-operators-index-snapshot:2021-06-23-BUILD-41-OCPv4.6
             displayName: Red Hat Operators Snapshot
     - name: create elastic subscription
