@@ -262,7 +262,7 @@ You can monitor the progress of the installation with `/home/crcuser/snc/install
 
 [source,bash]
 ----
-tail -f /home/crcuser/snc/install.out
+sudo tail -f /home/crcuser/snc/install.out
 ----
 
 [source,bash]
@@ -467,18 +467,26 @@ TODO:
 === Red Hat Openshift Service Mesh
 
 When environment <<link-ready,is ready>>,
-you can use a script to install
+you can use a script (It only works on OCP 4.6)
+to install
 Red Hat Openshift Service Mesh on OCP 4.6:
 
 [source,bash]
 ----
-su - crcuser
+su - crcuser #Enter the word password when you are prompted for it
 git clone https://github.com/danielmenezesbr/crc-on-gcp-terraform
 cd crc-on-gcp-terraform
 ./servicemesh-install-OCPv46.sh
 ----
 
-The script only works on OCP 4.6.
+
+
+[source,bash]
+----
+
+----
+
+
 
 [[link-ddns]]
 

@@ -7,6 +7,29 @@
     kiali_version: "kiali-operator.v1.24.7"
     servicemesh_version: "servicemeshoperator.v2.0.5.2"
   tasks:
+
+    #https://bugzilla.redhat.com/show_bug.cgi?id=1903632
+    - name: wait for openshift-marketplace pods
+      k8s_info:
+        kind: Pod
+        namespace: openshift-marketplace
+      register: wait_out
+      until:
+        - wait_out is defined
+        - wait_out.resources is defined
+        - wait_out.resources[0] is defined
+        - wait_out.resources[1] is defined
+        - wait_out.resources[2] is defined
+        - wait_out.resources[3] is defined
+        - wait_out.resources[4] is defined
+        - wait_out.resources[0].status.phase == 'Running'
+        - wait_out.resources[1].status.phase == 'Running'
+        - wait_out.resources[2].status.phase == 'Running'
+        - wait_out.resources[3].status.phase == 'Running'
+        - wait_out.resources[4].status.phase == 'Running'
+      retries: 5
+      delay: 20
+
     - name: create a namespace for the service mesh operators
       k8s:
         state: present
@@ -390,7 +413,7 @@
         - wait_out.resources[3].status.phase == 'Running'
         - wait_out.resources[4].status.phase == 'Running'
         - wait_out.resources[5].status.phase == 'Running'
-      retries: 30
+      retries: 5
       delay: 20
 
     - name: get bookinfo route
