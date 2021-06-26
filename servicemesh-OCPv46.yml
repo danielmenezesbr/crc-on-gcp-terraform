@@ -429,3 +429,5 @@
         method: GET
         validate_certs: no
         status_code: [200]
+      retries: 5
+      delay: 30
