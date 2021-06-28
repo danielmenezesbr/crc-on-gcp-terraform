@@ -295,16 +295,16 @@ pod "revision-pruner-9-crc-2mx9v-master-0" deleted
 ./snc.sh: line 1: kill: (56811) - No such process
 + true
 ----
-<1> "return 0" indicates SNC is ready.
+<1> `+ return 0` indicates SNC is ready.
 
 == command line tools
 
-=== oc
+=== VM
 
 The `crcuser` operating system user runs CRC / SNC. The password for `crcuser`
 is `password`.
 
-After accessing the instance via gcloud/SSH, change to the `crcuser`
+After accessing the VM via gcloud/SSH, change to the `crcuser`
 user if you want to run `crc` or
 https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html[`oc`].
 For example:
@@ -313,6 +313,8 @@ For example:
 ----
 su - crcuser
 ----
+
+=== oc
 
 ===== oc login
 
@@ -535,7 +537,7 @@ Recreate environment in case of preemption before the environment <<link-ready,i
 
 [source,bash]
 ----
-terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
+terraform destroy -auto-approve
 terraform apply -var-file="secrets.tfvars" -auto-approve
 ----
 
