@@ -249,6 +249,7 @@ have been successfully installed.
 
 [source,bash]
 ----
+...
 May 26 01:52:01 crc-build-1 GCEMetadataScripts[1226]: 2021/05/26 01:52:01 GCEMetadataScripts: startup-script: PLAY RECAP *********************************************************************
 May 26 01:52:01 crc-build-1 GCEMetadataScripts[1226]: 2021/05/26 01:52:01 GCEMetadataScripts: startup-script: localhost                  : ok=19   changed=17   unreachable=0    failed=0    skipped=15   rescued=0    ignored=0
 May 26 01:52:01 crc-build-1 GCEMetadataScripts[1226]: 2021/05/26 01:52:01 GCEMetadataScripts: startup-script:
