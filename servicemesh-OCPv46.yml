@@ -93,7 +93,7 @@
         - operator_subscription_out.resources[0].status is defined
         - operator_subscription_out.resources[0].status.installplan is defined
       retries: 30
-      delay: 20
+      delay: 40
     - name: patch the installplan to approve it
       k8s:
         definition:
@@ -277,7 +277,7 @@
             name: istio-system
 
     #Avoid Internal error occurred: failed calling webhook \\\\\"smcp.mutation.maistra.io\\\\\": Post \\\\\"https://maistra-admission-controller.service-mesh-operators.svc:443/mutate-smcp?timeout=10s\\\\\": dial tcp 10.217.0.64:11999: connect: connection refuse"
-    - name: Wait for maistra.
+    - name: wait for maistra
       pause:
         minutes: 1
 
@@ -358,7 +358,7 @@
           metadata:
             name: bookinfo
 
-    - name: Download bookinfo.yaml
+    - name: download bookinfo.yaml
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/Maistra/istio/maistra-2.0/samples/bookinfo/platform/kube/bookinfo.yaml
         dest: ./bookinfo.yaml
