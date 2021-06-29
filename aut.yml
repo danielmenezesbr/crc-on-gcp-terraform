@@ -62,13 +62,6 @@
       systemd: state=started name=libvirtd daemon_reload=yes enabled=yes
       when: crc_enabled
    #temp-end
-    - name: Change PATH CRC
-      shell: |
-        echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" >> /etc/environment
-        echo "KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
-        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
-      become: true
-      when: crc_enabled
     - name: Download and Extract CRC
       become: "true"
       become_user: "crcuser"
@@ -108,6 +101,27 @@
       when: crc_enabled
     - name: start crc
       systemd: state=started name=crc daemon_reload=yes enabled=yes
+      when: crc_enabled
+    - name: Change PATH CRC
+        shell: |
+          echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" >> /etc/environment
+          echo "KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
+          echo "K8S_AUTH_KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
+        become: true
+        when: crc_enabled
+    - name: ssh config to enter inside CRC VM
+      shell: |
+        cat <<EOF > ~/.ssh/config
+        Host master
+            Hostname 192.168.130.11
+            User core
+            IdentityFile /home/crcuser/.crc/machines/crc/id_ecdsa
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+        EOF
+        chmod 600 ~/.ssh/config
+      become: yes
+      become_user: "crcuser"
       when: crc_enabled
 #SNC
     - name: Change PATH SNC
