@@ -5,7 +5,7 @@ After=libvirtd.service
 TimeoutSec=0
 [Service]
 Restart=no
-ExecStart=/usr/sbin/runuser -l crcuser -c '/home/crcuser/crc/crc start --nameserver 8.8.8.8 --log-level debug'
+ExecStart=/usr/sbin/runuser -l crcuser -c '/home/crcuser/crc/crc start --nameserver 8.8.8.8'
 
 [Install]
 WantedBy=multi-user.target
