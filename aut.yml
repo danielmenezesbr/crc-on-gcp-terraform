@@ -103,12 +103,12 @@
       systemd: state=started name=crc daemon_reload=yes enabled=yes
       when: crc_enabled
     - name: Change PATH CRC
-        shell: |
-          echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" >> /etc/environment
-          #echo "KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
-          #echo "K8S_AUTH_KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
-        become: true
-        when: crc_enabled
+      shell: |
+        echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" >> /etc/environment
+        #echo "KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
+        #echo "K8S_AUTH_KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
+      become: true
+      when: crc_enabled
 #    - name: ssh config to enter inside CRC VM
 #      shell: |
 #        cat <<EOF > ~/.ssh/config
