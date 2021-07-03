@@ -6,18 +6,21 @@ gdown --id 1F-2HzXPdKXnhDKkxnFLZmVyuXTRjv2EB
 gdown --id 12nmicIMrZBtk7EPFl_RcIG_Votn-YUI2
 tar -xf ansible29.tar.gz
 sudo dnf install *.rpm -y
-sudo cat >inadyn.conf <<EOL
+cat >/tmp/inadyn.conf <<EOL
 ${file_inadyn_conf}
 EOL
-sudo cat >myservice.j2 <<EOL
+cat >/tmp/myservice.j2 <<EOL
 ${file_myservice_j2}
 EOL
-sudo cat >crc.j2 <<EOL
+cat >/tmp/crc.j2 <<EOL
 ${file_crc_j2}
 EOL
 cat >/tmp/aut.yml <<EOL
 ${file_aut_yml}
 EOL
+cp -a /tmp/inadyn.conf .
+cp -a /tmp/myservice.j2 .
+cp -a /tmp/crc.j2 .
 cp -a /tmp/aut.yml .
 sudo ansible-playbook aut.yml
 #to check ansible logs:
