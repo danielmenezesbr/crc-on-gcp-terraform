@@ -15,7 +15,7 @@ EOL
 sudo cat >crc.j2 <<EOL
 ${file_crc_j2}
 EOL
-sudo cat >/tmp/aut.yml <<EOL
+cat >/tmp/aut.yml <<EOL
 ${file_aut_yml}
 EOL
 cp -a /tmp/aut.yml .
