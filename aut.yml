@@ -10,13 +10,6 @@
       group:
         name: libvirt
         state: present
-    - name: Allow 'libvirt' group to have passwordless sudo
-      lineinfile:
-        dest: /etc/sudoers
-        state: present
-        regexp: '^%libvirt'
-        line: '%libvirt ALL=(ALL) NOPASSWD: ALL'
-        validate: 'visudo -cf %s'
     - name: Create a login user
       user:
         name: crcuser
@@ -33,7 +26,7 @@
       become: "true"
       become_user: "crcuser"
       shell: |
-        ansible-galaxy collection install redhat-openshift-2.0.1.tar.gz
+        ansible-galaxy collection install /etc/ansible-provision/redhat-openshift-2.0.1.tar.gz
 
 #CRC
     - name: Download and Extract CRC

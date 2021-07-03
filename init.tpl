@@ -15,7 +15,10 @@ EOL
 sudo cat >crc.j2 <<EOL
 ${file_crc_j2}
 EOL
-sudo cat >aut.yml <<EOL
+sudo cat >/tmp/aut.yml <<EOL
 ${file_aut_yml}
 EOL
-sudo ansible-playbook aut.yml #to check ansible logs: sudo journalctl -u google-startup-scripts.service -f
+cp -a /tmp/aut.yml .
+sudo ansible-playbook aut.yml
+#to check ansible logs:
+#sudo journalctl -u google-startup-scripts.service -f
