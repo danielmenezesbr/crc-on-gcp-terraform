@@ -13,28 +13,6 @@ tail -f /home/crcuser/snc/install.out
 */
 
 
-resource "google_compute_disk" "crcdisk" {
-  name  = "${var.disk-name}"
-  type  = "pd-standard"
-  zone  = "${var.region}"
-  image = "${var.os}"
-
-  timeouts {
-  create = "60m"
-  }
-}
-
-resource "google_compute_image" "crcimg" {
-  name = "${var.image-name}"
-  source_disk = "${google_compute_disk.crcdisk.self_link}"
-  licenses = [
-    "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx",
-  ]
-  timeouts {
-  create = "60m"
-  }
-}
-
 data "template_file" "default" {
   template = "${file("${path.module}/init.tpl")}"
   vars = {
@@ -77,7 +55,7 @@ resource "google_compute_instance" "crc-build-box" {
 
   zone = var.region
 
-  #min_cpu_platform = "Intel Haswell"
+  min_cpu_platform = "Intel Haswell"
 
   tags = [
     "${var.network}-firewall-ssh",
@@ -95,7 +73,7 @@ resource "google_compute_instance" "crc-build-box" {
 
   boot_disk {
     initialize_params {
-      image = "${google_compute_image.crcimg.self_link}"
+      image = var.image
       type  = var.gcp_vm_disk_type
       size  = var.gcp_vm_disk_size
     }

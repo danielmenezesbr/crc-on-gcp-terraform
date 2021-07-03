@@ -49,12 +49,9 @@ variable "network" {
   default = "crc-network"
 }
 
-variable "os" {
-  default = "centos-8-v20210122"
-}
-
-variable "image-name" {
-  default = "crcimg"
+variable "image" {
+  #projects/{project}/global/images/{image}
+  default = "projects/okd4-280016/global/images/packer-1597358211"
 }
 
 variable "disk-name" {
