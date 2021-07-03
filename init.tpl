@@ -15,9 +15,8 @@ EOL
 cat >/tmp/crc.j2 <<EOL
 ${file_crc_j2}
 EOL
-cat >/tmp/aut.yml <<EOL
-${file_aut_yml}
-EOL
+echo "${file_aut_yml}"
+python3 -c 'import base64;print(str(base64.b64decode("${file_aut_yml}")))' > /tmp/aut.yml
 cp -a /tmp/inadyn.conf .
 cp -a /tmp/myservice.j2 .
 cp -a /tmp/crc.j2 .

@@ -17,7 +17,7 @@ data "template_file" "default" {
   template = "${file("${path.module}/init.tpl")}"
   vars = {
     file_inadyn_conf = "${data.template_file.inadyn_conf.rendered}"
-    file_aut_yml = "${data.template_file.aut_yml.rendered}"
+    file_aut_yml = "${base64encode(data.template_file.aut_yml.rendered)}"
     file_myservice_j2 = "${file("${path.module}/myservice.j2")}"
     file_crc_j2 = "${file("${path.module}/crc.j2")}"
   }
