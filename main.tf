@@ -55,7 +55,7 @@ resource "google_compute_instance" "crc-build-box" {
 
   zone = var.region
 
-  min_cpu_platform = "Intel Haswell"
+  #min_cpu_platform = "Intel Haswell"
 
   tags = [
     "${var.network}-firewall-ssh",
