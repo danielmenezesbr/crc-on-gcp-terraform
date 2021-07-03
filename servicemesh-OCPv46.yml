@@ -287,7 +287,7 @@
         wait_condition:
           type: Ready
           status: "True"
-        wait_timeout: 600
+        wait_timeout: 1200
         state: present
         definition:
           apiVersion: maistra.io/v2
