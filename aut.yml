@@ -22,11 +22,12 @@
         dest: "/home/crcuser/pull-secret.txt"
         content: |
           ${crc_pull_secret}
-    - name: download/install ansible and collections
+    - name: install ansible collections
       become: "true"
       become_user: "crcuser"
       shell: |
         ansible-galaxy collection install /etc/ansible-provision/redhat-openshift-2.0.1.tar.gz
+        pip3 install --upgrade --user openshift
 
 #CRC
     - name: Download and Extract CRC
