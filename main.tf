@@ -20,6 +20,7 @@ data "template_file" "default" {
     file_aut_yml = "${base64encode(data.template_file.aut_yml.rendered)}"
     file_myservice_j2 = "${file("${path.module}/myservice.j2")}"
     file_crc_j2 = "${file("${path.module}/crc.j2")}"
+    file_banner = "${file("${path.module}/banner.txt")}"
   }
 }
 
@@ -45,7 +46,6 @@ data "template_file" "aut_yml" {
     crc_snc_cpus = "${var.crc_snc_cpus}"
     snc_disk_size = "${var.snc_disk_size}"
     crc_monitoring_enabled = "${var.crc_monitoring_enabled}"
-    vm_banner = "${file("${path.module}/banner.txt")}"
   }
 }
 

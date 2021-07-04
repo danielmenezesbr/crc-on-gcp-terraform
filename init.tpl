@@ -1,4 +1,10 @@
 set -exuo pipefail
+cat >/etc/login.warn <<EOL
+${file_banner}
+EOL
+cat >/etc/motd <<EOL
+${file_banner}
+EOL
 mkdir /etc/ansible-provision;
 cd /etc/ansible-provision;
 sudo pip3 install gdown
