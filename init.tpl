@@ -7,15 +7,14 @@ ${file_banner}
 EOL
 mkdir /etc/ansible-provision;
 cd /etc/ansible-provision;
-sudo pip3 install gdown
+pip3 install gdown
 gdown --id 1F-2HzXPdKXnhDKkxnFLZmVyuXTRjv2EB
 gdown --id 12nmicIMrZBtk7EPFl_RcIG_Votn-YUI2
 tar -xf ansible29.tar.gz
+echo "setting metadata_timer_sync=0" >> /etc/dnf/dnf.conf
 rm -f -- /var/cache/dnf/metadata_lock.pid
-sudo dnf install *.rpm -y
-rm -f -- /var/cache/dnf/metadata_lock.pid
+dnf install *.rpm -y
 yum module enable -y container-tools:rhel8
-rm -f -- /var/cache/dnf/metadata_lock.pid
 yum module install -y container-tools:rhel8
 cat >/tmp/inadyn.conf <<EOL
 ${file_inadyn_conf}
@@ -32,6 +31,6 @@ cp -a /tmp/inadyn.conf .
 cp -a /tmp/myservice.j2 .
 cp -a /tmp/crc.j2 .
 cp -a /tmp/aut.yml .
-sudo ansible-playbook aut.yml
+ansible-playbook aut.yml
 #to check ansible logs:
 #sudo journalctl -u google-startup-scripts.service -f
