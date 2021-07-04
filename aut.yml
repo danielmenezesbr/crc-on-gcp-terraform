@@ -10,6 +10,13 @@
       group:
         name: libvirt
         state: present
+    - name: Allow 'libvirt' group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%libvirt'
+        line: '%libvirt ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
     - name: Create a login user
       user:
         name: crcuser
