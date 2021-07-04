@@ -142,30 +142,30 @@
       become_user: "crcuser"
       when: snc_enabled
 #DDNS
-    - name: Add Docker repo
-      get_url:
-        url: https://download.docker.com/linux/centos/docker-ce.repo
-        dest: /etc/yum.repos.d/docker-ce.repo
-      become: yes
-    - name: setup docker-ce
-      yum: name=docker-ce state=present
-    - name: start docker
-      service: name=docker.service enabled=yes state=started
-    - name: deps
-      pip:
-        name: docker-py
-    - name: Log into DockerHub
-      community.docker.docker_login:
-        username: ${docker_login}
-        password: ${docker_password}
-      when: ddns_enabled
-    - name: pull image troglobit/inadyn:latest
-      docker_image:
-        name: troglobit/inadyn:latest
-      when: ddns_enabled
-    - name: install myservice systemd unit file
-      template: src=myservice.j2 dest=/etc/systemd/system/myservice.service
-      when: ddns_enabled
-    - name: start myservice
-      systemd: state=started name=myservice daemon_reload=yes enabled=yes
-      when: ddns_enabled
+#    - name: Add Docker repo
+#      get_url:
+#        url: https://download.docker.com/linux/centos/docker-ce.repo
+#        dest: /etc/yum.repos.d/docker-ce.repo
+#      become: yes
+#    - name: setup docker-ce
+#      yum: name=docker-ce state=present
+#    - name: start docker
+#      service: name=docker.service enabled=yes state=started
+#    - name: deps
+#      pip:
+#        name: docker-py
+#    - name: Log into DockerHub
+#      community.docker.docker_login:
+#        username: ${docker_login}
+#        password: ${docker_password}
+#      when: ddns_enabled
+#    - name: pull image troglobit/inadyn:latest
+#      docker_image:
+#        name: troglobit/inadyn:latest
+#      when: ddns_enabled
+#    - name: install myservice systemd unit file
+#      template: src=myservice.j2 dest=/etc/systemd/system/myservice.service
+#      when: ddns_enabled
+#    - name: start myservice
+#      systemd: state=started name=myservice daemon_reload=yes enabled=yes
+#      when: ddns_enabled

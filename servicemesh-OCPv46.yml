@@ -1,6 +1,4 @@
 - hosts: localhost
-  collections:
-    - community.kubernetes
   vars:
     elastic_version: "elasticsearch-operator.4.6.0-202106100456"
     jaeger_version: "jaeger-operator.v1.20.3"
@@ -10,9 +8,10 @@
 
     #https://bugzilla.redhat.com/show_bug.cgi?id=1903632
     - name: wait for openshift-marketplace pods
-      k8s_info:
+      redhat.openshift.openshift_process:
         kind: Pod
         namespace: openshift-marketplace
+        state: rendered
       register: wait_out
       until:
         - wait_out is defined
@@ -31,7 +30,7 @@
       delay: 20
 
     - name: create a namespace for the service mesh operators
-      k8s:
+      redhat.openshift.k8s:
         state: present
         definition:
           apiVersion: project.openshift.io/v1
@@ -40,7 +39,7 @@
             name: service-mesh-operators
 
     - name: create an OperatorGroup so that the CSVs will get installed
-      k8s:
+      redhat.openshift.k8s:
         state: present
         definition:
           apiVersion: operators.coreos.com/v1
@@ -50,7 +49,7 @@
             namespace: service-mesh-operators
 
     - name: create the CatalogSource for the snapshot
-      k8s:
+      redhat.openshift.k8s:
         state: present
         definition:
           apiVersion: operators.coreos.com/v1alpha1
@@ -64,7 +63,7 @@
             image: quay.io/danielmenezesbr/redhat-operators-index-snapshot:2021-06-23-BUILD-41-OCPv4.6
             displayName: Red Hat Operators Snapshot
     - name: create elastic subscription
-      k8s:
+      redhat.openshift.k8s:
         state: present
         definition:
           apiVersion: operators.coreos.com/v1alpha1
@@ -80,11 +79,12 @@
             startingCSV: "{{ elastic_version }}"
             installPlanApproval: Manual
     - name: wait for the status of the elastic subscription to not be empty
-      k8s_info:
+      redhat.openshift.openshift_process:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
         name: service-mesh-elastic
         namespace: service-mesh-operators
+        state: rendered
       register: operator_subscription_out
       until:
         - operator_subscription_out is defined
@@ -95,7 +95,7 @@
       retries: 30
       delay: 40
     - name: patch the installplan to approve it
-      k8s:
+      redhat.openshift.k8s:
         definition:
           apiVersion: operators.coreos.com/v1alpha1
           kind: InstallPlan
@@ -105,7 +105,7 @@
           spec:
             approved: true
     - name: create Jaeger subscription
-      k8s:
+      redhat.openshift.k8s:
         state: present
         definition:
           apiVersion: operators.coreos.com/v1alpha1
@@ -121,11 +121,12 @@
             startingCSV: "{{ jaeger_version }}"
             installPlanApproval: Manual
     - name: wait for the status of the jaeger subscription to not be empty
-      k8s_info:
+      redhat.openshift.openshift_process:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
         name: service-mesh-jaeger
         namespace: service-mesh-operators
+        state: rendered
       register: operator_subscription_out
       until:
         - operator_subscription_out is defined
@@ -137,7 +138,7 @@
       delay: 20
 
     - name: patch the installplan to approve it
-      k8s:
+      redhat.openshift.k8s:
         definition:
           apiVersion: operators.coreos.com/v1alpha1
           kind: InstallPlan
@@ -148,7 +149,7 @@
             approved: true
 
     - name: create Kiali subscription
-      k8s:
+      redhat.openshift.k8s:
         state: present
         definition:
           apiVersion: operators.coreos.com/v1alpha1
@@ -165,11 +166,12 @@
             installPlanApproval: Manual
 
     - name: wait for the status of the kiali subscription to not be empty
-      k8s_info:
+      redhat.openshift.openshift_process:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
         name: service-mesh-kiali
         namespace: service-mesh-operators
+        state: rendered
       register: operator_subscription_out
       until:
         - operator_subscription_out is defined
@@ -181,7 +183,7 @@
       delay: 20
 
     - name: patch the installplan to approve it
-      k8s:
+      redhat.openshift.k8s:
         definition:
           apiVersion: operators.coreos.com/v1alpha1
           kind: InstallPlan
@@ -192,7 +194,7 @@
             approved: true
 
     - name: create Service Mesh Operator subscription
-      k8s:
+      redhat.openshift.k8s:
         state: present
         definition:
           apiVersion: operators.coreos.com/v1alpha1
@@ -209,11 +211,12 @@
             installPlanApproval: Manual
 
     - name: wait for the status of the servicemesh subscription to not be empty
-      k8s_info:
+      redhat.openshift.openshift_process:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
         name: service-mesh-operator
         namespace: service-mesh-operators
+        state: rendered
       register: operator_subscription_out
       until:
         - operator_subscription_out is defined
@@ -225,7 +228,7 @@
       delay: 20
 
     - name: patch the installplan to approve it
-      k8s:
+      redhat.openshift.k8s:
         definition:
           apiVersion: operators.coreos.com/v1alpha1
           kind: InstallPlan
@@ -236,11 +239,12 @@
             approved: true
 
     - name: wait for the CSVs to exist
-      k8s_info:
+      redhat.openshift.openshift_process:
         api_version: operators.coreos.com/v1alpha1
         kind: ClusterServiceVersion
         name: "{{ item }}"
         namespace: service-mesh-operators
+        state: rendered
       register: csv_exists_out
       retries: 5
       delay: 70
@@ -252,11 +256,12 @@
         - "{{ servicemesh_version }}"
 
     - name: wait for the CSVs to be Succeeded
-      k8s_info:
+      redhat.openshift.openshift_process:
         api_version: operators.coreos.com/v1alpha1
         kind: ClusterServiceVersion
         name: "{{ item }}"
         namespace: service-mesh-operators
+        state: rendered
       register: csv_exists_out
       retries: 5
       delay: 70
@@ -268,7 +273,7 @@
         - "{{ servicemesh_version }}"
 
     - name: create a namespace for the service mesh control plane
-      k8s:
+      redhat.openshift.k8s:
         state: present
         definition:
           apiVersion: project.openshift.io/v1
@@ -282,7 +287,7 @@
         minutes: 1
 
     - name: create service mesh control plane
-      k8s:
+      redhat.openshift.k8s:
         wait: yes
         wait_condition:
           type: Ready
@@ -339,7 +344,7 @@
       retries: 5
       delay: 30
     - name: create ServiceMeshMemberRoll with booknfo
-      k8s:
+      redhat.openshift.k8s:
         definition:
           apiVersion: maistra.io/v1
           kind: ServiceMeshMemberRoll
@@ -350,7 +355,7 @@
             members: ['bookinfo']
 
     - name: create a namespace for bookinfo
-      k8s:
+      redhat.openshift.k8s:
         state: present
         definition:
           apiVersion: project.openshift.io/v1
@@ -380,23 +385,24 @@
         mode: '0664'
 
     - name: bookinfo.yaml
-      k8s:
+      redhat.openshift.k8s:
         namespace: bookinfo
         src: ./bookinfo.yaml
 
     - name: bookinfo-gateway.yaml
-      k8s:
+      redhat.openshift.k8s:
         namespace: bookinfo
         src: ./bookinfo-gateway.yaml
     - name: destination-rule-all-mtls.yaml
-      k8s:
+      redhat.openshift.k8s:
         namespace: bookinfo
         src: ./destination-rule-all-mtls.yaml
 
     - name: wait for bookinfo pods
-      k8s_info:
+      redhat.openshift.openshift_process:
         kind: Pod
         namespace: bookinfo
+        state: rendered
       register: wait_out
       until:
         - wait_out is defined
@@ -417,10 +423,11 @@
       delay: 30
 
     - name: get bookinfo route
-      k8s_info:
+      redhat.openshift.openshift_process:
         kind: Route
         name: istio-ingressgateway
         namespace: istio-system
+        state: rendered
       register: bookinfo_route
 
     - name: check productpage
