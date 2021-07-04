@@ -81,9 +81,9 @@
       when: crc_enabled
     - name: Change PATH CRC
       shell: |
-        echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" >> /etc/environment
-        echo "KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
-        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/environment
+        echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" >> /etc/bashrc
+        echo "KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/bashrc
+        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/bashrc
       become: true
       when: crc_enabled
 #    - name: ssh config to enter inside CRC VM
@@ -103,9 +103,9 @@
 #SNC
     - name: Change PATH SNC
       shell: |
-        echo "PATH=$PATH:/home/crcuser/snc/openshift-clients/linux" >> /etc/environment
-        echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/environment
-        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/environment
+        echo "PATH=$PATH:/home/crcuser/snc/openshift-clients/linux" >> /etc/bashrc
+        echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
+        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
       when: snc_enabled
     - name: SNC deps pre-install
       shell: |
