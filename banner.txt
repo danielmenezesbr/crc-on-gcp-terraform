@@ -1,0 +1,10 @@
+https://github.com/danielmenezesbr/crc-on-gcp-terraform
+
+1) wait for CRC/SNC:
+1.1) CRC
+sudo tail -f /var/log/messages -n +1 | grep runuser
+1.2) SNC
+sudo journalctl -u google-startup-scripts.service -f
+
+2) login with crcuser. Password: password
+su - crcuser

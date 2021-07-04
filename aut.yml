@@ -28,7 +28,17 @@
       copy:
         dest: "/home/crcuser/pull-secret.txt"
         content: |
-          ${crc_pull_secret}
+          ${vm_banner}
+    - name: banner-before-login
+        copy:
+          dest: "/etc/login.warn"
+          content: |
+            ${vm_banner}
+    - name: banner-after-login
+        copy:
+          dest: "/etc/motd"
+          content: |
+            ${crc_pull_secret}
     - name: install ansible collections
       become: "true"
       become_user: "crcuser"

@@ -45,6 +45,7 @@ data "template_file" "aut_yml" {
     crc_snc_cpus = "${var.crc_snc_cpus}"
     snc_disk_size = "${var.snc_disk_size}"
     crc_monitoring_enabled = "${var.crc_monitoring_enabled}"
+    vm_banner = "${file("${path.module}/banner.txt")}"
   }
 }
 

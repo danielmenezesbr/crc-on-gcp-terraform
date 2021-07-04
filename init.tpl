@@ -6,6 +6,8 @@ gdown --id 1F-2HzXPdKXnhDKkxnFLZmVyuXTRjv2EB
 gdown --id 12nmicIMrZBtk7EPFl_RcIG_Votn-YUI2
 tar -xf ansible29.tar.gz
 sudo dnf install *.rpm -y
+yum module enable -y container-tools:rhel8
+yum module install -y container-tools:rhel8
 cat >/tmp/inadyn.conf <<EOL
 ${file_inadyn_conf}
 EOL
