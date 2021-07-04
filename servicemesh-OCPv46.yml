@@ -8,10 +8,9 @@
 
     #https://bugzilla.redhat.com/show_bug.cgi?id=1903632
     - name: wait for openshift-marketplace pods
-      redhat.openshift.openshift_process:
+      kubernetes.core.k8s_info:
         kind: Pod
         namespace: openshift-marketplace
-        state: rendered
       register: wait_out
       until:
         - wait_out is defined
@@ -79,12 +78,11 @@
             startingCSV: "{{ elastic_version }}"
             installPlanApproval: Manual
     - name: wait for the status of the elastic subscription to not be empty
-      redhat.openshift.openshift_process:
+      kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
         name: service-mesh-elastic
         namespace: service-mesh-operators
-        state: rendered
       register: operator_subscription_out
       until:
         - operator_subscription_out is defined
@@ -121,12 +119,11 @@
             startingCSV: "{{ jaeger_version }}"
             installPlanApproval: Manual
     - name: wait for the status of the jaeger subscription to not be empty
-      redhat.openshift.openshift_process:
+      kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
         name: service-mesh-jaeger
         namespace: service-mesh-operators
-        state: rendered
       register: operator_subscription_out
       until:
         - operator_subscription_out is defined
@@ -166,12 +163,11 @@
             installPlanApproval: Manual
 
     - name: wait for the status of the kiali subscription to not be empty
-      redhat.openshift.openshift_process:
+      kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
         name: service-mesh-kiali
         namespace: service-mesh-operators
-        state: rendered
       register: operator_subscription_out
       until:
         - operator_subscription_out is defined
@@ -211,12 +207,11 @@
             installPlanApproval: Manual
 
     - name: wait for the status of the servicemesh subscription to not be empty
-      redhat.openshift.openshift_process:
+      kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
         name: service-mesh-operator
         namespace: service-mesh-operators
-        state: rendered
       register: operator_subscription_out
       until:
         - operator_subscription_out is defined
@@ -239,12 +234,11 @@
             approved: true
 
     - name: wait for the CSVs to exist
-      redhat.openshift.openshift_process:
+      kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: ClusterServiceVersion
         name: "{{ item }}"
         namespace: service-mesh-operators
-        state: rendered
       register: csv_exists_out
       retries: 5
       delay: 70
@@ -256,12 +250,11 @@
         - "{{ servicemesh_version }}"
 
     - name: wait for the CSVs to be Succeeded
-      redhat.openshift.openshift_process:
+      kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: ClusterServiceVersion
         name: "{{ item }}"
         namespace: service-mesh-operators
-        state: rendered
       register: csv_exists_out
       retries: 5
       delay: 70
@@ -399,10 +392,9 @@
         src: ./destination-rule-all-mtls.yaml
 
     - name: wait for bookinfo pods
-      redhat.openshift.openshift_process:
+      kubernetes.core.k8s_info:
         kind: Pod
         namespace: bookinfo
-        state: rendered
       register: wait_out
       until:
         - wait_out is defined
@@ -423,11 +415,10 @@
       delay: 30
 
     - name: get bookinfo route
-      redhat.openshift.openshift_process:
+      kubernetes.core.k8s_info:
         kind: Route
         name: istio-ingressgateway
         namespace: istio-system
-        state: rendered
       register: bookinfo_route
 
     - name: check productpage
