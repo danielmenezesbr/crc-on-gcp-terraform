@@ -55,6 +55,8 @@
     - name: crc consent-telemetry
       become_user: crcuser
       command: /home/crcuser/crc/crc config set consent-telemetry no
+      retries: 20
+      delay: 15
       when: crc_enabled
     - name: crc setup
       command: runuser -l crcuser -c '/home/crcuser/crc/crc setup'
