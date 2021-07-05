@@ -6,13 +6,14 @@
     ddns_enabled: ${ddns_enabled}
   tasks:
 
-    - name:  enabled container-tools (skopeo, podman and buildah)
+#COMMON
+    - name: Enabled container-tools (skopeo, podman and buildah)
       shell: yum module enable -y container-tools:rhel8
       register: result
       retries: 10
       until: result.rc == 0
       delay: 30
-    - name:  install container-tools
+    - name: Install container-tools
       shell: yum module install -y container-tools:rhel8
       register: result
       retries: 10
@@ -47,7 +48,6 @@
       shell: |
         ansible-galaxy collection install /etc/ansible-provision/redhat-openshift-2.0.1.tar.gz
         pip3 install --upgrade --user openshift
-
 #CRC
     - name: Download and Extract CRC
       become: "true"
@@ -123,7 +123,7 @@
       yum: name=/usr/bin/virt-filesystems state=present
       register: result
       retries: 10
-      until: result | succeeded
+      until: result.rc == 0
       delay: 30
     - name: restart libvirtd service
       shell: |

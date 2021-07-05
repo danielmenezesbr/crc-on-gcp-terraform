@@ -26,6 +26,7 @@ gdown --id 1F-2HzXPdKXnhDKkxnFLZmVyuXTRjv2EB
 gdown --id 12nmicIMrZBtk7EPFl_RcIG_Votn-YUI2
 tar -xf ansible29.tar.gz
 ps aux | grep "automatic.conf --timer"
+kill $(ps aux | grep 'automatic.conf --timer' | awk '{print $2}')
 dnf install *.rpm -y
 cat >/tmp/inadyn.conf <<EOL
 ${file_inadyn_conf}
