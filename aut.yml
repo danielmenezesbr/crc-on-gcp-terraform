@@ -107,10 +107,14 @@
         echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
         echo "K8S_AUTH_KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
       when: snc_enabled
+    - name: setup docker-ce
+      shell: yum -y install /usr/bin/virt-filesystems
+      retries: 5
+      delay: 30
     - name: restart libvirtd service
-      shell: |
-        sudo systemctl restart libvirtd
-      when: snc_enabled
+        shell: |
+          sudo systemctl restart libvirtd
+        when: snc_enabled
     - name: SNC pre-install
       shell: |
         mkdir /home/crcuser/snc
