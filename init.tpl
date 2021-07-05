@@ -17,8 +17,8 @@ systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
 systemctl stop dnf-automatic.timer
 systemctl disable dnf-automatic.timer
-yum module enable -y container-tools:rhel8
-yum module install -y container-tools:rhel8
+#yum module enable -y container-tools:rhel8
+#yum module install -y container-tools:rhel8
 mkdir /etc/ansible-provision;
 cd /etc/ansible-provision;
 pip3 install gdown
