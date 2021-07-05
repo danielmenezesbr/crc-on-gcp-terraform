@@ -6,6 +6,12 @@
     ddns_enabled: ${ddns_enabled}
   tasks:
 
+    - name:  install container-tools (skopeo, podman and buildah)
+      yum: name=container-tools:rhel8 state=present
+      register: result
+      retries: 10
+      until: result | succeeded
+      delay: 30
     - name: Make sure we have a 'libvirt' group
       group:
         name: libvirt
