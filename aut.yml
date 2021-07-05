@@ -112,9 +112,9 @@
       retries: 5
       delay: 30
     - name: restart libvirtd service
-        shell: |
-          sudo systemctl restart libvirtd
-        when: snc_enabled
+      shell: |
+        sudo systemctl restart libvirtd
+      when: snc_enabled
     - name: SNC pre-install
       shell: |
         mkdir /home/crcuser/snc
