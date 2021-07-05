@@ -10,7 +10,7 @@
       yum: name=container-tools:rhel8 state=present
       register: result
       retries: 10
-      until: result | succeeded
+      until: result.rc == 0
       delay: 30
     - name: Make sure we have a 'libvirt' group
       group:
