@@ -107,9 +107,11 @@
         echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
         echo "K8S_AUTH_KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
       when: snc_enabled
-    - name: install virt-filesystems
-      shell: yum -y install /usr/bin/virt-filesystems
-      retries: 5
+    - name:  install virt-filesystems
+      yum: name=/usr/bin/virt-filesystems state=present
+      register: result
+      retries: 10
+      until: result | succeeded
       delay: 30
     - name: restart libvirtd service
       shell: |
