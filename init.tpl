@@ -1,7 +1,6 @@
 set -exuo pipefail
 systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
-systemctl status dnf-makecache.timer
 cat >/etc/login.warn <<EOL
 ${file_banner}
 EOL
