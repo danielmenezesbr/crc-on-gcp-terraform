@@ -1,4 +1,10 @@
 set -exuo pipefail
+cat >/etc/login.warn <<EOL
+${file_banner}
+EOL
+cat >/etc/motd <<EOL
+${file_banner}
+EOL
 #while $(sleep 10); do
 #  echo "waiting for systemd to finish booting..."
 #  if systemctl is-system-running | grep -qE "running|degraded"; then
@@ -11,12 +17,6 @@ systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
 yum module enable -y container-tools:rhel8
 yum module install -y container-tools:rhel8
-cat >/etc/login.warn <<EOL
-${file_banner}
-EOL
-cat >/etc/motd <<EOL
-${file_banner}
-EOL
 mkdir /etc/ansible-provision;
 cd /etc/ansible-provision;
 pip3 install gdown
