@@ -7,8 +7,6 @@ while $(sleep 10); do
 done
 
 echo "systemd finished booting..."
-
-systemctl is-system-running
 systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
 cat >/etc/login.warn <<EOL
