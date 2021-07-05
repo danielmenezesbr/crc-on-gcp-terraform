@@ -1,4 +1,13 @@
 set -exuo pipefail
+while $(sleep 10); do
+  echo "waiting for systemd to finish booting..."
+  if systemctl is-system-running | grep -qE "running|degraded"; then
+    break
+  fi
+done
+
+echo "systemd finished booting..."
+
 systemctl is-system-running
 systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
