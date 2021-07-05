@@ -12,12 +12,12 @@
       retries: 10
       until: result.rc == 0
       delay: 30
-    - name:  install container-tools (skopeo, podman and buildah)
-        shell: yum module install -y container-tools:rhel8
-        register: result
-        retries: 10
-        until: result.rc == 0
-        delay: 30
+    - name:  install container-tools
+      shell: yum module install -y container-tools:rhel8
+      register: result
+      retries: 10
+      until: result.rc == 0
+      delay: 30
     - name: Make sure we have a 'libvirt' group
       group:
         name: libvirt
