@@ -236,7 +236,7 @@ At this point your CRC environment is ready!
 ==== For SNC
 
 The SNC installation is a long process.
-It can take up to 90 mins.
+It can take up to 2h.
 
 First,
 [source,bash]
