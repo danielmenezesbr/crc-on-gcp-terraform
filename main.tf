@@ -49,28 +49,6 @@ data "template_file" "aut_yml" {
   }
 }
 
-resource "google_compute_disk" "crcdisk" {
-  name  = var.disk-name
-  type  = var.gcp_vm_disk_type
-  zone  = var.region
-  image = var.image
-
-  timeouts {
-    create = "60m"
-  }
-}
-
-resource "google_compute_image" "crcimg" {
-  name = "crcimage"
-  source_disk = "${google_compute_disk.crcdisk.self_link}"
-  #licenses = [
-  #  "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx",
-  #]
-  timeouts {
-    create = "60m"
-  }
-}
-
 resource "google_compute_instance" "crc-build-box" {
   count = var.vmcount
   name = "${var.instance-name}-${count.index + 1}"
@@ -96,7 +74,7 @@ resource "google_compute_instance" "crc-build-box" {
 
   boot_disk {
     initialize_params {
-      image = google_compute_image.crcimg.self_link
+      image = var.image
       type  = var.gcp_vm_disk_type
       size  = var.gcp_vm_disk_size
     }

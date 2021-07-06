@@ -59,7 +59,7 @@ variable "disk-name" {
 }
 
 variable "gcp_vm_disk_size" {
-  default = "64"
+  default = "128"
 }
 
 variable "ddns_enabled" {
