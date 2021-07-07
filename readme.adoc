@@ -493,43 +493,62 @@ cd crc-on-gcp-terraform
 
 [[link-ddns]]
 
-=== DDNS (optinal)
+=== DDNS
 
 The current configuration uses an ephemeral IP in the GCP instance. This
 means that when the machine is initialized, a new IP can be assigned.
 
 Instead of working with IP, it is more practical to use a DNS. To do
 this, we can optionally configure a free DDNS (Dynamic DNS) service, for
-example, https://freedns.afraid.org/[https://freedns.afraid.org/]
+example, https://www.duckdns.org/[https://www.duckdns.org/]
 
-DDNS setup is optional.
-
-Create a subdomain that looks like this:
-
-image:https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/master/ddns-subdomain.png?raw=true[subdomain]
-
-When we set up DDNS, we also need a https://hub.docker.com/[Docker Hub]
-account.
-
-Set the following variables in `variable.tf`:
+After creating an account and a subdomain in https://www.duckdns.org/[duckdns],
+set the following variables in `variable.tf`:
 
 * ddns_enabled (value true)
+* ddns_hostname (e.g myopenshift.duck.org )
+
+Sensitive variables must be set in `secrets.tfvars`:
+
 * ddns_login
-* ddns_hostname
-* docker_login
-
-Sensitive variables such as passwords must be set in `secrets.tfvars`:
-
-* ddns_password
-* docker_password
+* ddns_password (leave blank for duck.org)
 
 [source,bash]
 ----
 cat >secrets.tfvars <<EOL
-ddns_password = "YOUR_PASSWORD"
-docker_password = "YOUR_PASSWORD"
+ddns_login = "YOUR_TOKEN"
+ddns_password = ""
 EOL
 ----
+
+The `ddns service` runs during operating system startup.
+The following command shows the DDNS service log.
+
+[source,bash]
+----
+sudo journalctl -u ddns.service
+----
+
+[source,bash]
+----
+-- Logs begin at Wed 2021-07-07 19:59:35 UTC, end at Wed 2021-07-07 20:24:36 UTC. --
+Jul 07 20:05:08 crc-build-1 systemd[1]: Started DDNS.
+Jul 07 20:05:08 crc-build-1 podman[5443]: Trying to pull docker.io/troglobit/inadyn:latest...
+Jul 07 20:05:09 crc-build-1 podman[5443]: Getting image source signatures
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying blob sha256:e8edeaf8013a6d59edaf786abe7db1d2e84c57007cee30494cd32d85c309>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying blob sha256:540db60ca9383eac9e418f78490994d0af424aab7bf6d0e47ac8ed4e2e9b>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying blob sha256:50d5a522733190b7abb2494c60511de7aa5c32a4e4ea725b2e24ced651de>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying blob sha256:7b6d4b69e20057c1e0fc615e179d9493adf3c3fc572faa9c90ddb45a2656>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying config sha256:66ea1a5539de606e965afd0a14d39d60f29cf984104b0512cdeccf2d9d>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Writing manifest to image destination
+Jul 07 20:05:10 crc-build-1 podman[5443]: Storing signatures
+Jul 07 20:05:11 crc-build-1 podman[5443]: inadyn[1]: In-a-dyn version 2.8.1 -- Dynamic DNS update client.
+Jul 07 20:05:11 crc-build-1 podman[5443]: inadyn[1]: Guessing DDNS plugin 'default@duckdns.org' from 'duckdns.org'
+Jul 07 20:05:12 crc-build-1 podman[5443]: inadyn[1]: Update forced for alias myopenshift.duckdns.org, new IP# 34.133.129.97
+Jul 07 20:05:12 crc-build-1 podman[5443]: inadyn[1]: Updating cache for myopenshift.duckdns.org
+----
+
+
 
 [[link-reecreate]]
 === Recreate environment in case of preemption before the environment is ready.
