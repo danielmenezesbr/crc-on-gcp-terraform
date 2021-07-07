@@ -321,7 +321,7 @@ su - crcuser
 
 ====== For CRC
 
-It is not necessary to "oc login" because
+It is not necessary to do "oc login" because
 `KUBECONFIG` is already configured for `crcuser`.
 
 `crc` command line is available for `crcuser` too:
@@ -342,7 +342,7 @@ Cache Directory: /home/crcuser/.crc/cache
 
 ====== For SNC
 
-It is not necessary to "oc login" because
+It is not necessary to do "oc login" because
 `KUBECONFIG` is already configured for `crcuser`.
 
 [source,bash]
