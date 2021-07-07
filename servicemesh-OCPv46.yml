@@ -274,7 +274,7 @@
           metadata:
             name: istio-system
 
-    #Avoid Internal error occurred: failed calling webhook \\\\\"smcp.mutation.maistra.io\\\\\": Post \\\\\"https://maistra-admission-controller.service-mesh-operators.svc:443/mutate-smcp?timeout=10s\\\\\": dial tcp 10.217.0.64:11999: connect: connection refuse"
+    #Avoid: Internal error occurred: failed calling webhook \\\\\"smcp.mutation.maistra.io\\\\\": Post \\\\\"https://maistra-admission-controller.service-mesh-operators.svc:443/mutate-smcp?timeout=10s\\\\\": dial tcp 10.217.0.64:11999: connect: connection refuse"
     - name: wait for maistra
       pause:
         minutes: 1
@@ -334,8 +334,6 @@
                   persistence:
                     storageClassName: ""
                     accessMode: ReadWriteOnce
-      retries: 5
-      delay: 30
     - name: create ServiceMeshMemberRoll with booknfo
       redhat.openshift.k8s:
         definition:
