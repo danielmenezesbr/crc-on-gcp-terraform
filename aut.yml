@@ -19,6 +19,13 @@
       retries: 10
       until: result.rc == 0
       delay: 30
+#DDNS
+    - name: install ddns systemd unit file
+      template: src=ddns.j2 dest=/etc/systemd/system/ddns.service
+      when: ddns_enabled
+    - name: start ddns service
+      systemd: state=started name=ddns daemon_reload=yes enabled=yes
+      when: ddns_enabled
     - name: Make sure we have a 'libvirt' group
       group:
         name: libvirt
@@ -172,10 +179,3 @@
       become: yes
       become_user: "crcuser"
       when: snc_enabled
-#DDNS
-    - name: install ddns systemd unit file
-      template: src=ddns.j2 dest=/etc/systemd/system/ddns.service
-      when: ddns_enabled
-    - name: start ddns service
-      systemd: state=started name=ddns daemon_reload=yes enabled=yes
-      when: ddns_enabled
