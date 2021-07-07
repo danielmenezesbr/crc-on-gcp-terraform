@@ -138,8 +138,8 @@ remotely with an ssh client
 TODO:
 
  - see all var em main.tf and variables.tf
- - auto-start SNC
  - IP ephemeral
+ - talk about autostart (CRC/SNC)
 ////
 
 |===
