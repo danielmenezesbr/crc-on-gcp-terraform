@@ -1,0 +1,19 @@
+https://github.com/danielmenezesbr/crc-on-gcp-terraform
+
+1) wait for provision
+sudo journalctl -u google-startup-scripts.service -f
+
+2) wait for CRC/SNC:
+2.1) CRC
+sudo tail -f /var/log/messages -n +1 | grep runuser
+2.2) SNC
+sudo tail -f /home/crcuser/snc/install.out
+
+3) login with crcuser. Password: password
+su - crcuser
+
+Terraform:
+Recreate environment:
+terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
+Apply:
+terraform apply -var-file="secrets.tfvars" -auto-approve

@@ -138,8 +138,8 @@ remotely with an ssh client
 TODO:
 
  - see all var em main.tf and variables.tf
- - auto-start SNC
  - IP ephemeral
+ - talk about autostart (CRC/SNC)
 ////
 
 |===
@@ -233,10 +233,14 @@ Apr 17 16:16:51 crc-build-1 runuser[51541]: The console will open in your defaul
 
 At this point your CRC environment is ready!
 
+When the machine is rebooted, CRC will be automatically started.
+You can use the same command described in this section to track
+CRC startup when the machine is rebooted.
+
 ==== For SNC
 
 The SNC installation is a long process.
-It can take up to 90 mins.
+It can take up to 2h.
 
 First,
 [source,bash]
@@ -298,6 +302,8 @@ pod "revision-pruner-9-crc-2mx9v-master-0" deleted
 ----
 <1> `+ return 0` indicates SNC is ready.
 
+When the machine is rebooted, SNC will be automatically started.
+
 == command line tools
 
 === VM
@@ -321,21 +327,10 @@ su - crcuser
 
 ====== For CRC
 
-[source,bash]
-----
-oc login -u kubeadmin -p $(crc console --credentials | awk -F "kubeadmin" '{print $2}' | cut -c 5- | rev | cut -c31- | rev) https://api.crc.testing:6443
-----
+It is not necessary to do "oc login" because
+`KUBECONFIG` is already configured for `crcuser`.
 
-[source,bash]
-----
-Login successful.
-
-You have access to 58 projects, the list has been suppressed. You can list all projects with ' projects'
-
-Using project "default".
-----
-
-crc command line is available:
+`crc` command line is available for `crcuser` too:
 
 [source,bash]
 ----
@@ -353,8 +348,8 @@ Cache Directory: /home/crcuser/.crc/cache
 
 ====== For SNC
 
-It is not necessary to "oc login" because
-`KUBECONFIG` is already configured.
+It is not necessary to do "oc login" because
+`KUBECONFIG` is already configured for `crcuser`.
 
 [source,bash]
 ----
@@ -457,79 +452,128 @@ https://console-openshift-console.apps-crc.127.0.0.1.nip.io/[https://console-ope
 
 == Troubleshooting
 
-=== Change CRC version
-
-TODO:
-
-=== Change OpenShift version
-
-TODO:
-
-== Advanced configurations
-
-=== Red Hat Openshift Service Mesh
-
-When environment <<link-ready,is ready>>,
-you can use a script (It only works on OCP 4.6)
-to install
-Red Hat Openshift Service Mesh on OCP 4.6:
+=== Access CRC/SNC VMs via SSH
 
 [source,bash]
 ----
-su - crcuser #Enter the word password when you are prompted for it
+su - crcuser #Password: password
+ssh master
+----
+
+In the SNC environment the bootstrap machine will be created
+temporarily during cluster configuration.
+
+[source,bash]
+----
+ssh bootstrap
+----
+
+=== Change CRC version
+
+By default this project configures and installs `CRC 1.22` (OCP 4.6.15).
+Although this project was only tested on CRC 1.22,
+it should probably work on other versions.
+
+You can change the CRC version in the `provision.yml` file.
+
+=== Change OpenShift version on SNC environment
+
+By default this project configures and installs OCP 4.6.18.
+Although this project was only tested on OCP 4.6.18,
+it should probably work on other versions.
+
+You can change the CRC version in the `provision.yml` file.
+
+If you are trying to install a version other than 4.6.x,
+be sure to change the `branch` and `OPENSHIFT_VERSION`
+in the following snippet from `provision.yml`:
+
+[source,bash]
+----
+...
+git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
+...
+export OPENSHIFT_VERSION="4.6.18"
+...
+----
+
+
+
+== Advanced configurations
+
+=== Red Hat OpenShift Service Mesh (OSSM)
+
+When environment <<link-ready,is ready>>,
+you can use a script (It only works on OCP 4.6)
+to install OSSM on OCP 4.6:
+
+[source,bash]
+----
+su - crcuser #Password: password
 git clone https://github.com/danielmenezesbr/crc-on-gcp-terraform
 cd crc-on-gcp-terraform
 ./servicemesh-install-OCPv46.sh
 ----
 
 
-
-[source,bash]
-----
-
-----
-
-
-
 [[link-ddns]]
 
-=== DDNS (optinal)
+=== DDNS
 
 The current configuration uses an ephemeral IP in the GCP instance. This
 means that when the machine is initialized, a new IP can be assigned.
 
 Instead of working with IP, it is more practical to use a DNS. To do
 this, we can optionally configure a free DDNS (Dynamic DNS) service, for
-example, https://freedns.afraid.org/[https://freedns.afraid.org/]
+example, https://www.duckdns.org/[https://www.duckdns.org/]
 
-DDNS setup is optional.
-
-Create a subdomain that looks like this:
-
-image:https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/master/ddns-subdomain.png?raw=true[subdomain]
-
-When we set up DDNS, we also need a https://hub.docker.com/[Docker Hub]
-account.
-
-Set the following variables in `variable.tf`:
+After creating an account and a subdomain in https://www.duckdns.org/[duckdns],
+set the following variables in `variable.tf`:
 
 * ddns_enabled (value true)
+* ddns_hostname (e.g myopenshift.duckdns.org )
+
+Sensitive variables must be set in `secrets.tfvars`:
+
 * ddns_login
-* ddns_hostname
-* docker_login
-
-Sensitive variables such as passwords must be set in `secrets.tfvars`:
-
-* ddns_password
-* docker_password
+* ddns_password (leave blank for duckdns.org)
 
 [source,bash]
 ----
 cat >secrets.tfvars <<EOL
-ddns_password = "YOUR_PASSWORD"
-docker_password = "YOUR_PASSWORD"
+ddns_login = "YOUR_TOKEN"
+ddns_password = ""   #leave blank for duckdns.org
 EOL
 ----
+
+The `ddns service` runs during operating system startup.
+The following command shows the DDNS service log.
+
+[source,bash]
+----
+sudo journalctl -u ddns.service
+----
+
+[source,bash]
+----
+-- Logs begin at Wed 2021-07-07 19:59:35 UTC, end at Wed 2021-07-07 20:24:36 UTC. --
+Jul 07 20:05:08 crc-build-1 systemd[1]: Started DDNS.
+Jul 07 20:05:08 crc-build-1 podman[5443]: Trying to pull docker.io/troglobit/inadyn:latest...
+Jul 07 20:05:09 crc-build-1 podman[5443]: Getting image source signatures
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying blob sha256:e8edeaf8013a6d59edaf786abe7db1d2e84c57007cee30494cd32d85c309>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying blob sha256:540db60ca9383eac9e418f78490994d0af424aab7bf6d0e47ac8ed4e2e9b>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying blob sha256:50d5a522733190b7abb2494c60511de7aa5c32a4e4ea725b2e24ced651de>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying blob sha256:7b6d4b69e20057c1e0fc615e179d9493adf3c3fc572faa9c90ddb45a2656>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Copying config sha256:66ea1a5539de606e965afd0a14d39d60f29cf984104b0512cdeccf2d9d>
+Jul 07 20:05:10 crc-build-1 podman[5443]: Writing manifest to image destination
+Jul 07 20:05:10 crc-build-1 podman[5443]: Storing signatures
+Jul 07 20:05:11 crc-build-1 podman[5443]: inadyn[1]: In-a-dyn version 2.8.1 -- Dynamic DNS update client.
+Jul 07 20:05:11 crc-build-1 podman[5443]: inadyn[1]: Guessing DDNS plugin 'default@duckdns.org' from 'duckdns.org'
+Jul 07 20:05:12 crc-build-1 podman[5443]: inadyn[1]: Update forced for alias myopenshift.duckdns.org, new IP# 34.133.129.97
+Jul 07 20:05:12 crc-build-1 podman[5443]: inadyn[1]: Updating cache for myopenshift.duckdns.org
+----
+
+
 
 [[link-reecreate]]
 === Recreate environment in case of preemption before the environment is ready.

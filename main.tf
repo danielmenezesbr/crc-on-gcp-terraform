@@ -13,49 +13,29 @@ tail -f /home/crcuser/snc/install.out
 */
 
 
-resource "google_compute_disk" "crcdisk" {
-  name  = "${var.disk-name}"
-  type  = "pd-standard"
-  zone  = "${var.region}"
-  image = "${var.os}"
-
-  timeouts {
-  create = "60m"
-  }
-}
-
-resource "google_compute_image" "crcimg" {
-  name = "${var.image-name}"
-  source_disk = "${google_compute_disk.crcdisk.self_link}"
-  licenses = [
-    "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx",
-  ]
-  timeouts {
-  create = "60m"
-  }
-}
-
 data "template_file" "default" {
   template = "${file("${path.module}/init.tpl")}"
   vars = {
     file_inadyn_conf = "${data.template_file.inadyn_conf.rendered}"
-    file_aut_yml = "${data.template_file.aut_yml.rendered}"
-    file_myservice_j2 = "${file("${path.module}/myservice.j2")}"
+    file_provision_yml = "${base64encode(data.template_file.provision_yml.rendered)}"
+    file_ddns_j2 = "${file("${path.module}/ddns.j2")}"
     file_crc_j2 = "${file("${path.module}/crc.j2")}"
+    file_banner = "${file("${path.module}/banner.txt")}"
   }
 }
 
 data "template_file" "inadyn_conf" {
   template = "${file("${path.module}/inadyn.conf")}"
   vars = {
-    ddns_login = "${var.ddns_login}"
-    ddns_password = "${var.ddns_password}"
-    ddns_hostname = "${var.ddns_hostname}"
+    ddns_provider = var.ddns_provider
+    ddns_login = var.ddns_login
+    ddns_password = var.ddns_password
+    ddns_hostname = var.ddns_hostname
   }
 }
 
-data "template_file" "aut_yml" {
-  template = "${file("${path.module}/aut.yml")}"
+data "template_file" "provision_yml" {
+  template = "${file("${path.module}/provision.yml")}"
   vars = {
     ddns_enabled = "${var.ddns_enabled}"
     docker_login = "${var.docker_login}"
@@ -95,7 +75,7 @@ resource "google_compute_instance" "crc-build-box" {
 
   boot_disk {
     initialize_params {
-      image = "${google_compute_image.crcimg.self_link}"
+      image = var.image
       type  = var.gcp_vm_disk_type
       size  = var.gcp_vm_disk_size
     }
