@@ -27,9 +27,10 @@ data "template_file" "default" {
 data "template_file" "inadyn_conf" {
   template = "${file("${path.module}/inadyn.conf")}"
   vars = {
-    ddns_login = "${var.ddns_login}"
-    ddns_password = "${var.ddns_password}"
-    ddns_hostname = "${var.ddns_hostname}"
+    ddns_provider = var.ddns_provider
+    ddns_login = var.ddns_login
+    ddns_password = var.ddns_password
+    ddns_hostname = var.ddns_hostname
   }
 }
 

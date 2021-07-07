@@ -26,6 +26,7 @@
     - name: start ddns service
       systemd: state=started name=ddns daemon_reload=yes enabled=yes
       when: ddns_enabled
+#COMMON
     - name: Make sure we have a 'libvirt' group
       group:
         name: libvirt

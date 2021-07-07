@@ -50,7 +50,6 @@ variable "network" {
 }
 
 variable "image" {
-  #projects/{project}/global/images/{image}
   default = "projects/okd4-280016/global/images/packer-1597358211"
 }
 
@@ -66,12 +65,35 @@ variable "ddns_enabled" {
   default = "false"
 }
 
+variable "ddns_provider" {
+  default = "duckdns.org"
+  description = "freedns.afraid.org, duckdns.org etc."
+/*
+https://fossies.org/linux/inadyn/README.md
+
+Examples:
+provider duckdns.org {
+    username         = YOUR_TOKEN
+    password         = noPasswordForDuckdns
+    hostname         = YOUR_DOMAIN.duckdns.org
+}
+
+provider freedns {
+    username    = lower-case-username
+    password    = case-sensitive-pwd
+    hostname    = some.example.com
+}
+*/
+}
+
+
 variable "ddns_login" {
-  default = "bytecodesbr"
+  default = ""
+  description = "duckdns.org uses this field to put TOKEN. In this case, put it in secrets.tfvars because TOKEN is a sensitive data."
 }
 
 variable "ddns_hostname" {
-  default = "crc-openshift.ignorelist.com"
+  default = "myopenshift.duckdns.org"
 }
 
 variable "docker_login" {
