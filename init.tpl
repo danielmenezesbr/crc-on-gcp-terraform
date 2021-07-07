@@ -31,8 +31,8 @@ dnf install *.rpm -y
 cat >/tmp/inadyn.conf <<EOL
 ${file_inadyn_conf}
 EOL
-cat >/tmp/myservice.j2 <<EOL
-${file_myservice_j2}
+cat >/tmp/ddns.j2 <<EOL
+${file_ddns_j2}
 EOL
 cat >/tmp/crc.j2 <<EOL
 ${file_crc_j2}
@@ -40,7 +40,7 @@ EOL
 echo "${file_aut_yml}"
 echo "${file_aut_yml}" | base64 -d > /tmp/aut.yml
 cp -a /tmp/inadyn.conf .
-cp -a /tmp/myservice.j2 .
+cp -a /tmp/ddns.j2 .
 cp -a /tmp/crc.j2 .
 cp -a /tmp/aut.yml .
 ansible-playbook aut.yml
