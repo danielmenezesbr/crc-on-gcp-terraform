@@ -233,6 +233,10 @@ Apr 17 16:16:51 crc-build-1 runuser[51541]: The console will open in your defaul
 
 At this point your CRC environment is ready!
 
+When the machine is rebooted, CRC will be automatically started.
+You can use the same command described in this section to track
+CRC startup when the machine is rebooted.
+
 ==== For SNC
 
 The SNC installation is a long process.
@@ -297,6 +301,8 @@ pod "revision-pruner-9-crc-2mx9v-master-0" deleted
 + true
 ----
 <1> `+ return 0` indicates SNC is ready.
+
+When the machine is rebooted, SNC will be automatically started.
 
 == command line tools
 
