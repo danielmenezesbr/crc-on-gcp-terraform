@@ -98,20 +98,20 @@
         echo "K8S_AUTH_KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/bashrc
       become: true
       when: crc_enabled
-#    - name: ssh config to enter inside CRC VM
-#      shell: |
-#        cat <<EOF > ~/.ssh/config
-#        Host master
-#            Hostname 192.168.130.11
-#            User core
-#            IdentityFile /home/crcuser/.crc/machines/crc/id_ecdsa
-#            StrictHostKeyChecking no
-#            UserKnownHostsFile /dev/null
-#        EOF
-#        chmod 600 ~/.ssh/config
-#      become: yes
-#      become_user: "crcuser"
-#      when: crc_enabled
+    - name: ssh config to enter inside CRC VM
+      shell: |
+        cat <<EOF > ~/.ssh/config
+        Host master
+            Hostname 192.168.130.11
+            User core
+            IdentityFile /home/crcuser/.crc/machines/crc/id_ecdsa
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+        EOF
+        chmod 600 ~/.ssh/config
+      become: yes
+      become_user: "crcuser"
+      when: crc_enabled
 #SNC
     - name: Change PATH SNC
       shell: |
@@ -157,6 +157,7 @@
         sudo virsh autostart $(sudo virsh list --all --name | head -n 1)
         EOF
         chmod +x install.sh
+        # nip.io requires stop firewalld
         sudo systemctl stop firewalld
         sudo systemctl disable firewalld
       become: yes
@@ -170,30 +171,9 @@
       become_user: "crcuser"
       when: snc_enabled
 #DDNS
-#    - name: Add Docker repo
-#      get_url:
-#        url: https://download.docker.com/linux/centos/docker-ce.repo
-#        dest: /etc/yum.repos.d/docker-ce.repo
-#      become: yes
-#    - name: setup docker-ce
-#      yum: name=docker-ce state=present
-#    - name: start docker
-#      service: name=docker.service enabled=yes state=started
-#    - name: deps
-#      pip:
-#        name: docker-py
-#    - name: Log into DockerHub
-#      community.docker.docker_login:
-#        username: ${docker_login}
-#        password: ${docker_password}
-#      when: ddns_enabled
-#    - name: pull image troglobit/inadyn:latest
-#      docker_image:
-#        name: troglobit/inadyn:latest
-#      when: ddns_enabled
-#    - name: install myservice systemd unit file
-#      template: src=myservice.j2 dest=/etc/systemd/system/myservice.service
-#      when: ddns_enabled
-#    - name: start myservice
-#      systemd: state=started name=myservice daemon_reload=yes enabled=yes
-#      when: ddns_enabled
+    - name: install ddns systemd unit file
+      template: src=ddns.j2 dest=/etc/systemd/system/ddns.service
+      when: ddns_enabled
+    - name: start ddns service
+      systemd: state=started name=ddns daemon_reload=yes enabled=yes
+      when: ddns_enabled

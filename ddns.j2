@@ -1,0 +1,9 @@
+[Unit]
+Description=DDNS
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/podman run --rm -v "/etc/ansible-provision/inadyn.conf:/etc/inadyn.conf" troglobit/inadyn:latest
+
+[Install]
+WantedBy=multi-user.target
