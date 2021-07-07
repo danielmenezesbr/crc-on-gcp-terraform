@@ -108,7 +108,7 @@ gcloud projects add-iam-policy-binding $TF_VAR_PROJECT_ID --member "serviceAccou
 ----
 
 Create pull-secret.txt. Go to
-https://cloud.redhat.com/openshift/create/local][https://cloud.redhat.com/openshift/create/local]
+https://cloud.redhat.com/openshift/create/local[https://cloud.redhat.com/openshift/create/local]
 > `Copy pull secret` and paste below:
 
 [source,bash]
