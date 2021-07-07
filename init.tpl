@@ -37,12 +37,12 @@ EOL
 cat >/tmp/crc.j2 <<EOL
 ${file_crc_j2}
 EOL
-echo "${file_aut_yml}"
-echo "${file_aut_yml}" | base64 -d > /tmp/aut.yml
+echo "${file_provision_yml}"
+echo "${file_provision_yml}" | base64 -d > /tmp/provision.yml
 cp -a /tmp/inadyn.conf .
 cp -a /tmp/ddns.j2 .
 cp -a /tmp/crc.j2 .
-cp -a /tmp/aut.yml .
-ansible-playbook aut.yml
+cp -a /tmp/provision.yml .
+ansible-playbook provision.yml
 #to check ansible logs:
 #sudo journalctl -u google-startup-scripts.service -f

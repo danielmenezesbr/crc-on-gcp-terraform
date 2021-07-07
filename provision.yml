@@ -127,6 +127,27 @@
         echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
         echo "K8S_AUTH_KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
       when: snc_enabled
+    - name: ssh config to enter inside SNC VMs (master and bootstrap)
+      shell: |
+        cat <<EOF > ~/.ssh/config
+        Host master
+            Hostname 192.168.126.11
+            User core
+            IdentityFile /home/crcuser/snc/id_ecdsa_crc
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+
+        Host bootstrap
+            Hostname 192.168.126.10
+            User core
+            IdentityFile /home/crcuser/snc/id_ecdsa_crc
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+        EOF
+        chmod 600 ~/.ssh/config
+      become: yes
+      become_user: "crcuser"
+      when: snc_enabled
     - name: dnf update
       shell: dnf update -y
       register: result

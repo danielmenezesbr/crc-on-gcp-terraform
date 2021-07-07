@@ -17,7 +17,7 @@ data "template_file" "default" {
   template = "${file("${path.module}/init.tpl")}"
   vars = {
     file_inadyn_conf = "${data.template_file.inadyn_conf.rendered}"
-    file_aut_yml = "${base64encode(data.template_file.aut_yml.rendered)}"
+    file_provision_yml = "${base64encode(data.template_file.provision_yml.rendered)}"
     file_ddns_j2 = "${file("${path.module}/ddns.j2")}"
     file_crc_j2 = "${file("${path.module}/crc.j2")}"
     file_banner = "${file("${path.module}/banner.txt")}"
@@ -34,8 +34,8 @@ data "template_file" "inadyn_conf" {
   }
 }
 
-data "template_file" "aut_yml" {
-  template = "${file("${path.module}/aut.yml")}"
+data "template_file" "provision_yml" {
+  template = "${file("${path.module}/provision.yml")}"
   vars = {
     ddns_enabled = "${var.ddns_enabled}"
     docker_login = "${var.docker_login}"
