@@ -515,6 +515,9 @@ cd crc-on-gcp-terraform
 ./servicemesh-install-OCPv46.sh
 ----
 
+In case of any network failure during OSSM installation,
+usually re-running the script solves the problem.
+
 
 [[link-ddns]]
 
