@@ -1,7 +1,7 @@
 /*
-terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
-terraform apply -var-file="secrets.tfvars" -auto-approve
-terraform destroy -auto-approve
+./terraformDocker.sh destroy -auto-approve && ./terraformDocker.sh apply -var-file="secrets.tfvars" -auto-approve
+./terraformDocker.sh apply -var-file="secrets.tfvars" -auto-approve
+./terraformDocker.sh destroy -auto-approve
 # CRC and SNC
 sudo journalctl -u google-startup-scripts.service -f
 # CRC

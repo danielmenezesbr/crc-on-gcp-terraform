@@ -14,6 +14,6 @@ su - crcuser
 
 Terraform:
 Recreate environment:
-terraform destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
+./terraformDocker.sh destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
 Apply:
-terraform apply -var-file="secrets.tfvars" -auto-approve
+./terraformDocker.sh apply -var-file="secrets.tfvars" -auto-approve
