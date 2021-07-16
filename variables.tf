@@ -58,6 +58,8 @@ variable "disk-name" {
 }
 
 variable "gcp_vm_disk_size" {
+  # The minimum size is 128GB due to the image (projects/okd4-280016/global/images/packer-1597358211).
+  # You need to generate a new image (https://blog.kevinlin.info/post/google-compute-engine-reducing-the-size-of-a-persistent-disk) if you want to reduce the size.
   default = "128"
 }
 

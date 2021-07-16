@@ -57,12 +57,12 @@ export TF_VAR_PROJECT_ID=$(python3 -c 'import uuid; print("c" + str(uuid.uuid4()
 echo "Project ID:" $TF_VAR_PROJECT_ID
 gcloud projects create $TF_VAR_PROJECT_ID --name="CRConGCP" --labels=type=crc --format="json" --quiet
 gcloud config set project $TF_VAR_PROJECT_ID
-echo "export TF_VAR_PROJECT_ID=\"$TF_VAR_PROJECT_ID\"" >> ~/.bash_profile
-echo "export PATH=~:$PATH" >> ~/.bash_profile
-source ~/.bash_profile
+echo "export TF_VAR_PROJECT_ID=\"$TF_VAR_PROJECT_ID\"" >> ~/.profile
+source ~/.profile
 ----
 
-Link new project to a billing account:
+Link new project to a first billing account
+(if you have more than one billing account, adjust the commands below)):
 
 [source,bash]
 ----
@@ -82,12 +82,9 @@ Download and config Terraform:
 
 [source,bash]
 ----
-wget https://releases.hashicorp.com/terraform/0.13.6/terraform_0.13.6_linux_amd64.zip
-unzip terraform_0.13.6_linux_amd64.zip
-export PATH=~:$PATH
 git clone https://github.com/danielmenezesbr/crc-on-gcp-terraform
 cd crc-on-gcp-terraform
-terraform init
+./terraformDocker.sh init
 cat >variables.auto.tfvars.json <<EOL
 {
   "project_id": "$TF_VAR_PROJECT_ID"
@@ -181,8 +178,11 @@ Set `false` if you want to use a normal VM.
 |pd-standard or pd-ssd
 
 |gcp_vm_disk_size
-|50
-|Disk size (GB)
+|128
+|Disk size (GB). The minimum size is 128GB due to the image
+(projects/okd4-280016/global/images/packer-1597358211).
+You need to generate a new image (https://blog.kevinlin.info/post/google-compute-engine-reducing-the-size-of-a-persistent-disk)
+if you want to reduce the size.
 
 |DDNS
 |disabled
@@ -198,7 +198,7 @@ Provision the environment:
 
 [source,bash]
 ----
-terraform apply -var-file="secrets.tfvars" -auto-approve
+./terraformDocker.sh apply -var-file="secrets.tfvars" -auto-approve
 ----
 
 Access the instance via SSH:
@@ -582,8 +582,8 @@ Recreate environment in case of preemption before the environment <<link-ready,i
 
 [source,bash]
 ----
-terraform destroy -auto-approve
-terraform apply -var-file="secrets.tfvars" -auto-approve
+./terraformDocker.sh destroy -auto-approve
+./terraformDocker.sh -var-file="secrets.tfvars" -auto-approve
 ----
 
 [[link-cleanup]]
@@ -595,9 +595,7 @@ Shell] and run the following commands:
 [source,bash]
 ----
 cd ~/crc-on-gcp-terraform/
-terraform destroy -auto-approve
+./terraformDocker.sh destroy -auto-approve
 gcloud projects delete $TF_VAR_PROJECT_ID --quiet
-cd ~
-rm terraform*
-rm crc-on-gcp-terraform/ -Rf
+rm ~/crc-on-gcp-terraform/ -Rf
 ----
