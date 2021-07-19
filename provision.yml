@@ -235,12 +235,10 @@
       shell: |
         sudo systemctl restart libvirtd
       when: strategy == "multinode"
-    # TODO: review
     - name: OpenShift pre-install
       shell: |
         NAME="mycluster"
-        # nip.io requires stop firewalld
-        sudo systemctl stop firewalld
+        sudo systemctl stop firewalld # nip.io requires stop firewalld
         sudo systemctl disable firewalld
         CLUSTER_DIR="$${HOME}/clusters/$${NAME}"
         if [ -d "$${CLUSTER_DIR}" ]; then
@@ -252,7 +250,6 @@
         wget -r -l1 -np -nd -q https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.6.18 -P . -A 'openshift-install-linux-4*.tar.gz'
         tar zxvf ./openshift-install-linux-4*.tar.gz -C .
         rm ./openshift-install-linux-4*.tar.gz
-        # Generate a default SSH key if one doesn't exist
         SSH_KEY="$${HOME}/.ssh/id_rsa"
         if [ ! -f $SSH_KEY ]; then
           ssh-keygen -t rsa -N "" -f $SSH_KEY
