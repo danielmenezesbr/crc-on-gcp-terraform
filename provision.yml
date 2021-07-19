@@ -1,8 +1,7 @@
 - hosts: localhost
   vars:
     password: password
-    crc_enabled: ${crc_enabled}
-    snc_enabled: ${snc_enabled}
+    strategy: ${strategy}
     ddns_enabled: ${ddns_enabled}
   tasks:
 
@@ -67,45 +66,45 @@
         group: crcuser
         owner: crcuser
         creates: /home/crcuser/crc/
-      when: crc_enabled
+      when:  strategy == "crc"
     - name: Rename crc directory
       #CRC 1.22 uses OpenShift 4.6.15
       command: mv /home/crcuser/crc-linux-1.22.0-amd64/ /home/crcuser/crc/
-      when: crc_enabled
+      when: strategy == "crc"
     - name: crc consent-telemetry
       become_user: crcuser
       command: /home/crcuser/crc/crc config set consent-telemetry no
       retries: 20
       delay: 15
-      when: crc_enabled
+      when: strategy == "crc"
     - name: crc setup
       command: runuser -l crcuser -c '/home/crcuser/crc/crc setup'
-      when: crc_enabled
+      when: strategy == "crc"
     - name: crc config set memory
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set memory ${crc_snc_memory}'
-      when: crc_enabled
+      when: strategy == "crc"
     - name: crc config set cpus
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set cpus ${crc_snc_cpus}'
-      when: crc_enabled
+      when: strategy == "crc"
     - name: crc config set enable-cluster-monitoring
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set enable-cluster-monitoring ${crc_monitoring_enabled}'
-      when: crc_enabled
+      when: strategy == "crc"
     - name: crc config set pull-secret-file
       command: runuser -l crcuser -c '/home/crcuser/crc/crc config set pull-secret-file /home/crcuser/pull-secret.txt'
-      when: crc_enabled
+      when: strategy == "crc"
     - name: install crc systemd unit file
       template: src=crc.j2 dest=/etc/systemd/system/crc.service
-      when: crc_enabled
+      when: strategy == "crc"
     - name: start crc
       systemd: state=started name=crc daemon_reload=yes enabled=yes
-      when: crc_enabled
+      when: strategy == "crc"
     - name: Change PATH CRC
       shell: |
         echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" >> /etc/bashrc
         echo "KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/bashrc
         echo "K8S_AUTH_KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/bashrc
       become: true
-      when: crc_enabled
+      when: strategy == "crc"
     - name: ssh config to enter inside CRC VM
       shell: |
         cat <<EOF > ~/.ssh/config
@@ -119,14 +118,14 @@
         chmod 600 ~/.ssh/config
       become: yes
       become_user: "crcuser"
-      when: crc_enabled
+      when: strategy == "crc"
 #SNC
     - name: Change PATH SNC
       shell: |
         echo "PATH=$PATH:/home/crcuser/snc/openshift-clients/linux" >> /etc/bashrc
         echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
         echo "K8S_AUTH_KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
-      when: snc_enabled
+      when: strategy == "snc"
     - name: ssh config to enter inside SNC VMs (master and bootstrap)
       shell: |
         cat <<EOF > ~/.ssh/config
@@ -147,25 +146,25 @@
         chmod 600 ~/.ssh/config
       become: yes
       become_user: "crcuser"
-      when: snc_enabled
+      when: strategy == "snc"
     - name: dnf update
       shell: dnf update -y
       register: result
       retries: 6
       until: result.rc == 0
       delay: 30
-      when: snc_enabled
+      when: strategy == "snc"
     - name: install virt-filesystems
       shell: yum -y install /usr/bin/virt-filesystems
       register: result
       retries: 6
       until: result.rc == 0
       delay: 30
-      when: snc_enabled
+      when: strategy == "snc"
     - name: restart libvirtd service
       shell: |
         sudo systemctl restart libvirtd
-      when: snc_enabled
+      when: strategy == "snc"
     - name: SNC pre-install
       shell: |
         mkdir /home/crcuser/snc
@@ -193,11 +192,136 @@
         sudo systemctl disable firewalld
       become: yes
       become_user: "crcuser"
-      when: snc_enabled
+      when: strategy == "snc"
     - name: SNC install
       ansible.builtin.shell: /home/crcuser/snc/install.sh &> install.out
       args:
         chdir: /home/crcuser/snc
       become: yes
       become_user: "crcuser"
-      when: snc_enabled
+      when: strategy == "snc"
+#Multi-Node
+    # TODO: review
+    - name: Change env
+      shell: |
+        echo "PATH=$PATH:/home/crcuser/clusters/mycluster" >> /etc/bashrc
+        # TODO: review
+        echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
+        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
+      when: strategy == "multinode"
+    # TODO: review
+    - name: dnf update
+      shell: dnf update -y
+      register: result
+      retries: 6
+      until: result.rc == 0
+      delay: 30
+      when: strategy == "multinode"
+    - name: install virt-filesystems
+      shell: yum -y install /usr/bin/virt-filesystems
+      register: result
+      retries: 6
+      until: result.rc == 0
+      delay: 30
+      when: strategy == "multinode"
+    - name: restart libvirtd service
+      shell: |
+        sudo systemctl restart libvirtd
+      when: strategy == "multinode"
+    # TODO: review
+    - name: OpenShift pre-install
+      shell: |
+        # nip.io requires stop firewalld
+        sudo systemctl stop firewalld
+        sudo systemctl disable firewalld
+        #
+        NAME="mycluster"
+        CLUSTER_DIR="${HOME}/clusters/${NAME}"
+        if [ -d "${CLUSTER_DIR}" ]; then
+          echo "WARNING: cluster ${NAME} already exists at ${CLUSTER_DIR}"
+        else
+          mkdir -p ${CLUSTER_DIR}
+        fi
+        cd $CLUSTER_DIR
+        wget -r -l1 -np -nd -q https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.6.18 -P . -A 'openshift-install-linux-4*.tar.gz'
+        tar zxvf ./openshift-install-linux-4*.tar.gz -C .
+        rm ./openshift-install-linux-4*.tar.gz
+        # Generate a default SSH key if one doesn't exist
+        SSH_KEY="${HOME}/.ssh/id_rsa"
+        if [ ! -f $SSH_KEY ]; then
+          ssh-keygen -t rsa -N "" -f $SSH_KEY
+        fi
+        export BASE_DOMAIN=openshift.testing
+        export CLUSTER_NAME="${NAME}"
+        export PUB_SSH_KEY="${SSH_KEY}.pub"
+        PULL_SECRET=$(cat "${HOME}/pull-secret")
+        cat > "${CLUSTER_DIR}/install-config.yaml" << EOF
+        apiVersion: v1
+        baseDomain: "${BASE_DOMAIN}"
+        compute:
+        - hyperthreading: Enabled
+          architecture: amd64
+          name: worker
+          platform: {}
+          replicas: 2
+        controlPlane:
+          hyperthreading: Enabled
+          architecture: amd64
+          name: master
+          platform: {}
+          replicas: 3
+        metadata:
+          creationTimestamp: null
+          name: "${CLUSTER_NAME}"
+        networking:
+          clusterNetwork:
+          - cidr: 10.128.0.0/14
+            hostPrefix: 23
+          machineNetwork:
+          - cidr: 192.168.126.0/24
+          networkType: OpenShiftSDN
+          serviceNetwork:
+          - 172.30.0.0/16
+        platform:
+          libvirt:
+            network:
+              if: tt0
+        publish: External
+        pullSecret: $(echo \'"${PULL_SECRET}"\')
+        sshKey: |
+          $(cat "${PUB_SSH_KEY}")
+        EOF
+        # Create manifests and modify route domain
+        ./openshift-install --dir="$CLUSTER_DIR" create manifests
+        # Workaround for https://github.com/openshift/installer/issues/1007
+        # Add custom domain to cluster-ingress
+        yq write --inplace $CLUSTER_DIR/manifests/cluster-ingress-02-config.yml spec[domain] apps.$BASE_DOMAIN
+
+        # Add master memory to 12 GB
+        # This is only valid for openshift 4.3 onwards
+        yq write --inplace ${CLUSTER_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml spec.providerSpec.value[domainMemory] 14336
+
+        ./openshift-install create cluster --log-level=debug --dir="$CLUSTER_DIR" || true
+        ./openshift-install wait-for install-complete --log-level=debug --dir="$CLUSTER_DIR"
+#        cat <<EOF > install.sh
+#        set -exuo pipefail
+#        export OPENSHIFT_VERSION="4.6.18"
+#        export MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp"
+#        export PULL_SECRET="/home/crcuser/pull-secret.txt"
+#        export CRC_BASE_DOMAIN="127.0.0.1.nip.io"
+#        ./snc.sh 2>&1
+#        # TODO: review
+#        #sudo virsh autostart $(sudo virsh list --all --name | head -n 1)
+#        EOF
+#        chmod +x install.sh
+      become: yes
+      become_user: "crcuser"
+      when: strategy == "multinode"
+    # TODO: review
+#    - name: OpenShift install
+#      ansible.builtin.shell: /home/crcuser/snc/install.sh &> install.out
+#      args:
+#        chdir: /home/crcuser/snc
+#      become: yes
+#      become_user: "crcuser"
+#      when: strategy == "multinode"
