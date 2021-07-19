@@ -224,6 +224,13 @@
       until: result.rc == 0
       delay: 30
       when: strategy == "multinode"
+    - name: install virt-filesystems
+      shell: yum -y install wget
+      register: result
+      retries: 6
+      until: result.rc == 0
+      delay: 30
+      when: strategy == "multinode"
     - name: restart libvirtd service
       shell: |
         sudo systemctl restart libvirtd
@@ -231,11 +238,10 @@
     # TODO: review
     - name: OpenShift pre-install
       shell: |
+        NAME="mycluster"
         # nip.io requires stop firewalld
         sudo systemctl stop firewalld
         sudo systemctl disable firewalld
-        #
-        NAME="mycluster"
         CLUSTER_DIR="$${HOME}/clusters/$${NAME}"
         if [ -d "$${CLUSTER_DIR}" ]; then
           echo "WARNING: cluster $${NAME} already exists at $${CLUSTER_DIR}"
