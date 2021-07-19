@@ -14,7 +14,7 @@ variable "gcp_vm_preemptible" {
 }
 
 variable "gcp_vm_type" {
-  default = "n1-standard-8"
+  default = "n1-standard-16"
   description = "crc or snc -> n1-standard-8; multinode -> n1-standard-16"
 }
 
