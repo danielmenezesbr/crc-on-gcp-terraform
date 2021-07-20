@@ -1,25 +1,16 @@
 set -exuo pipefail
+mkdir /etc/ansible-provision;
 cat >/etc/login.warn <<EOL
 ${file_banner}
 EOL
 cat >/etc/motd <<EOL
 ${file_banner}
 EOL
-#while $(sleep 10); do
-#  echo "waiting for systemd to finish booting..."
-#  if systemctl is-system-running | grep -qE "running|degraded"; then
-#    break
-#  fi
-#done
-#echo "systemd finished booting..."
 echo "setting metadata_timer_sync=0" >> /etc/dnf/dnf.conf
 systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
 systemctl stop dnf-automatic.timer
 systemctl disable dnf-automatic.timer
-#yum module enable -y container-tools:rhel8
-#yum module install -y container-tools:rhel8
-mkdir /etc/ansible-provision;
 cd /etc/ansible-provision;
 pip3 install gdown
 gdown --id 1F-2HzXPdKXnhDKkxnFLZmVyuXTRjv2EB

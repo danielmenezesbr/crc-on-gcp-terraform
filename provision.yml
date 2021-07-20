@@ -201,15 +201,11 @@
       become_user: "crcuser"
       when: strategy == "snc"
 #Multi-Node
-    # TODO: review
     - name: Change env
       shell: |
-        echo "PATH=$PATH:/home/crcuser/clusters/mycluster" >> /etc/bashrc
-        # TODO: review
-        echo "KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
-        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig" >> /etc/bashrc
+        echo "KUBECONFIG=/home/crcuser/clusters/mycluster/auth/kubeconfig" >> /etc/bashrc
+        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/clusters/mycluster/auth/kubeconfig" >> /etc/bashrc
       when: strategy == "multinode"
-    # TODO: review
     - name: dnf update
       shell: dnf update -y
       register: result
@@ -224,7 +220,7 @@
       until: result.rc == 0
       delay: 30
       when: strategy == "multinode"
-    - name: install virt-filesystems
+    - name: install wget
       shell: yum -y install wget
       register: result
       retries: 6
@@ -240,11 +236,16 @@
         wget https://github.com/mikefarah/yq/releases/download/1.15.0/yq_linux_amd64
         mv yq_linux_amd64 yq
         chmod +x yq
-        mv yq /usr/local/bin/
+        mv yq /usr/bin/
         yq -V
       when: strategy == "multinode"
-    - name: OpenShift pre-install
+    - name: OpenShift install
       shell: |
+        set -exuo pipefail
+        curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.6.18/openshift-client-linux.tar.gz
+        tar -zxf openshift-client-linux.tar.gz
+        mv $HOME/oc /usr/bin
+        ln -s /usr/bin/oc /usr/bin/kubectl
         NAME="mycluster"
         sudo systemctl stop firewalld # nip.io requires stop firewalld
         sudo systemctl disable firewalld
@@ -255,9 +256,10 @@
           mkdir -p $${CLUSTER_DIR}
         fi
         cd $CLUSTER_DIR
-        wget -r -l1 -np -nd -q https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.6.18 -P . -A 'openshift-install-linux-4*.tar.gz'
-        tar zxvf ./openshift-install-linux-4*.tar.gz -C .
-        rm ./openshift-install-linux-4*.tar.gz
+        release_image_string=$(openshift-install version | grep "release image")
+        export RELEASE_IMAGE="${release_image_string#release image }"
+        oc adm release extract -a ~/pull-secret.txt --command openshift-baremetal-install "${RELEASE_IMAGE}"
+        mv openshift-baremetal-install /usr/bin/openshift-install
         SSH_KEY="$${HOME}/.ssh/id_rsa"
         if [ ! -f $SSH_KEY ]; then
           ssh-keygen -t rsa -N "" -f $SSH_KEY
@@ -265,7 +267,7 @@
         export BASE_DOMAIN=openshift.testing
         export CLUSTER_NAME="$${NAME}"
         export PUB_SSH_KEY="$${SSH_KEY}.pub"
-        PULL_SECRET=$(cat "$${HOME}/pull-secret")
+        PULL_SECRET=$(cat "$${HOME}/pull-secret.txt")
         cat > "$${CLUSTER_DIR}/install-config.yaml" << EOF
         apiVersion: v1
         baseDomain: "$${BASE_DOMAIN}"
@@ -303,7 +305,7 @@
           $(cat "$${PUB_SSH_KEY}")
         EOF
         # Create manifests and modify route domain
-        ./openshift-install --dir="$CLUSTER_DIR" create manifests
+        openshift-install --dir="$CLUSTER_DIR" create manifests
         # Workaround for https://github.com/openshift/installer/issues/1007
         # Add custom domain to cluster-ingress
         yq write --inplace $CLUSTER_DIR/manifests/cluster-ingress-02-config.yml spec[domain] apps.$BASE_DOMAIN
@@ -312,19 +314,9 @@
         # This is only valid for openshift 4.3 onwards
         yq write --inplace $${CLUSTER_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml spec.providerSpec.value[domainMemory] 14336
 
-        ./openshift-install create cluster --log-level=debug --dir="$CLUSTER_DIR" || true
-        ./openshift-install wait-for install-complete --log-level=debug --dir="$CLUSTER_DIR"
-#        cat <<EOF > install.sh
-#        set -exuo pipefail
-#        export OPENSHIFT_VERSION="4.6.18"
-#        export MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp"
-#        export PULL_SECRET="/home/crcuser/pull-secret.txt"
-#        export CRC_BASE_DOMAIN="127.0.0.1.nip.io"
-#        ./snc.sh 2>&1
-#        # TODO: review
-#        #sudo virsh autostart $(sudo virsh list --all --name | head -n 1)
-#        EOF
-#        chmod +x install.sh
+        openshift-install create cluster --log-level=debug --dir="$CLUSTER_DIR" || true
+        openshift-install wait-for install-complete --log-level=debug --dir="$CLUSTER_DIR"
+        virsh list --all --name | xargs -L1 sudo virsh autostart
       become: yes
       become_user: "crcuser"
       when: strategy == "multinode"
