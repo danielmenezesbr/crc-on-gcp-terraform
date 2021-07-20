@@ -235,6 +235,14 @@
       shell: |
         sudo systemctl restart libvirtd
       when: strategy == "multinode"
+    - name: install yq
+      shell: |
+        wget https://github.com/mikefarah/yq/releases/download/1.15.0/yq_linux_amd64
+        mv yq_linux_amd64 yq
+        chmod +x yq
+        mv yq /usr/local/bin/
+        yq -V
+      when: strategy == "multinode"
     - name: OpenShift pre-install
       shell: |
         NAME="mycluster"
