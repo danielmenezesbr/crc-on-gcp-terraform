@@ -258,7 +258,7 @@
         cd $CLUSTER_DIR
         release_image_string=$(openshift-install version | grep "release image")
         export RELEASE_IMAGE="${release_image_string#release image }"
-        oc adm release extract -a ~/pull-secret.txt --command openshift-baremetal-install "${RELEASE_IMAGE}"
+        oc adm release extract -a ~/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
         mv openshift-baremetal-install /usr/bin/openshift-install
         SSH_KEY="$${HOME}/.ssh/id_rsa"
         if [ ! -f $SSH_KEY ]; then
