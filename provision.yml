@@ -261,8 +261,8 @@
         oc adm release extract -a /home/crcuser/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
         mv openshift-baremetal-install /usr/bin/openshift-install
         SSH_KEY="$${HOME}/.ssh/id_rsa"
-        if [ ! -f $${SSH_KEY} ]; then
-          ssh-keygen -t rsa -N "" -f $${SSH_KEY}
+        if [ ! -f ${"$"}SSH_KEY ]; then
+          ssh-keygen -t rsa -N "" -f ${"$"}SSH_KEY
         fi
         export BASE_DOMAIN=openshift.testing
         export CLUSTER_NAME="$${NAME}"
