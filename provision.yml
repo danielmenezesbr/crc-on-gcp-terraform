@@ -245,8 +245,8 @@
         cd ~
         curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.6.18/openshift-client-linux.tar.gz
         tar -zxf openshift-client-linux.tar.gz
-        mv $HOME/oc /usr/bin
-        ln -s /usr/bin/oc /usr/bin/kubectl
+        sudo mv $HOME/oc /usr/bin
+        sudo ln -s /usr/bin/oc /usr/bin/kubectl
         NAME="mycluster"
         sudo systemctl stop firewalld # nip.io requires stop firewalld
         sudo systemctl disable firewalld
@@ -260,7 +260,7 @@
         release_image_string=$(openshift-install version | grep "release image")
         export RELEASE_IMAGE="$${release_image_string#release image }"
         oc adm release extract -a /home/crcuser/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
-        mv openshift-baremetal-install /usr/bin/openshift-install
+        sudo mv openshift-baremetal-install /usr/bin/openshift-install
         SSH_KEY="$${HOME}/.ssh/id_rsa"
         if [ ! -f $SSH_KEY ]; then
           ssh-keygen -t rsa -N "" -f $SSH_KEY
