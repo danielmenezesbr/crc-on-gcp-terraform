@@ -242,6 +242,11 @@
     - name: OpenShift install
       shell: |
         set -exuo pipefail
+        echo -e "[main]\ndns=dnsmasq" | sudo tee /etc/NetworkManager/conf.d/openshift.conf
+        echo server=/openshift.testing/192.168.126.1 | sudo tee /etc/NetworkManager/dnsmasq.d/openshift.conf
+        # Create new domain for ingress to make sure it able to resolve auth route URL
+        echo address=/.apps.openshift.testing/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
+        sudo systemctl restart NetworkManager
         cd ~
         curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.6.18/openshift-client-linux.tar.gz
         tar -zxf openshift-client-linux.tar.gz
