@@ -322,8 +322,8 @@
         yq write --inplace $${CLUSTER_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml spec.providerSpec.value[domainMemory] 14336
         cat <<EOF > install.sh
         set -exuo pipefail
-        openshift-install create cluster --log-level=debug --dir="$CLUSTER_DIR" || true
-        openshift-install wait-for install-complete --log-level=debug --dir="$CLUSTER_DIR"
+        openshift-install create cluster --dir="$CLUSTER_DIR" || true
+        openshift-install wait-for install-complete --dir="$CLUSTER_DIR"
         sudo virsh list --all --name | xargs -L1 sudo virsh autostart
         EOF
         chmod +x install.sh
