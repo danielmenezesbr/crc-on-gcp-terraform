@@ -315,18 +315,20 @@
         # Add master memory to 12 GB
         # This is only valid for openshift 4.3 onwards
         yq write --inplace $${CLUSTER_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml spec.providerSpec.value[domainMemory] 14336
-
+        cat <<EOF > install.sh
+        set -exuo pipefail
         openshift-install create cluster --log-level=debug --dir="$CLUSTER_DIR" || true
         openshift-install wait-for install-complete --log-level=debug --dir="$CLUSTER_DIR"
-        virsh list --all --name | xargs -L1 sudo virsh autostart
+        sudo virsh list --all --name | xargs -L1 sudo virsh autostart
+        EOF
+        chmod +x install.sh
       become: yes
       become_user: "crcuser"
       when: strategy == "multinode"
-    # TODO: review
-#    - name: OpenShift install
-#      ansible.builtin.shell: /home/crcuser/snc/install.sh &> install.out
-#      args:
-#        chdir: /home/crcuser/snc
-#      become: yes
-#      become_user: "crcuser"
-#      when: strategy == "multinode"
+    - name: OpenShift install
+      ansible.builtin.shell: /home/crcuser/clusters/mycluster/install.sh &> install.out
+      args:
+        chdir: /home/crcuser/clusters/mycluster
+      become: yes
+      become_user: "crcuser"
+      when: strategy == "multinode"
