@@ -257,8 +257,9 @@
           mkdir -p $${CLUSTER_DIR}
         fi
         cd $CLUSTER_DIR
-        release_image_string=$(openshift-install version | grep "release image")
-        export RELEASE_IMAGE="$${release_image_string#release image }"
+        #release_image_string=$(openshift-install version | grep "release image")
+        #export RELEASE_IMAGE="$${release_image_string#release image }"
+        RELEASE_IMAGE="quay.io/openshift-release-dev/ocp-release@sha256:08ef16270e643a001454410b22864db6246d782298be267688a4433d83f404f4"
         oc adm release extract -a /home/crcuser/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
         sudo mv openshift-baremetal-install /usr/bin/openshift-install
         SSH_KEY="$${HOME}/.ssh/id_rsa"
