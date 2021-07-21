@@ -242,6 +242,7 @@
     - name: OpenShift install
       shell: |
         set -exuo pipefail
+        cd ~
         curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.6.18/openshift-client-linux.tar.gz
         tar -zxf openshift-client-linux.tar.gz
         mv $HOME/oc /usr/bin
