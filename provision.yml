@@ -330,10 +330,10 @@
       become: yes
       become_user: "crcuser"
       when: strategy == "multinode"
-    - name: OpenShift install
-      ansible.builtin.shell: /home/crcuser/clusters/mycluster/install.sh &> install.out
-      args:
-        chdir: /home/crcuser/clusters/mycluster
-      become: yes
-      become_user: "crcuser"
-      when: strategy == "multinode"
+#    - name: OpenShift install
+#      ansible.builtin.shell: /home/crcuser/clusters/mycluster/install.sh &> install.out
+#      args:
+#        chdir: /home/crcuser/clusters/mycluster
+#      become: yes
+#      become_user: "crcuser"
+#      when: strategy == "multinode"
