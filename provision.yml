@@ -242,6 +242,14 @@
     - name: OpenShift install
       shell: |
         set -exuo pipefail
+        sudo bash -c 'cat >> /etc/modprobe.d/kvm.conf' << EOF
+        options kvm_intel nested=1
+        EOF
+        # Ensure nesting is enabled in the kernel
+        # TODO: verify this is still necessary
+        sudo modprobe -r kvm_intel
+        sudo modprobe kvm_intel nested=1
+        sudo systemctl restart libvirtd
         echo -e "[main]\ndns=dnsmasq" | sudo tee /etc/NetworkManager/conf.d/openshift.conf
         echo server=/openshift.testing/192.168.126.1 | sudo tee /etc/NetworkManager/dnsmasq.d/openshift.conf
         # Create new domain for ingress to make sure it able to resolve auth route URL
