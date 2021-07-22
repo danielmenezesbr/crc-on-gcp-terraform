@@ -1,5 +1,26 @@
 set -exuo pipefail
 mkdir /etc/ansible-provision;
+function fail {
+  echo $1 >&2
+  exit 1
+}
+
+function retry {
+  local n=1
+  local max=5
+  local delay=15
+  while true; do
+    "$@" && break || {
+      if [[ $n -lt $max ]]; then
+        ((n++))
+        echo "Command failed. Attempt $n/$max:"
+        sleep $delay;
+      else
+        fail "The command has failed after $n attempts."
+      fi
+    }
+  done
+}
 cat >/etc/login.warn <<EOL
 ${file_banner}
 EOL
@@ -18,7 +39,7 @@ gdown --id 12nmicIMrZBtk7EPFl_RcIG_Votn-YUI2
 tar -xf ansible29.tar.gz
 ps aux | grep "automatic.conf --timer"
 kill $(ps aux | grep 'automatic.conf --timer' | awk '{print $2}') || true
-dnf install *.rpm -y
+retry dnf install *.rpm -y
 cat >/tmp/inadyn.conf <<EOL
 ${file_inadyn_conf}
 EOL
