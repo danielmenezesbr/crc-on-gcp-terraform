@@ -32,16 +32,68 @@ toc::[]
 
 <<<
 
-= CRC (CodeReady Containers) / SNC (Single Node Cluster) on GCP (Google Cloud Platform)
+= Openshift 4 development environment on GCP
 
-This repository provides an automated way to provision
-https://developers.redhat.com/products/codeready-containers/overview[CRC]
-/ https://github.com/code-ready/snc[SNC]
-on https://cloud.google.com/[GCP].
+The purpose of this repository is to provide an
+automated way to provision an Openshift 4
+development environment hosted
+on https://cloud.google.com/[GCP] at the
+lowest possible cost.
 
-== CRC vs SNC
+== Strategies (CRC vs SNC vs MNC)
 
-TODO:
+There are 3 OpenShift development environment (OCP)
+provisioning strategies in GCP
+
+* https://developers.redhat.com/products/codeready-containers/overview[CRC (CodeReady Containers)]
+
+* https://github.com/code-ready/snc[SNC (Single Node Cluster)]
+
+* MNC (Multi Node Cluster): this is an installation via
+https://github.com/openshift/installer/tree/master/docs/dev/libvirt[Libvirt]
+with multi node.
+
+All strategies are deployed on a single GCP instance.
+Also, all strategies use the
+https://github.com/openshift/installer/tree/master/docs/dev/libvirt[Libvirt]
+provider to create nested VMs inside the GCP instance).
+
+Below is a summary of the characteristics of each strategy:
+
+|===
+| |CRC |SNC |MNC
+
+|Use a single GCP instance?
+|YES
+|YES
+|YES
+
+|Single node or multi node (number of VMs created inside the GCP instance) ?
+|Single Node
+|Single Node
+|Multi Node
+
+|Allows installing any version of OCP?
+|NO
+|YES
+|YES
+
+|Allows using wildcard DNS services like nip.io?
+|NO
+|YES
+|YES
+
+|Resource consumption
+|Low
+|Medium
+|High
+
+|Time to provision the environment
+|Low
+|High
+|High
+|===
+
 
 
 == Setting Up Your Development Environment
@@ -142,16 +194,15 @@ TODO:
 |===
 |Parameter |Default |Description
 
-|crc_enabled / snc_enabled
-|CRC is enabled by default:
+|strategy
+|crc
+|Strategies:
 
-crc_enabled = true
+crc
 
-snc_enabled = false
-|To enabled SNC change variables.tf:
+snc
 
-Set `false` to `crc_enabled` and
-set `true` to `snc_enabled`
+mnc
 
 |gcp_vm_preemptible
 |true
@@ -171,7 +222,16 @@ Set `false` if you want to use a normal VM.
 
 |gcp_vm_type
 |n1-standard-8
-|n1-standard-8 has 8 vCPUs and 30 GB memory
+|n1-standard-8 has 8 vCPUs and 30 GB memory.
+
+If you choose mnc strategy, choose a machine with
+more resources like:
+
+`n2-highmem-8` (8 vCPUs and 64 Gib memory)
+
+or
+
+`n1-standard-16` (16 vCPUS and 60 Gib memory)
 
 |gcp_vm_disk_type
 |pd-standard

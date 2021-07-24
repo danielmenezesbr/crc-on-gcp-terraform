@@ -1,11 +1,11 @@
 variable "strategy" {
   type    = string
-  description = "crc, snc or multinode"
-  default = "multinode"
+  description = "crc, snc or mnc"
+  default = "crc"
 
   validation {
-    condition     = contains(["crc", "snc", "multinode"], var.strategy)
-    error_message = "Allowed values for input_parameter are \"crc\", \"snc\", or \"multinode\"."
+    condition     = contains(["crc", "snc", "mnc"], var.strategy)
+    error_message = "Allowed values for input_parameter are \"crc\", \"snc\", or \"mnc\"."
   }
 }
 
@@ -14,8 +14,8 @@ variable "gcp_vm_preemptible" {
 }
 
 variable "gcp_vm_type" {
-  default = "n1-standard-16"
-  description = "crc or snc -> n1-standard-8; multinode -> n1-standard-16"
+  default = "n1-standard-8"
+  description = "crc or snc -> n1-standard-8; mnc ->  n2-highmem-8 or n1-standard-16"
 }
 
 variable "gcp_vm_disk_type" {

@@ -205,32 +205,32 @@
       shell: |
         echo "KUBECONFIG=/home/crcuser/clusters/mycluster/auth/kubeconfig" >> /etc/bashrc
         echo "K8S_AUTH_KUBECONFIG=/home/crcuser/clusters/mycluster/auth/kubeconfig" >> /etc/bashrc
-      when: strategy == "multinode"
+      when: strategy == "mnc"
     - name: dnf update
       shell: dnf update -y
       register: result
       retries: 6
       until: result.rc == 0
       delay: 30
-      when: strategy == "multinode"
+      when: strategy == "mnc"
     - name: install virt-filesystems
       shell: yum -y install /usr/bin/virt-filesystems
       register: result
       retries: 6
       until: result.rc == 0
       delay: 30
-      when: strategy == "multinode"
+      when: strategy == "mnc"
     - name: install wget
       shell: yum -y install wget
       register: result
       retries: 6
       until: result.rc == 0
       delay: 30
-      when: strategy == "multinode"
+      when: strategy == "mnc"
     - name: restart libvirtd service
       shell: |
         sudo systemctl restart libvirtd
-      when: strategy == "multinode"
+      when: strategy == "mnc"
     - name: install yq
       shell: |
         wget https://github.com/mikefarah/yq/releases/download/1.15.0/yq_linux_amd64
@@ -238,7 +238,7 @@
         chmod +x yq
         mv yq /usr/bin/
         yq -V
-      when: strategy == "multinode"
+      when: strategy == "mnc"
     - name: OpenShift install
       shell: |
         set -exuo pipefail
@@ -342,11 +342,11 @@
         chmod +x install.sh
       become: yes
       become_user: "crcuser"
-      when: strategy == "multinode"
+      when: strategy == "mnc"
 #    - name: OpenShift install
 #      ansible.builtin.shell: /home/crcuser/clusters/mycluster/install.sh &> install.out
 #      args:
 #        chdir: /home/crcuser/clusters/mycluster
 #      become: yes
 #      become_user: "crcuser"
-#      when: strategy == "multinode"
+#      when: strategy == "mnc"
