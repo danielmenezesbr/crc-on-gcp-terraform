@@ -8,6 +8,8 @@ sudo journalctl -u google-startup-scripts.service -f
 sudo tail -f /var/log/messages -n +1 | grep runuser
 2.2) SNC
 sudo tail -f /home/crcuser/snc/install.out
+2.3) MNC
+sudo tail -f /home/crcuser/clusters/cluster/install.out
 
 3) login with crcuser. Password: password
 su - crcuser

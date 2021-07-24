@@ -194,7 +194,7 @@
       become_user: "crcuser"
       when: strategy == "snc"
     - name: SNC install
-      ansible.builtin.shell: /home/crcuser/snc/install.sh &> install.out
+      ansible.builtin.shell: /home/crcuser/snc/install.sh &> install.out &
       args:
         chdir: /home/crcuser/snc
       become: yes
@@ -343,10 +343,10 @@
       become: yes
       become_user: "crcuser"
       when: strategy == "mnc"
-#    - name: OpenShift install
-#      ansible.builtin.shell: /home/crcuser/clusters/mycluster/install.sh &> install.out
-#      args:
-#        chdir: /home/crcuser/clusters/mycluster
-#      become: yes
-#      become_user: "crcuser"
-#      when: strategy == "mnc"
+    - name: OpenShift install
+      ansible.builtin.shell: /home/crcuser/clusters/mycluster/install.sh &> install.out &
+      args:
+        chdir: /home/crcuser/clusters/mycluster
+      become: yes
+      become_user: "crcuser"
+      when: strategy == "mnc"
