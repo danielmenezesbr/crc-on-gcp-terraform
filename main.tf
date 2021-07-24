@@ -54,17 +54,17 @@ resource "google_compute_instance" "crc-build-box" {
   name = "${var.instance-name}-${count.index + 1}"
   machine_type = var.gcp_vm_type
 
-  zone = var.region
+  zone = var.zone
 
   #min_cpu_platform = "Intel Haswell"
 
   tags = [
-    "${var.network}-firewall-ssh",
-    "${var.network}-firewall-http",
-    "${var.network}-firewall-https",
-    "${var.network}-firewall-icmp",
-    "${var.network}-firewall-openshift-console",
-    "${var.network}-firewall-secure-forward",
+    "default-firewall-ssh",
+    "default-firewall-http",
+    "default-firewall-https",
+    "default-firewall-icmp",
+    "default-firewall-openshift-console",
+    "default-firewall-secure-forward",
   ]
   
   scheduling {
@@ -87,7 +87,8 @@ resource "google_compute_instance" "crc-build-box" {
   metadata_startup_script = "${data.template_file.default.rendered}"
 
   network_interface {
-    subnetwork = "${google_compute_subnetwork.crc_network_subnetwork.name}"
+    #subnetwork = "${google_compute_subnetwork.crc_network_subnetwork.name}"
+    network = "default"
 
     access_config {
       // Ephemeral IP

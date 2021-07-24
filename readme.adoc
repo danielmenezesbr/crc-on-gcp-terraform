@@ -435,8 +435,20 @@ cat /home/crcuser/snc/crc-tmp-install-data/auth/kubeadmin-password
 
 After installing the https://cloud.google.com/sdk/docs/install[Google
 Cloud SDK (gcloud)] on your laptop, execute the commands in order to
-forward the local ports 80 and 443 to the IP which CRC meets the
-requests.
+forward the local ports 80 and 443 to the IP which OpenShift Enviroment
+meets the requests.
+
+[NOTE]
+====
+Tip for Windows users: use a shell bash like "Git Bash" to execute the
+previous commands. Also, install Python 3.9 manually and set
+CLOUDSDK_PYTHON after opening Git Bash:
+
+[source,bash]
+----
+export CLOUDSDK_PYTHON='/c/Python39/python.exe'
+----
+====
 
 [source,bash]
 ----
@@ -461,19 +473,13 @@ gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_P
 ----
 gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.126.11:80 -L 443:192.168.126.11:443 -N
 ----
-[NOTE]
-====
-Tip for Windows users: use a shell bash like "Git Bash" to execute the
-previous commands. Also, install Python 3.9 manually and set
-CLOUDSDK_PYTHON after opening Git Bash:
+
+==== For MNC
 
 [source,bash]
 ----
-export CLOUDSDK_PYTHON='/c/Python39/python.exe'
+gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.126.11:80 -L 443:192.168.126.11:443 -N
 ----
-====
-
-TODO: talk about autossh
 
 === add hosts file
 

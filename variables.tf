@@ -24,7 +24,11 @@ variable "gcp_vm_disk_type" {
 }
 
 variable "region" {
-  default = "us-central1-a"
+  default = "northamerica-northeast1"
+}
+
+variable "zone" {
+  default = "northamerica-northeast1-a"
 }
 
 variable "project_id" {
@@ -45,13 +49,13 @@ variable "instance-name" {
   default = "crc-build"
 }
 
-variable "subnetwork-region" {
-  default = "us-central1"
-}
-
-variable "network" {
-  default = "crc-network"
-}
+#variable "subnetwork-region" {
+#  default = "us-central1"
+#}
+#
+#variable "network" {
+#  default = "crc-network"
+#}
 
 variable "image" {
   default = "projects/okd4-280016/global/images/packer-1597358211"
