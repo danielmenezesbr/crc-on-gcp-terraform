@@ -49,6 +49,9 @@ EOL
 cat >/tmp/crc.j2 <<EOL
 ${file_crc_j2}
 EOL
+cat >/tmp/tools.sh <<EOL
+${file_tools_sh}
+EOL
 echo "${file_provision_yml}"
 echo "${file_provision_yml}" | base64 -d > /tmp/provision.yml
 cp -a /tmp/inadyn.conf .

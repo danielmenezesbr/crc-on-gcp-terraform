@@ -21,6 +21,7 @@ data "template_file" "default" {
     file_ddns_j2 = "${file("${path.module}/ddns.j2")}"
     file_crc_j2 = "${file("${path.module}/crc.j2")}"
     file_banner = "${file("${path.module}/banner.txt")}"
+    file_tools_sh = "${file("${path.module}/tools.sh")}"
   }
 }
 
