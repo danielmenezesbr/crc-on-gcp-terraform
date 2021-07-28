@@ -338,6 +338,7 @@
         sudo virsh list --all --name | xargs -L1 sudo virsh autostart
         export SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /home/crcuser/.ssh/id_rsa"
         export CRC_VM_NAME=$CLUSTER_NAME
+        export BASE_DOMAIN=$BASE_DOMAIN
         source /tmp/tools.sh
         renew_certificates
         EOF
