@@ -40,16 +40,16 @@ tar -xf ansible29.tar.gz
 ps aux | grep "automatic.conf --timer"
 kill $(ps aux | grep 'automatic.conf --timer' | awk '{print $2}') || true
 retry dnf install *.rpm -y
-cat >/tmp/inadyn.conf <<EOL
+cat >/tmp/inadyn.conf <<'EOL'
 ${file_inadyn_conf}
 EOL
-cat >/tmp/ddns.j2 <<EOL
+cat >/tmp/ddns.j2 <<'EOL'
 ${file_ddns_j2}
 EOL
-cat >/tmp/crc.j2 <<EOL
+cat >/tmp/crc.j2 <<'EOL'
 ${file_crc_j2}
 EOL
-cat >/tmp/tools.sh <<EOL
+cat >/tmp/tools.sh <<'EOL'
 ${file_tools_sh}
 EOL
 echo "${file_provision_yml}"
