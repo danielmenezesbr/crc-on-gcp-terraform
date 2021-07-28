@@ -1,5 +1,5 @@
 https://github.com/danielmenezesbr/crc-on-gcp-terraform
-
+If you prefer, aliases 1 2 3 are available for the following commands:
 1) wait for provision
 sudo journalctl -u google-startup-scripts.service -f
 
@@ -13,6 +13,8 @@ sudo tail -f /home/crcuser/clusters/mycluster/install.out
 
 3) login with crcuser. Password: password
 su - crcuser
+
+Alias 1 2 3
 
 Terraform:
 Recreate environment:

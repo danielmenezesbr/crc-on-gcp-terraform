@@ -1,5 +1,26 @@
 set -exuo pipefail
 mkdir /etc/ansible-provision;
+
+cat >/etc/profile.d/env.sh <<'EOL'
+export strategy=${strategy}
+alias 1='sudo journalctl -u google-startup-scripts.service -f'
+case $strategy in
+        crc)
+                alias 2='sudo tail -f /var/log/messages -n +1 | grep runuser'
+                ;;
+        snc)
+                alias 2='sudo tail -f /home/crcuser/snc/install.out'
+                ;;
+        mnc)
+                alias 2='sudo tail -f /home/crcuser/clusters/mycluster/install.out'
+                ;;
+        *)
+                alias 2='echo please review /etc/profile.d/env.sh'
+                ;;
+esac
+alias 3='su - crcuser'
+EOL
+
 function fail {
   echo $1 >&2
   exit 1
