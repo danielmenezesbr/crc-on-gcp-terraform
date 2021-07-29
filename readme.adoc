@@ -95,6 +95,8 @@ Below is a summary of the characteristics of each strategy:
 |===
 
 
+Before choosing MNC, be aware of its <<mnc-limitations, limitations>>.
+
 
 == Setting Up Your Development Environment
 
@@ -654,6 +656,19 @@ Recreate environment in case of preemption before the environment <<link-ready,i
 ./terraformDocker.sh destroy -auto-approve
 ./terraformDocker.sh -var-file="secrets.tfvars" -auto-approve
 ----
+
+
+== Limitations
+
+[[mnc-limitations]]
+=== MNC
+
+Certificate renewal as described in this
+https://github.com/redhat-cop/openshift-lab-origin/blob/master/OpenShift4/Stopping_and_Resuming_OCP4_Clusters.adoc[link]
+did not work on MNC. Therefore, when the machine is restarted
+the status of the nodes will be `NotReady`. In other words, MNC
+cluster is functional even before restarting the GCP instance.
+If you know how to fix it, please create a PR.
 
 [[link-cleanup]]
 == Cleanup

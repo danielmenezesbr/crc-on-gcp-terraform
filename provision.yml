@@ -242,7 +242,6 @@
     - name: OpenShift install
       shell: |
         set -exuo pipefail
-        OCP_VERSION="4.6.40"
         sudo bash -c 'cat >> /etc/modprobe.d/kvm.conf' << EOF
         options kvm_intel nested=1
         EOF
@@ -262,7 +261,8 @@
         echo address=/.apps.openshift.testing/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
         sudo systemctl restart NetworkManager
         cd ~
-        curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$${OCP_VERSION}/openshift-client-linux.tar.gz
+        export OPENSHIFT_VERSION="4.6.18"
+        curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$${OPENSHIFT_VERSION}/openshift-client-linux.tar.gz
         tar -zxf openshift-client-linux.tar.gz
         sudo mv $HOME/oc /usr/bin
         sudo ln -s /usr/bin/oc /usr/bin/kubectl
@@ -276,7 +276,7 @@
           mkdir -p $${CLUSTER_DIR}
         fi
         cd $CLUSTER_DIR
-        RELEASE_IMAGE="quay.io/openshift-release-dev/ocp-release:$${OCP_VERSION}-x86_64"
+        RELEASE_IMAGE="quay.io/openshift-release-dev/ocp-release:$${OPENSHIFT_VERSION}-x86_64"
         oc adm release extract -a /home/crcuser/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
         sudo mv openshift-baremetal-install /usr/bin/openshift-install
         SSH_KEY="$${HOME}/.ssh/id_rsa"
@@ -323,9 +323,9 @@
         sshKey: |
           $(cat "$${PUB_SSH_KEY}")
         EOF
-        sed -i 's/mastersSchedulable: false/mastersSchedulable: true/' $CLUSTER_DIR/manifests/cluster-scheduler-02-config.yml
         # Create manifests and modify route domain
         openshift-install --dir="$CLUSTER_DIR" create manifests
+        sed -i 's/mastersSchedulable: false/mastersSchedulable: true/' $CLUSTER_DIR/manifests/cluster-scheduler-02-config.yml
         # Workaround for https://github.com/openshift/installer/issues/1007
         # Add custom domain to cluster-ingress
         yq write --inplace $CLUSTER_DIR/manifests/cluster-ingress-02-config.yml spec[domain] apps.$BASE_DOMAIN
