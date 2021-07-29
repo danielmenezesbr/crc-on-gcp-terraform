@@ -478,7 +478,7 @@ gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_P
 
 [source,bash]
 ----
-gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.126.11:80 -L 443:192.168.126.11:443 -N
+gcloud beta compute ssh --zone "us-central1-a" "crc-build-1" --project $TF_VAR_PROJECT_ID -- -L 80:192.168.126.51:80 -L 443:192.168.126.51:443 -N
 ----
 
 === add hosts file

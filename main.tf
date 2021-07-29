@@ -14,20 +14,20 @@ tail -f /home/crcuser/snc/install.out
 
 
 data "template_file" "default" {
-  template = "${file("${path.module}/init.tpl")}"
+  template = file("${path.module}/init.tpl")
   vars = {
-    file_inadyn_conf = "${data.template_file.inadyn_conf.rendered}"
-    file_provision_yml = "${base64encode(data.template_file.provision_yml.rendered)}"
-    file_ddns_j2 = "${file("${path.module}/ddns.j2")}"
-    file_crc_j2 = "${file("${path.module}/crc.j2")}"
-    file_banner = "${file("${path.module}/banner.txt")}"
-    file_tools_sh = "${file("${path.module}/tools.sh")}"
-    strategy = "${var.strategy}"
+    file_inadyn_conf = data.template_file.inadyn_conf.rendered
+    file_provision_yml = base64encode(data.template_file.provision_yml.rendered)
+    file_ddns_j2 = file("${path.module}/ddns.j2")
+    file_crc_j2 = file("${path.module}/crc.j2")
+    file_banner = file("${path.module}/banner.txt")
+    file_tools_sh = file("${path.module}/tools.sh")
+    strategy = var.strategy
   }
 }
 
 data "template_file" "inadyn_conf" {
-  template = "${file("${path.module}/inadyn.conf")}"
+  template = file("${path.module}/inadyn.conf")
   vars = {
     ddns_provider = var.ddns_provider
     ddns_login = var.ddns_login
@@ -37,17 +37,17 @@ data "template_file" "inadyn_conf" {
 }
 
 data "template_file" "provision_yml" {
-  template = "${file("${path.module}/provision.yml")}"
+  template = file("${path.module}/provision.yml")
   vars = {
-    ddns_enabled = "${var.ddns_enabled}"
-    docker_login = "${var.docker_login}"
-    docker_password = "${var.docker_password}"
-    strategy: "${var.strategy}"
-    crc_pull_secret = "${file("${path.module}/pull-secret.txt")}"
-    crc_snc_memory = "${var.crc_snc_memory}"
-    crc_snc_cpus = "${var.crc_snc_cpus}"
-    snc_disk_size = "${var.snc_disk_size}"
-    crc_monitoring_enabled = "${var.crc_monitoring_enabled}"
+    ddns_enabled = var.ddns_enabled
+    docker_login = var.docker_login
+    docker_password = var.docker_password
+    strategy: var.strategy
+    crc_pull_secret = file("${path.module}/pull-secret.txt")
+    crc_snc_memory = var.crc_snc_memory
+    crc_snc_cpus = var.crc_snc_cpus
+    snc_disk_size = var.snc_disk_size
+    crc_monitoring_enabled = var.crc_monitoring_enabled
   }
 }
 
@@ -86,7 +86,7 @@ resource "google_compute_instance" "crc-build-box" {
     ssh-keys = "crcuser:${file("crcuser_key.pub")}"
   }
   
-  metadata_startup_script = "${data.template_file.default.rendered}"
+  metadata_startup_script = data.template_file.default.rendered
 
   network_interface {
     #subnetwork = "${google_compute_subnetwork.crc_network_subnetwork.name}"

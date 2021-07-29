@@ -242,6 +242,7 @@
     - name: OpenShift install
       shell: |
         set -exuo pipefail
+        OCP_VERSION="4.6.40"
         sudo bash -c 'cat >> /etc/modprobe.d/kvm.conf' << EOF
         options kvm_intel nested=1
         EOF
@@ -261,7 +262,7 @@
         echo address=/.apps.openshift.testing/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
         sudo systemctl restart NetworkManager
         cd ~
-        curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.6.40/openshift-client-linux.tar.gz
+        curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$${OCP_VERSION}/openshift-client-linux.tar.gz
         tar -zxf openshift-client-linux.tar.gz
         sudo mv $HOME/oc /usr/bin
         sudo ln -s /usr/bin/oc /usr/bin/kubectl
@@ -275,7 +276,7 @@
           mkdir -p $${CLUSTER_DIR}
         fi
         cd $CLUSTER_DIR
-        RELEASE_IMAGE="quay.io/openshift-release-dev/ocp-release:4.6.40-x86_64"
+        RELEASE_IMAGE="quay.io/openshift-release-dev/ocp-release:$${OCP_VERSION}-x86_64"
         oc adm release extract -a /home/crcuser/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
         sudo mv openshift-baremetal-install /usr/bin/openshift-install
         SSH_KEY="$${HOME}/.ssh/id_rsa"
