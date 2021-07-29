@@ -261,7 +261,7 @@
         echo address=/.apps.openshift.testing/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
         sudo systemctl restart NetworkManager
         cd ~
-        export OPENSHIFT_VERSION="4.6.18"
+        export OPENSHIFT_VERSION="4.6.40"
         curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$${OPENSHIFT_VERSION}/openshift-client-linux.tar.gz
         tar -zxf openshift-client-linux.tar.gz
         sudo mv $HOME/oc /usr/bin

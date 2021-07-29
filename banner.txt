@@ -3,7 +3,7 @@ If you prefer, aliases 1 2 3 are available for the following commands:
 1) wait for provision
 sudo journalctl -u google-startup-scripts.service -f
 
-2) wait for CRC/SNC:
+2) wait for CRC/SNC/MNC:
 2.1) CRC
 sudo tail -f /var/log/messages -n +1 | grep runuser
 2.2) SNC
@@ -14,10 +14,4 @@ sudo tail -f /home/crcuser/clusters/mycluster/install.out
 3) login with crcuser. Password: password
 su - crcuser
 
-Alias 1 2 3
-
-Terraform:
-Recreate environment:
-./terraformDocker.sh destroy -auto-approve && terraform apply -var-file="secrets.tfvars" -auto-approve
-Apply:
-./terraformDocker.sh apply -var-file="secrets.tfvars" -auto-approve
+Alias: 0 (show this banner) 1 2 3

@@ -3,6 +3,7 @@ mkdir /etc/ansible-provision;
 
 cat >/etc/profile.d/env.sh <<'EOL'
 export strategy=${strategy}
+alias 0='cat /etc/login.warn'
 alias 1='sudo journalctl -u google-startup-scripts.service -f'
 case $strategy in
         crc)
