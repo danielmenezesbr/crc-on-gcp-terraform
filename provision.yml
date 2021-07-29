@@ -294,7 +294,7 @@
           architecture: amd64
           name: worker
           platform: {}
-          replicas: 2
+          replicas: 0
         controlPlane:
           hyperthreading: Enabled
           architecture: amd64
@@ -322,6 +322,7 @@
         sshKey: |
           $(cat "$${PUB_SSH_KEY}")
         EOF
+        sed -i 's/mastersSchedulable: false/mastersSchedulable: true/' $CLUSTER_DIR/manifests/cluster-scheduler-02-config.yml
         # Create manifests and modify route domain
         openshift-install --dir="$CLUSTER_DIR" create manifests
         # Workaround for https://github.com/openshift/installer/issues/1007
