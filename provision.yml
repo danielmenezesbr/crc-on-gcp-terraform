@@ -295,7 +295,7 @@
           architecture: amd64
           name: worker
           platform: {}
-          replicas: 0
+          replicas: 2
         controlPlane:
           hyperthreading: Enabled
           architecture: amd64
