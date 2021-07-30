@@ -571,6 +571,12 @@ export OPENSHIFT_VERSION="4.6.18"
 
 === Red Hat OpenShift Service Mesh (OSSM)
 
+To install OSSM, using the MNC strategy,
+requires a gcp instance with more processors,
+for example n1-standard-16.
+It is possible to install OSSM on smaller
+instances when using CRC or SNC.
+
 When environment <<link-ready,is ready>>,
 you can use a script (It only works on OCP 4.6)
 to install OSSM on OCP 4.6:
@@ -665,7 +671,8 @@ Recreate environment in case of preemption before the environment <<link-ready,i
 
 Certificate renewal as described in this
 https://github.com/redhat-cop/openshift-lab-origin/blob/master/OpenShift4/Stopping_and_Resuming_OCP4_Clusters.adoc[link]
-did not work on MNC. Therefore, when the machine is restarted
+did https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/master/tools.sh[not work on MNC].
+ Therefore, when the machine is restarted
 the status of the nodes will be `NotReady`. In other words, MNC
 cluster is functional even before restarting the GCP instance.
 If you know how to fix it, please create a PR.
