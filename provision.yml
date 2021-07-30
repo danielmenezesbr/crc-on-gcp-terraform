@@ -325,7 +325,7 @@
         EOF
         # Create manifests and modify route domain
         openshift-install --dir="$CLUSTER_DIR" create manifests
-        sed -i 's/mastersSchedulable: false/mastersSchedulable: true/' $CLUSTER_DIR/manifests/cluster-scheduler-02-config.yml
+        #sed -i 's/mastersSchedulable: false/mastersSchedulable: true/' $CLUSTER_DIR/manifests/cluster-scheduler-02-config.yml
         # Workaround for https://github.com/openshift/installer/issues/1007
         # Add custom domain to cluster-ingress
         yq write --inplace $CLUSTER_DIR/manifests/cluster-ingress-02-config.yml spec[domain] apps.$BASE_DOMAIN
