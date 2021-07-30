@@ -24,11 +24,11 @@ variable "gcp_vm_disk_type" {
 }
 
 variable "region" {
-  default = "northamerica-northeast1"
+  default = "us-central1"
 }
 
 variable "zone" {
-  default = "northamerica-northeast1-a"
+  default = "us-central1-a"
 }
 
 variable "project_id" {
