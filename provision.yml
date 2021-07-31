@@ -104,9 +104,9 @@
       when: strategy == "crc"
     - name: Change PATH CRC
       shell: |
-        echo 'PATH="$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc"' >> /etc/bashrc
-        echo 'KUBECONFIG="/home/crcuser/.crc/machines/crc/kubeconfig"' >> /etc/bashrc
-        echo 'K8S_AUTH_KUBECONFIG="/home/crcuser/.crc/machines/crc/kubeconfig"' >> /etc/bashrc
+        echo 'export PATH="$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc"' >> /etc/bashrc
+        echo 'export KUBECONFIG="/home/crcuser/.crc/machines/crc/kubeconfig"' >> /etc/bashrc
+        echo 'export K8S_AUTH_KUBECONFIG="/home/crcuser/.crc/machines/crc/kubeconfig"' >> /etc/bashrc
       become: true
       when: strategy == "crc"
     - name: ssh config to enter inside CRC VM
@@ -126,9 +126,9 @@
 #SNC
     - name: Change PATH SNC
       shell: |
-        echo 'PATH="$PATH:/home/crcuser/snc/openshift-clients/linux"' >> /etc/bashrc
-        echo 'KUBECONFIG="/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig"' >> /etc/bashrc
-        echo 'K8S_AUTH_KUBECONFIG="/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig"' >> /etc/bashrc
+        echo 'export PATH="$PATH:/home/crcuser/snc/openshift-clients/linux"' >> /etc/bashrc
+        echo 'export KUBECONFIG="/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig"' >> /etc/bashrc
+        echo 'export K8S_AUTH_KUBECONFIG="/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig"' >> /etc/bashrc
       when: strategy == "snc"
     - name: ssh config to enter inside SNC VMs (master and bootstrap)
       shell: |
@@ -151,7 +151,6 @@
       become: yes
       become_user: "crcuser"
       when: strategy == "snc"
-
     - name: dnf update
       shell: dnf update -y
       register: result
@@ -220,8 +219,8 @@
 #Multi-Node
     - name: Change env
       shell: |
-        echo 'KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
-        echo 'K8S_AUTH_KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
+        echo 'export KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
+        echo 'export K8S_AUTH_KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
       when: strategy == "mnc"
     - name: dnf update
       shell: dnf update -y
