@@ -31,6 +31,14 @@ variable "zone" {
   default = "us-central1-a"
 }
 
+variable "os" {
+  default = "centos-8-v20210512"
+}
+
+variable "image-name" {
+  default = "my-centos-8"
+}
+
 variable "project_id" {
   default = ""
   validation {
