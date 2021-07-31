@@ -54,7 +54,7 @@ data "template_file" "provision_yml" {
 resource "google_compute_disk" "crcdisk" {
   name  = "${var.disk-name}"
   type  = "pd-standard"
-  zone  = "${var.region}"
+  zone  = "${var.zone}"
   image = "${var.os}"
 
   timeouts {
