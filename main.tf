@@ -100,3 +100,7 @@ resource "google_compute_instance" "crc-build-box" {
   create = "60m"
   }
 }
+
+resource "google_compute_project_default_network_tier" "default" {
+  network_tier = "STANDARD"
+}
