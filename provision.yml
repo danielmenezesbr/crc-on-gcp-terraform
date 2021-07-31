@@ -171,6 +171,7 @@
       when: strategy == "snc"
     - name: SNC pre-install
       shell: |
+        set -exuo pipefail
         mkdir /home/crcuser/snc
         git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
         #git clone --branch fix-hardcoded-api.crc.testing https://github.com/danielmenezesbr/snc /home/crcuser/snc
