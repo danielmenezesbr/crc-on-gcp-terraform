@@ -31,12 +31,9 @@ variable "zone" {
   default = "us-central1-a"
 }
 
-variable "os" {
+variable "image" {
   default = "centos-8-v20210512"
-}
-
-variable "image-name" {
-  default = "my-centos-8"
+  #default = "projects/okd4-280016/global/images/packer-1597358211"
 }
 
 variable "project_id" {
@@ -64,10 +61,6 @@ variable "instance-name" {
 #variable "network" {
 #  default = "crc-network"
 #}
-
-variable "image" {
-  default = "projects/okd4-280016/global/images/packer-1597358211"
-}
 
 variable "disk-name" {
   default = "crcdisk"
