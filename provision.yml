@@ -104,9 +104,9 @@
       when: strategy == "crc"
     - name: Change PATH CRC
       shell: |
-        echo "PATH=$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc" >> /etc/bashrc
-        echo "KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/bashrc
-        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/.crc/machines/crc/kubeconfig" >> /etc/bashrc
+        echo 'PATH="$PATH:/home/crcuser/crc:/home/crcuser/.crc/bin/oc"' >> /etc/bashrc
+        echo 'KUBECONFIG="/home/crcuser/.crc/machines/crc/kubeconfig"' >> /etc/bashrc
+        echo 'K8S_AUTH_KUBECONFIG="/home/crcuser/.crc/machines/crc/kubeconfig"' >> /etc/bashrc
       become: true
       when: strategy == "crc"
     - name: ssh config to enter inside CRC VM
@@ -220,8 +220,8 @@
 #Multi-Node
     - name: Change env
       shell: |
-        echo "KUBECONFIG=/home/crcuser/clusters/mycluster/auth/kubeconfig" >> /etc/bashrc
-        echo "K8S_AUTH_KUBECONFIG=/home/crcuser/clusters/mycluster/auth/kubeconfig" >> /etc/bashrc
+        echo 'KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
+        echo 'K8S_AUTH_KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
       when: strategy == "mnc"
     - name: dnf update
       shell: dnf update -y
