@@ -194,7 +194,7 @@
         sed -i 's/domainMemory = 14336/domainMemory = ${crc_snc_memory}/' snc.sh
         sed -i 's/domainVcpu = 6/domainVcpu = ${crc_snc_cpus}/' snc.sh
         sed -i 's/volumeSize = 33285996544/volumeSize = ${snc_disk_size}/' snc.sh
-        cat <<EOF > install.sh
+        cat <<'EOF' > install.sh
         set -exuo pipefail
         export OPENSHIFT_VERSION="4.6.18"
         export MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp"
