@@ -6,18 +6,18 @@
   tasks:
 
 #COMMON
-#    - name: Enabled container-tools (skopeo, podman and buildah)
-#      shell: yum module enable -y container-tools:rhel8
-#      register: result
-#      retries: 10
-#      until: result.rc == 0
-#      delay: 30
-#    - name: Install container-tools
-#      shell: yum module install -y container-tools:rhel8
-#      register: result
-#      retries: 10
-#      until: result.rc == 0
-#      delay: 30
+    - name: Enabled container-tools (skopeo, podman and buildah)
+      shell: yum module enable -y container-tools:rhel8
+      register: result
+      retries: 10
+      until: result.rc == 0
+      delay: 30
+    - name: Install container-tools
+      shell: yum module install -y container-tools:rhel8
+      register: result
+      retries: 10
+      until: result.rc == 0
+      delay: 30
     - name: Install yum git
       yum:
         name:
