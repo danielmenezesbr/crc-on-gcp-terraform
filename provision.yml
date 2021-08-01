@@ -287,8 +287,8 @@
         # Create new domain for ingress to make sure it able to resolve auth route URL
         echo address=/.apps.openshift.testing/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
         sudo systemctl restart NetworkManager
-        #sudo timedatectl set-ntp off
-        #sudo date -s '-1 day'
+        sudo timedatectl set-ntp off
+        sudo date -s '-1 day'
         cd ~
         export OPENSHIFT_VERSION="4.6.40"
         curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$${OPENSHIFT_VERSION}/openshift-client-linux.tar.gz
