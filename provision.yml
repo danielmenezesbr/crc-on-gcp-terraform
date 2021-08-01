@@ -371,7 +371,7 @@
         export CLUSTER_NAME=$CLUSTER_NAME
         export BASE_DOMAIN=$BASE_DOMAIN
         source /tmp/tools.sh
-        #renew_certificates
+        renew_certificates
         EOF
         chmod +x install.sh
       become: yes
