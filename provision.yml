@@ -253,7 +253,7 @@
         systemctl mask libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tls.socket libvirtd-tcp.socket
         echo "net.ipv4.ip_forward = 1" | tee /etc/sysctl.d/99-ipforward.conf
         sysctl -p /etc/sysctl.d/99-ipforward.conf
-      when: strategy == "snc"
+      when: strategy == "mnc"
     - name: restart libvirtd service
       shell: |
         sudo systemctl restart libvirtd
