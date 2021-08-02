@@ -271,7 +271,7 @@
         set -exuo pipefail
         NAME="mycluster"
         CLUSTER_DIR="$${HOME}/clusters/$${NAME}"
-        INSTALL_DIR=${CLUSTER_DIR}
+        INSTALL_DIR=$${CLUSTER_DIR}
         export BASE_DOMAIN=openshift.testing
         export CLUSTER_NAME="$${NAME}"
         CERT_ROTATION=${SNC_DISABLE_CERT_ROTATION:-enabled}
@@ -305,14 +305,14 @@
 
         # Set NetworkManager DNS overlay file
         cat << EOF | sudo tee /etc/NetworkManager/dnsmasq.d/crc-snc.conf
-        server=/${CRC_VM_NAME}.${BASE_DOMAIN}/192.168.126.1
-        address=/apps-${CRC_VM_NAME}.${BASE_DOMAIN}/192.168.126.11
+        server=/$${CRC_VM_NAME}.$${BASE_DOMAIN}/192.168.126.1
+        address=/apps-$${CRC_VM_NAME}.$${BASE_DOMAIN}/192.168.126.11
         EOF
 
         # Reload the NetworkManager to make DNS overlay effective
         sudo systemctl reload NetworkManager
 
-        if [[ ${CERT_ROTATION} == "enabled" ]]
+        if [[ $${CERT_ROTATION} == "enabled" ]]
         then
             # Disable the network time sync and set the clock to past (for a day) on host
             sudo timedatectl set-ntp off
@@ -393,7 +393,7 @@
         cat <<EOF > install.sh
         set -exuo pipefail
         openshift-install create cluster --dir="$CLUSTER_DIR" || true
-        if [[ ${CERT_ROTATION} == "enabled" ]]
+        if [[ $${CERT_ROTATION} == "enabled" ]]
         then
             renew_certificates
         fi
