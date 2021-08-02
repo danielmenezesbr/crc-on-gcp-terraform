@@ -274,7 +274,7 @@
         INSTALL_DIR=$${CLUSTER_DIR}
         export BASE_DOMAIN=openshift.testing
         export CLUSTER_NAME="$${NAME}"
-        CERT_ROTATION=${SNC_DISABLE_CERT_ROTATION:-enabled}
+        CERT_ROTATION=$${SNC_DISABLE_CERT_ROTATION:-enabled}
         CRC_VM_NAME="$${NAME}"
         OPENSHIFT_INSTALL="openshift-install"
         #sudo bash -c 'cat >> /etc/modprobe.d/kvm.conf' << EOF
