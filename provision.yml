@@ -287,11 +287,11 @@
         #sudo systemctl restart libvirtd
         # Set up iptables and firewalld
         # TODO: discover the ports
-        sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
-        sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
-        sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
-        #sudo systemctl stop firewalld
-        #sudo systemctl disable firewalld
+        #sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
+        #sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
+        #sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
+        sudo systemctl stop firewalld
+        sudo systemctl disable firewalld
         # Use dnsmasq as dns in network manager config
         if ! grep -iqR dns=dnsmasq /etc/NetworkManager/conf.d/ ; then
         cat << EOF | sudo tee /etc/NetworkManager/conf.d/crc-snc-nm-dnsmasq.conf
@@ -322,7 +322,7 @@
         fi
 
         cd ~
-        export OPENSHIFT_VERSION="4.6.40"
+        export OPENSHIFT_VERSION="4.6.18"
         curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$${OPENSHIFT_VERSION}/openshift-client-linux.tar.gz
         tar -zxf openshift-client-linux.tar.gz
         sudo mv $HOME/oc /usr/bin
