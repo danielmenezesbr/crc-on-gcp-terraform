@@ -269,9 +269,9 @@
     - name: OpenShift install
       shell: |
         set -exuo pipefail
-        sudo bash -c 'cat >> /etc/modprobe.d/kvm.conf' << EOF
-        options kvm_intel nested=1
-        EOF
+        #sudo bash -c 'cat >> /etc/modprobe.d/kvm.conf' << EOF
+        #options kvm_intel nested=1
+        #EOF
         # Ensure nesting is enabled in the kernel
         # TODO: verify this is still necessary
         #sudo modprobe -r kvm_intel
@@ -296,8 +296,8 @@
         sudo mv $HOME/oc /usr/bin
         sudo ln -s /usr/bin/oc /usr/bin/kubectl
         NAME="mycluster"
-        sudo systemctl stop firewalld # nip.io requires stop firewalld
-        sudo systemctl disable firewalld
+        #sudo systemctl stop firewalld # nip.io requires stop firewalld
+        #sudo systemctl disable firewalld
         CLUSTER_DIR="$${HOME}/clusters/$${NAME}"
         if [ -d "$${CLUSTER_DIR}" ]; then
           echo "WARNING: cluster $${NAME} already exists at $${CLUSTER_DIR}"
@@ -336,15 +336,16 @@
           name: "$${CLUSTER_NAME}"
         networking:
           clusterNetwork:
-          - cidr: 10.128.0.0/14
-            hostPrefix: 23
+            - cidr: 10.217.0.0/22
+              hostPrefix: 23
           machineNetwork:
-          - cidr: 192.168.126.0/24
+            - cidr: 192.168.126.0/24
           networkType: OpenShiftSDN
           serviceNetwork:
-          - 172.30.0.0/16
+            - 10.217.4.0/23
         platform:
           libvirt:
+            URI: qemu+tcp://192.168.122.1/system
             network:
               if: tt0
         publish: External
