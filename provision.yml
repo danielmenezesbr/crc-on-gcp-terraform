@@ -274,21 +274,21 @@
         EOF
         # Ensure nesting is enabled in the kernel
         # TODO: verify this is still necessary
-        sudo modprobe -r kvm_intel
-        sudo modprobe kvm_intel nested=1
-        sudo systemctl restart libvirtd
+        #sudo modprobe -r kvm_intel
+        #sudo modprobe kvm_intel nested=1
+        #sudo systemctl restart libvirtd
         # Set up iptables and firewalld
         # TODO: discover the ports
-        sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
-        sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
-        sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
+        #sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
+        #sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
+        #sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
         echo -e "[main]\ndns=dnsmasq" | sudo tee /etc/NetworkManager/conf.d/openshift.conf
         echo server=/openshift.testing/192.168.126.1 | sudo tee /etc/NetworkManager/dnsmasq.d/openshift.conf
         # Create new domain for ingress to make sure it able to resolve auth route URL
         echo address=/.apps.openshift.testing/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
         sudo systemctl restart NetworkManager
-        sudo timedatectl set-ntp off
-        sudo date -s '-1 day'
+        #sudo timedatectl set-ntp off
+        #sudo date -s '-1 day'
         cd ~
         export OPENSHIFT_VERSION="4.6.40"
         curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$${OPENSHIFT_VERSION}/openshift-client-linux.tar.gz
@@ -296,8 +296,8 @@
         sudo mv $HOME/oc /usr/bin
         sudo ln -s /usr/bin/oc /usr/bin/kubectl
         NAME="mycluster"
-        #sudo systemctl stop firewalld # nip.io requires stop firewalld
-        #sudo systemctl disable firewalld
+        sudo systemctl stop firewalld # nip.io requires stop firewalld
+        sudo systemctl disable firewalld
         CLUSTER_DIR="$${HOME}/clusters/$${NAME}"
         if [ -d "$${CLUSTER_DIR}" ]; then
           echo "WARNING: cluster $${NAME} already exists at $${CLUSTER_DIR}"
@@ -371,7 +371,7 @@
         export CLUSTER_NAME=$CLUSTER_NAME
         export BASE_DOMAIN=$BASE_DOMAIN
         source /tmp/tools.sh
-        renew_certificates
+        #renew_certificates
         EOF
         chmod +x install.sh
       become: yes
