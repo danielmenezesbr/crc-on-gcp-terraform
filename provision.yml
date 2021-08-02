@@ -296,8 +296,8 @@
         sudo mv $HOME/oc /usr/bin
         sudo ln -s /usr/bin/oc /usr/bin/kubectl
         NAME="mycluster"
-        #sudo systemctl stop firewalld # nip.io requires stop firewalld
-        #sudo systemctl disable firewalld
+        sudo systemctl stop firewalld # nip.io requires stop firewalld
+        sudo systemctl disable firewalld
         CLUSTER_DIR="$${HOME}/clusters/$${NAME}"
         if [ -d "$${CLUSTER_DIR}" ]; then
           echo "WARNING: cluster $${NAME} already exists at $${CLUSTER_DIR}"
