@@ -287,9 +287,11 @@
         #sudo systemctl restart libvirtd
         # Set up iptables and firewalld
         # TODO: discover the ports
-        sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
-        sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
-        sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
+        #sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
+        #sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
+        #sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
+        sudo systemctl stop firewalld
+        sudo systemctl disable firewalld
         # Use dnsmasq as dns in network manager config
         if ! grep -iqR dns=dnsmasq /etc/NetworkManager/conf.d/ ; then
         cat << EOF | sudo tee /etc/NetworkManager/conf.d/crc-snc-nm-dnsmasq.conf
@@ -337,6 +339,7 @@
         RELEASE_IMAGE="quay.io/openshift-release-dev/ocp-release:$${OPENSHIFT_VERSION}-x86_64"
         oc adm release extract -a /home/crcuser/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
         sudo mv openshift-baremetal-install /usr/bin/openshift-install
+        $${OPENSHIFT_INSTALL} --dir $${INSTALL_DIR} destroy cluster || echo "failed to destroy previous cluster.  Continuing anyway"
         SSH_KEY="$${HOME}/.ssh/id_rsa"
         if [ ! -f $SSH_KEY ]; then
           ssh-keygen -t rsa -N "" -f $SSH_KEY
@@ -393,6 +396,7 @@
         cat <<EOF > install.sh
         set -exuo pipefail
         openshift-install create cluster --dir="$CLUSTER_DIR" || true
+        source /tmp/tools.sh
         if [[ $${CERT_ROTATION} == "enabled" ]]
         then
             renew_certificates
@@ -402,7 +406,6 @@
         export SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /home/crcuser/.ssh/id_rsa"
         export CLUSTER_NAME=$CLUSTER_NAME
         export BASE_DOMAIN=$BASE_DOMAIN
-        source /tmp/tools.sh
         EOF
         chmod +x install.sh
       become: yes
