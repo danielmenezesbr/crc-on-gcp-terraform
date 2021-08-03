@@ -278,9 +278,14 @@
         CERT_ROTATION=$${SNC_DISABLE_CERT_ROTATION:-enabled}
         CRC_VM_NAME="$${NAME}"
         OPENSHIFT_INSTALL="openshift-install"
-        #sudo bash -c 'cat >> /etc/modprobe.d/kvm.conf' << EOF
-        #options kvm_intel nested=1
-        #EOF
+        sudo bash -c 'cat >> /etc/modprobe.d/kvm.conf' << EOF
+        options kvm_intel nested=1
+        EOF
+        # Ensure nesting is enabled in the kernel
+        # TODO: verify this is still necessary
+        sudo modprobe -r kvm_intel
+        sudo modprobe kvm_intel nested=1
+        sudo systemctl restart libvirtd
         # Ensure nesting is enabled in the kernel
         # TODO: verify this is still necessary
         #sudo modprobe -r kvm_intel
