@@ -52,10 +52,10 @@ data "template_file" "provision_yml" {
 }
 
 resource "google_compute_disk" "crcdisk" {
-  name  = "${var.disk-name}"
+  name  = var.disk-name
   type  = "pd-standard"
-  zone  = "${var.zone}"
-  image = "${var.image}"
+  zone  = var.zone
+  image = var.image
 
   timeouts {
     create = "60m"
@@ -64,7 +64,7 @@ resource "google_compute_disk" "crcdisk" {
 
 resource "google_compute_image" "crcimg" {
   name = "my-centos-8"
-  source_disk = "${google_compute_disk.crcdisk.self_link}"
+  source_disk = google_compute_disk.crcdisk.self_link
   licenses = [
     "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx",
   ]
@@ -98,8 +98,8 @@ resource "google_compute_instance" "crc-build-box" {
 
   boot_disk {
     initialize_params {
-      image = "${google_compute_image.crcimg.self_link}"
-      #TODO: image = "${google_compute_image.crcimg.self_link}" #
+      #image = google_compute_image.crcimg.self_link
+      image = "projects/okd4-280016/global/images/packer-1597358211"
       type  = var.gcp_vm_disk_type
       size  = var.gcp_vm_disk_size
     }

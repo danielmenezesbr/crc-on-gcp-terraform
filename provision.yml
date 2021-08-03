@@ -272,7 +272,8 @@
         NAME="mycluster"
         CLUSTER_DIR="$${HOME}/clusters/$${NAME}"
         INSTALL_DIR=$${CLUSTER_DIR}
-        export BASE_DOMAIN="127.0.0.1.nip.io"
+        #export BASE_DOMAIN="127.0.0.1.nip.io"
+        export BASE_DOMAIN="openshift.testing"
         export CLUSTER_NAME="$${NAME}"
         CERT_ROTATION=$${SNC_DISABLE_CERT_ROTATION:-enabled}
         CRC_VM_NAME="$${NAME}"
@@ -290,8 +291,8 @@
         #sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
         #sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
         #sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
-        sudo systemctl stop firewalld
-        sudo systemctl disable firewalld
+        #sudo systemctl stop firewalld
+        #sudo systemctl disable firewalld
         # Use dnsmasq as dns in network manager config
         if ! grep -iqR dns=dnsmasq /etc/NetworkManager/conf.d/ ; then
         cat << EOF | sudo tee /etc/NetworkManager/conf.d/crc-snc-nm-dnsmasq.conf
