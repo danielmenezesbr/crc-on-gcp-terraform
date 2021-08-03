@@ -288,32 +288,14 @@
         #sudo systemctl restart libvirtd
         # Set up iptables and firewalld
         # TODO: discover the ports
-        #sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
-        #sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
-        #sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
-        #sudo systemctl stop firewalld
-        #sudo systemctl disable firewalld
-        # Use dnsmasq as dns in network manager config
-        if ! grep -iqR dns=dnsmasq /etc/NetworkManager/conf.d/ ; then
-        cat << EOF | sudo tee /etc/NetworkManager/conf.d/crc-snc-nm-dnsmasq.conf
-        [main]
-        dns=dnsmasq
-        EOF
-        fi
-
-        # Clean up old DNS overlay file
-        if [ -f /etc/NetworkManager/dnsmasq.d/openshift.conf ]; then
-        sudo rm /etc/NetworkManager/dnsmasq.d/openshift.conf
-        fi
-
-        # Set NetworkManager DNS overlay file
-        cat << EOF | sudo tee /etc/NetworkManager/dnsmasq.d/crc-snc.conf
-        server=/$${CRC_VM_NAME}.$${BASE_DOMAIN}/192.168.126.1
-        address=/apps-$${CRC_VM_NAME}.$${BASE_DOMAIN}/192.168.126.11
-        EOF
-
-        # Reload the NetworkManager to make DNS overlay effective
-        sudo systemctl reload NetworkManager
+        sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
+        sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
+        sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
+        echo -e "[main]\ndns=dnsmasq" | sudo tee /etc/NetworkManager/conf.d/openshift.conf
+        echo server=/openshift.testing/192.168.126.1 | sudo tee /etc/NetworkManager/dnsmasq.d/openshift.conf
+        # Create new domain for ingress to make sure it able to resolve auth route URL
+        echo address=/.apps.openshift.testing/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
+        sudo systemctl restart NetworkManager
 
         if [[ $${CERT_ROTATION} == "enabled" ]]
         then
@@ -367,16 +349,15 @@
           name: "$${CLUSTER_NAME}"
         networking:
           clusterNetwork:
-            - cidr: 10.217.0.0/22
-              hostPrefix: 23
+          - cidr: 10.128.0.0/14
+            hostPrefix: 23
           machineNetwork:
-            - cidr: 192.168.126.0/24
+          - cidr: 192.168.126.0/24
           networkType: OpenShiftSDN
           serviceNetwork:
-            - 10.217.4.0/23
+          - 172.30.0.0/16
         platform:
           libvirt:
-            URI: qemu+tcp://192.168.122.1/system
             network:
               if: tt0
         publish: External
@@ -400,7 +381,7 @@
         source /tmp/tools.sh
         if [[ $${CERT_ROTATION} == "enabled" ]]
         then
-            renew_certificates
+            #renew_certificates
         fi
         openshift-install wait-for install-complete --dir="$CLUSTER_DIR"
         sudo virsh list --all --name | xargs -L1 sudo virsh autostart
