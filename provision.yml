@@ -302,12 +302,12 @@
         echo address=/.apps.openshift.testing/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
         sudo systemctl restart NetworkManager
 
-        if [[ $${CERT_ROTATION} == "enabled" ]]
-        then
-            # Disable the network time sync and set the clock to past (for a day) on host
-            sudo timedatectl set-ntp off
-            sudo date -s '-1 day'
-        fi
+        #if [[ $${CERT_ROTATION} == "enabled" ]]
+        #then
+        #    # Disable the network time sync and set the clock to past (for a day) on host
+        #    sudo timedatectl set-ntp off
+        #    sudo date -s '-1 day'
+        #fi
 
         cd ~
         export OPENSHIFT_VERSION="4.6.18"
@@ -327,7 +327,7 @@
         RELEASE_IMAGE="quay.io/openshift-release-dev/ocp-release:$${OPENSHIFT_VERSION}-x86_64"
         oc adm release extract -a /home/crcuser/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
         sudo mv openshift-baremetal-install /usr/bin/openshift-install
-        $${OPENSHIFT_INSTALL} --dir $${INSTALL_DIR} destroy cluster || echo "failed to destroy previous cluster.  Continuing anyway"
+        #$${OPENSHIFT_INSTALL} --dir $${INSTALL_DIR} destroy cluster || echo "failed to destroy previous cluster.  Continuing anyway"
         SSH_KEY="$${HOME}/.ssh/id_rsa"
         if [ ! -f $SSH_KEY ]; then
           ssh-keygen -t rsa -N "" -f $SSH_KEY
