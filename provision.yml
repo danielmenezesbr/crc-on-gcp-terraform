@@ -296,8 +296,17 @@
         #sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
         #sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
         #sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
-        sudo systemctl stop firewalld
-        sudo systemctl disable firewalld
+        #sudo systemctl stop firewalld
+        #sudo systemctl disable firewalld
+        sudo iptables -F
+        sudo iptables -X
+        sudo iptables -t nat -F
+        sudo iptables -t nat -X
+        sudo iptables -t mangle -F
+        sudo iptables -t mangle -X
+        sudo iptables -P INPUT ACCEPT
+        sudo iptables -P FORWARD ACCEPT
+        sudo iptables -P OUTPUT ACCEPT
         echo -e "[main]\ndns=dnsmasq" | sudo tee /etc/NetworkManager/conf.d/openshift.conf
         echo server=/openshift.testing/192.168.126.1 | sudo tee /etc/NetworkManager/dnsmasq.d/openshift.conf
         # Create new domain for ingress to make sure it able to resolve auth route URL
