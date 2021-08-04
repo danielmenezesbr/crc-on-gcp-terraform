@@ -455,6 +455,33 @@ Show kubeadmin password:
 cat /home/crcuser/snc/crc-tmp-install-data/auth/kubeadmin-password
 ----
 
+====== For MNC
+
+It is not necessary to do "oc login" because
+`KUBECONFIG` is already configured for `crcuser`.
+
+[source,bash]
+----
+oc get nodes
+----
+
+[source,bash]
+----
+NAME                             STATUS   ROLES    AGE    VERSION
+mycluster-p4clh-master-0         Ready    master   107m   v1.19.0+f173eb4
+mycluster-p4clh-master-1         Ready    master   107m   v1.19.0+f173eb4
+mycluster-p4clh-master-2         Ready    master   107m   v1.19.0+f173eb4
+mycluster-p4clh-worker-0-4s5mq   Ready    worker   94m    v1.19.0+f173eb4
+mycluster-p4clh-worker-0-hhjt8   Ready    worker   94m    v1.19.0+f173eb4
+----
+
+Show kubeadmin password:
+
+[source,bash]
+----
+cat /home/crcuser/clusters/mycluster/auth/kubeadmin-password
+----
+
 == Access OpenShift Console from your laptop
 
 === SSH port fordward
