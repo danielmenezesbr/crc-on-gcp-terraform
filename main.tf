@@ -14,18 +14,20 @@ tail -f /home/crcuser/snc/install.out
 
 
 data "template_file" "default" {
-  template = "${file("${path.module}/init.tpl")}"
+  template = file("${path.module}/init.tpl")
   vars = {
-    file_inadyn_conf = "${data.template_file.inadyn_conf.rendered}"
-    file_provision_yml = "${base64encode(data.template_file.provision_yml.rendered)}"
-    file_ddns_j2 = "${file("${path.module}/ddns.j2")}"
-    file_crc_j2 = "${file("${path.module}/crc.j2")}"
-    file_banner = "${file("${path.module}/banner.txt")}"
+    file_inadyn_conf = data.template_file.inadyn_conf.rendered
+    file_provision_yml = base64encode(data.template_file.provision_yml.rendered)
+    file_ddns_j2 = file("${path.module}/ddns.j2")
+    file_crc_j2 = file("${path.module}/crc.j2")
+    file_banner = file("${path.module}/banner.txt")
+    file_tools_sh = file("${path.module}/tools.sh")
+    strategy = var.strategy
   }
 }
 
 data "template_file" "inadyn_conf" {
-  template = "${file("${path.module}/inadyn.conf")}"
+  template = file("${path.module}/inadyn.conf")
   vars = {
     ddns_provider = var.ddns_provider
     ddns_login = var.ddns_login
@@ -35,18 +37,39 @@ data "template_file" "inadyn_conf" {
 }
 
 data "template_file" "provision_yml" {
-  template = "${file("${path.module}/provision.yml")}"
+  template = file("${path.module}/provision.yml")
   vars = {
-    ddns_enabled = "${var.ddns_enabled}"
-    docker_login = "${var.docker_login}"
-    docker_password = "${var.docker_password}"
-    crc_enabled: "${var.crc_enabled}"
-    snc_enabled: "${var.snc_enabled}"
-    crc_pull_secret = "${file("${path.module}/pull-secret.txt")}"
-    crc_snc_memory = "${var.crc_snc_memory}"
-    crc_snc_cpus = "${var.crc_snc_cpus}"
-    snc_disk_size = "${var.snc_disk_size}"
-    crc_monitoring_enabled = "${var.crc_monitoring_enabled}"
+    ddns_enabled = var.ddns_enabled
+    docker_login = var.docker_login
+    docker_password = var.docker_password
+    strategy: var.strategy
+    crc_pull_secret = file("${path.module}/pull-secret.txt")
+    crc_snc_memory = var.crc_snc_memory
+    crc_snc_cpus = var.crc_snc_cpus
+    snc_disk_size = var.snc_disk_size
+    crc_monitoring_enabled = var.crc_monitoring_enabled
+  }
+}
+
+resource "google_compute_disk" "crcdisk" {
+  name  = var.disk-name
+  type  = "pd-standard"
+  zone  = var.zone
+  image = var.image
+
+  timeouts {
+    create = "60m"
+  }
+}
+
+resource "google_compute_image" "crcimg" {
+  name = "my-centos-8"
+  source_disk = google_compute_disk.crcdisk.self_link
+  licenses = [
+    "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx",
+  ]
+  timeouts {
+    create = "60m"
   }
 }
 
@@ -55,17 +78,17 @@ resource "google_compute_instance" "crc-build-box" {
   name = "${var.instance-name}-${count.index + 1}"
   machine_type = var.gcp_vm_type
 
-  zone = var.region
+  zone = var.zone
 
   #min_cpu_platform = "Intel Haswell"
 
   tags = [
-    "${var.network}-firewall-ssh",
-    "${var.network}-firewall-http",
-    "${var.network}-firewall-https",
-    "${var.network}-firewall-icmp",
-    "${var.network}-firewall-openshift-console",
-    "${var.network}-firewall-secure-forward",
+    "default-firewall-ssh",
+    "default-firewall-http",
+    "default-firewall-https",
+    "default-firewall-icmp",
+    "default-firewall-openshift-console",
+    "default-firewall-secure-forward",
   ]
   
   scheduling {
@@ -75,7 +98,8 @@ resource "google_compute_instance" "crc-build-box" {
 
   boot_disk {
     initialize_params {
-      image = var.image
+      #image = google_compute_image.crcimg.self_link
+      image = "projects/okd4-280016/global/images/packer-1597358211"
       type  = var.gcp_vm_disk_type
       size  = var.gcp_vm_disk_size
     }
@@ -85,10 +109,11 @@ resource "google_compute_instance" "crc-build-box" {
     ssh-keys = "crcuser:${file("crcuser_key.pub")}"
   }
   
-  metadata_startup_script = "${data.template_file.default.rendered}"
+  metadata_startup_script = data.template_file.default.rendered
 
   network_interface {
-    subnetwork = "${google_compute_subnetwork.crc_network_subnetwork.name}"
+    #subnetwork = "${google_compute_subnetwork.crc_network_subnetwork.name}"
+    network = "default"
 
     access_config {
       // Ephemeral IP
@@ -97,4 +122,8 @@ resource "google_compute_instance" "crc-build-box" {
   timeouts {
   create = "60m"
   }
+}
+
+resource "google_compute_project_default_network_tier" "default" {
+  network_tier = "STANDARD"
 }

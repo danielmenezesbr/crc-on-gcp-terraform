@@ -1,9 +1,12 @@
-variable "crc_enabled" {
-  default = "true"
-}
+variable "strategy" {
+  type    = string
+  description = "crc, snc or mnc"
+  default = "crc"
 
-variable "snc_enabled" {
-  default = "false"
+  validation {
+    condition     = contains(["crc", "snc", "mnc"], var.strategy)
+    error_message = "Allowed values for input_parameter are \"crc\", \"snc\", or \"mnc\"."
+  }
 }
 
 variable "gcp_vm_preemptible" {
@@ -12,6 +15,7 @@ variable "gcp_vm_preemptible" {
 
 variable "gcp_vm_type" {
   default = "n1-standard-8"
+  description = "crc or snc -> n1-standard-8; mnc ->  n1-standard-16 (recommended) or n2-highmem-8 "
 }
 
 variable "gcp_vm_disk_type" {
@@ -20,7 +24,16 @@ variable "gcp_vm_disk_type" {
 }
 
 variable "region" {
+  default = "us-central1"
+}
+
+variable "zone" {
   default = "us-central1-a"
+}
+
+variable "image" {
+  default = "centos-8-v20210512"
+  #default = "projects/okd4-280016/global/images/packer-1597358211"
 }
 
 variable "project_id" {
@@ -41,17 +54,13 @@ variable "instance-name" {
   default = "crc-build"
 }
 
-variable "subnetwork-region" {
-  default = "us-central1"
-}
-
-variable "network" {
-  default = "crc-network"
-}
-
-variable "image" {
-  default = "projects/okd4-280016/global/images/packer-1597358211"
-}
+#variable "subnetwork-region" {
+#  default = "us-central1"
+#}
+#
+#variable "network" {
+#  default = "crc-network"
+#}
 
 variable "disk-name" {
   default = "crcdisk"
@@ -125,14 +134,4 @@ variable "docker_password" {
 
 variable "ddns_password" {
   default = ""
-}
-
-locals {
-  validate_fet_code_cnd = var.crc_enabled == var.snc_enabled
-  validate_fet_code_msg = "Error. crc_enabled and snc_enabled have the same value."
-  validate_fet_code_chk = regex(
-      "^${local.validate_fet_code_msg}$",
-      ( !local.validate_fet_code_cnd
-        ? local.validate_fet_code_msg
-        : "" ) )
 }
