@@ -366,6 +366,30 @@ pod "revision-pruner-9-crc-2mx9v-master-0" deleted
 
 When the machine is rebooted, SNC will be automatically started.
 
+==== For MNC
+
+The SNC installation is a long process.
+It can take up to 1h.
+
+[source,bash]
+----
+sudo tail -f /home/crcuser/clusters/mycluster/install.out
+----
+
+[source,bash]
+----
+...
+level=info msg="Waiting up to 10m0s for the openshift-console route to be created..."
+level=info msg="Install complete!"
+level=info msg="To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/home/crcuser/clusters/mycluster/auth/kubeconfig'"
+level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.127.0.0.1.nip.io"
+level=info msg="Login to the console with user: \"kubeadmin\", and password: \"baVNT-dPN5D-vjRhy-4CmhS\""
+level=info msg="Time elapsed: 51m2s"
+...
+----
+`"Install complete!"` indicates MNC is ready.
+
+
 == command line tools
 
 === VM
