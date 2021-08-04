@@ -185,7 +185,6 @@
         set -exuo pipefail
         mkdir /home/crcuser/snc
         git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
-        #git clone --branch fix-hardcoded-api.crc.testing https://github.com/danielmenezesbr/snc /home/crcuser/snc
         cd /home/crcuser/snc
         #patch for work with *.nip.io
         sed -i '/if echo $${ping_status}/c\        if false; then' snc-library.sh
@@ -243,17 +242,6 @@
       until: result.rc == 0
       delay: 30
       when: strategy == "mnc"
-    - name: deps pre-install
-      shell: |
-        #dnf -y module install virt
-        #dnf -y install virt-install virt-viewer
-        #echo -e 'listen_tls = 0\nlisten_tcp = 1\ntcp_port = "16509"\nauth_tcp = "none"' | tee -a /etc/libvirt/libvirtd.conf
-        #sed -i 's/LIBVIRTD_ARGS="--timeout 120"/#LIBVIRTD_ARGS="--timeout 120"/' /etc/sysconfig/libvirtd
-        #sed -i 's/#LIBVIRTD_ARGS="--listen"/LIBVIRTD_ARGS="--listen"/' /etc/sysconfig/libvirtd
-        #systemctl mask libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tls.socket libvirtd-tcp.socket
-        #echo "net.ipv4.ip_forward = 1" | tee /etc/sysctl.d/99-ipforward.conf
-        #sysctl -p /etc/sysctl.d/99-ipforward.conf
-      when: strategy == "mnc"
     - name: restart libvirtd service
       shell: |
         sudo systemctl restart libvirtd
@@ -306,13 +294,6 @@
         echo address=/.apps.$BASE_DOMAIN/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
         sudo systemctl restart NetworkManager
 
-        #if [[ $${CERT_ROTATION} == "enabled" ]]
-        #then
-        #    # Disable the network time sync and set the clock to past (for a day) on host
-        #    sudo timedatectl set-ntp off
-        #    sudo date -s '-1 day'
-        #fi
-
         cd ~
         export OPENSHIFT_VERSION="4.6.18"
         curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$${OPENSHIFT_VERSION}/openshift-client-linux.tar.gz
@@ -331,7 +312,6 @@
         RELEASE_IMAGE="quay.io/openshift-release-dev/ocp-release:$${OPENSHIFT_VERSION}-x86_64"
         oc adm release extract -a /home/crcuser/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
         sudo mv openshift-baremetal-install /usr/bin/openshift-install
-        #$${OPENSHIFT_INSTALL} --dir $${INSTALL_DIR} destroy cluster || echo "failed to destroy previous cluster.  Continuing anyway"
         SSH_KEY="$${HOME}/.ssh/id_rsa"
         if [ ! -f $SSH_KEY ]; then
           ssh-keygen -t rsa -N "" -f $SSH_KEY
@@ -374,6 +354,14 @@
         sshKey: |
           $(cat "$${PUB_SSH_KEY}")
         EOF
+
+        if [[ $${CERT_ROTATION} == "enabled" ]]
+        then
+            # Disable the network time sync and set the clock to past (for a day) on host
+            sudo timedatectl set-ntp off
+            sudo date -s '-1 day'
+        fi
+
         # Create manifests and modify route domain
         openshift-install --dir="$CLUSTER_DIR" create manifests
         #sed -i 's/mastersSchedulable: false/mastersSchedulable: true/' $CLUSTER_DIR/manifests/cluster-scheduler-02-config.yml
@@ -384,17 +372,32 @@
         # Add master memory to 12 GB
         # This is only valid for openshift 4.3 onwards
         yq write --inplace $${CLUSTER_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml spec.providerSpec.value[domainMemory] 14336
+
+        mkdir /home/crcuser/snc
+        git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
+
+        cp -a /home/crcuser/snc/99_master-chronyd-mask.yaml $INSTALL_DIR/openshift/
+
+        #OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=$OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE ${OPENSHIFT_INSTALL} --dir ${INSTALL_DIR} create ignition-configs ${OPENSHIFT_INSTALL_EXTRA_ARGS} || exit 1
+        ## mask the chronyd service on the bootstrap node
+        #cat <<< $(${JQ} '.systemd.units += [{"mask": true, "name": "chronyd.service"}]' ${INSTALL_DIR}/bootstrap.ign) > ${INSTALL_DIR}/bootstrap.ign
+        $${OPENSHIFT_INSTALL} --dir $${INSTALL_DIR} create ignition-configs || exit 1
+        # mask the chronyd service on the bootstrap node
+        cat <<< $(jq '.systemd.units += [{"mask": true, "name": "chronyd.service"}]' $${INSTALL_DIR}/bootstrap.ign) > $${INSTALL_DIR}/bootstrap.ign
+
         cat <<EOF > install.sh
         set -exuo pipefail
-        openshift-install create cluster --dir="$CLUSTER_DIR" || true
+        mkdir /tmp/install-ocp
+        cp -a $CLUSTER_DIR /tmp/install-ocp
+        openshift-install create cluster --dir="$CLUSTER_DIR" || echo "failed to create the cluster, but that is expected.  We will block on a successful cluster via a future wait-for."
         source /tmp/tools.sh
-        #export SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /home/crcuser/.ssh/id_rsa"
-        #export CLUSTER_NAME=$CLUSTER_NAME
-        #export BASE_DOMAIN=$BASE_DOMAIN
-        #if [[ $${CERT_ROTATION} == "enabled" ]]
-        #then
-        #    renew_certificates
-        #fi
+        export SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /home/crcuser/.ssh/id_rsa"
+        export CLUSTER_NAME=$CLUSTER_NAME
+        export BASE_DOMAIN=$BASE_DOMAIN
+        if [[ $${CERT_ROTATION} == "enabled" ]]
+        then
+            renew_certificates
+        fi
         openshift-install wait-for install-complete --dir="$CLUSTER_DIR"
         sudo virsh list --all --name | xargs -L1 sudo virsh autostart
         EOF
