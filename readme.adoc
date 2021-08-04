@@ -502,7 +502,7 @@ laptop, appropriately change the hosts file.
 
 TODO: talk about dnsmasq
 
-==== For SNC
+==== For SNC and MNC
 
 SNC configuration uses subdomain 127.0.0.1.nip.io. This means that when
 accessing the instance remotely there is no need to change the hosts
@@ -517,6 +517,10 @@ https://console-openshift-console.apps-crc.testing/[https://console-openshift-co
 ==== For SNC
 
 https://console-openshift-console.apps-crc.127.0.0.1.nip.io/[https://console-openshift-console.apps-crc.127.0.0.1.nip.io/]
+
+==== For MNC
+
+https://console-openshift-console.apps.127.0.0.1.nip.io/[https://console-openshift-console.apps.127.0.0.1.nip.io/]
 
 == Troubleshooting
 
