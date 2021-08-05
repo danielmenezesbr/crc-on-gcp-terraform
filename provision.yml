@@ -408,7 +408,7 @@
         chmod +x pre-install.sh
       become: yes
       become_user: "crcuser"
-      when: strategy == "mnc"
+      when: strategy == "mnc-disabled"
 #    - name: OpenShift install
 #      ansible.builtin.shell: /home/crcuser/clusters/mycluster/install.sh &> install.out &
 #      args:
