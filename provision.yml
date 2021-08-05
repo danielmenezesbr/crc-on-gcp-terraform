@@ -254,8 +254,9 @@
         mv yq /usr/bin/
         yq -V
       when: strategy == "mnc"
-    - name: OpenShift install
+    - name: OpenShift Pre-install
       shell: |
+        cat <<EOF > pre-install.sh
         set -exuo pipefail
         NAME="mycluster"
         CLUSTER_DIR="$${HOME}/clusters/$${NAME}"
@@ -403,6 +404,8 @@
         sudo virsh list --all --name | xargs -L1 sudo virsh autostart
         EOF
         chmod +x install.sh
+        EOF
+        chmod +x pre-install.sh
       become: yes
       become_user: "crcuser"
       when: strategy == "mnc"
