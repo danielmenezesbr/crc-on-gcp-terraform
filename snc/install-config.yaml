@@ -13,7 +13,7 @@ controlPlane:
   hyperthreading: Enabled
   name: master
   platform: {}
-  replicas: 1
+  replicas: 3
 metadata:
   creationTimestamp: null
   name: crc

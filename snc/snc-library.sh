@@ -205,40 +205,74 @@ function create_pvs() {
     ${OC} patch config.imageregistry.operator.openshift.io/cluster --patch='[{"op": "remove", "path": "/spec/storage/emptyDir"}]' --type=json
 }
 
-# This follows https://blog.openshift.com/enabling-openshift-4-clusters-to-stop-and-resume-cluster-vms/
-# in order to trigger regeneration of the initial 24h certs the installer created on the cluster
 function renew_certificates() {
-    local vm_prefix=$(get_vm_prefix ${CRC_VM_NAME})
-    shutdown_vm ${vm_prefix}
+    shutdown_vms
 
     # Enable the network time sync and set the clock back to present on host
     sudo date -s '1 day'
     sudo timedatectl set-ntp on
 
-    start_vm ${vm_prefix}
+    start_vms
 
     # After cluster starts kube-apiserver-client-kubelet signer need to be approved
-    timeout 300 bash -c -- "until ${OC} get csr | grep Pending; do echo 'Waiting for first CSR request.'; sleep 2; done"
-    ${OC} get csr -ojsonpath='{.items[*].metadata.name}' | xargs ${OC} adm certificate approve
+    timeout 300 bash -c -- "until oc get csr | grep Pending; do echo 'Waiting for first CSR request.'; sleep 2; done"
+    oc get csr -ojsonpath='{.items[*].metadata.name}' | xargs oc adm certificate approve
 
     # Retry 5 times to make sure kubelet certs are rotated correctly.
     i=0
     while [ $i -lt 5 ]; do
-        if ! ${SSH} core@api.${CRC_VM_NAME}.${BASE_DOMAIN} -- sudo openssl x509 -checkend 2160000 -noout -in /var/lib/kubelet/pki/kubelet-client-current.pem; then
-	    # Wait until bootstrap csr request is generated with 5 min timeout
-	    echo "Retry loop $i, wait for 60sec before starting next loop"
+        if ! ${SSH} core@api.${CLUSTER_NAME}.${BASE_DOMAIN} -- sudo openssl x509 -checkend 2160000 -noout -in /var/lib/kubelet/pki/kubelet-client-current.pem; then
+	          # Wait until bootstrap csr request is generated with 5 min timeout
+	          echo "Retry loop $i, wait for 60sec before starting next loop"
             sleep 60
-	else
+	      else
             break
         fi
-	i=$[$i+1]
+	      i=$[$i+1]
     done
 
-    if ! ${SSH} core@api.${CRC_VM_NAME}.${BASE_DOMAIN} -- sudo openssl x509 -checkend 2160000 -noout -in /var/lib/kubelet/pki/kubelet-client-current.pem; then
+    if ! ${SSH} core@api.${CLUSTER_NAME}.${BASE_DOMAIN} -- sudo openssl x509 -checkend 2160000 -noout -in /var/lib/kubelet/pki/kubelet-client-current.pem; then
         echo "Certs are not yet rotated to have 30 days validity"
-	exit 1
+	      exit 1
     fi
 }
+
+# This follows https://blog.openshift.com/enabling-openshift-4-clusters-to-stop-and-resume-cluster-vms/
+# in order to trigger regeneration of the initial 24h certs the installer created on the cluster
+#function renew_certificates() {
+#    local vm_prefix=$(get_vm_prefix ${CRC_VM_NAME})
+#    shutdown_vm ${vm_prefix}
+#
+#    # Enable the network time sync and set the clock back to present on host
+#    sudo date -s '1 day'
+#    sudo timedatectl set-ntp on
+#
+#    start_vm ${vm_prefix}
+#
+#    # After cluster starts kube-apiserver-client-kubelet signer need to be approved
+#    timeout 300 bash -c -- "until ${OC} get csr | grep Pending; do echo 'Waiting for first CSR request.'; sleep 2; done"
+#    ${OC} get csr -ojsonpath='{.items[*].metadata.name}' | xargs ${OC} adm certificate approve
+#
+#    # Retry 5 times to make sure kubelet certs are rotated correctly.
+#    i=0
+#    while [ $i -lt 5 ]; do
+#        if ! ${SSH} core@api.${CRC_VM_NAME}.${BASE_DOMAIN} -- sudo openssl x509 -checkend 2160000 -noout -in /var/lib/kubelet/pki/kubelet-client-current.pem; then
+#	    # Wait until bootstrap csr request is generated with 5 min timeout
+#	    echo "Retry loop $i, wait for 60sec before starting next loop"
+#            sleep 60
+#	else
+#            break
+#        fi
+#	i=$[$i+1]
+#    done
+#
+#    if ! ${SSH} core@api.${CRC_VM_NAME}.${BASE_DOMAIN} -- sudo openssl x509 -checkend 2160000 -noout -in /var/lib/kubelet/pki/kubelet-client-current.pem; then
+#        echo "Certs are not yet rotated to have 30 days validity"
+#	exit 1
+#    fi
+#}
+
+
 
 # deletes an operator and wait until the resources it manages are gone.
 function delete_operator() {
