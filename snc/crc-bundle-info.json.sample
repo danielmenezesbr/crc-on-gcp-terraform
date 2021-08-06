@@ -1,0 +1,79 @@
+{
+  # Version of the bundle, used to denote format changes
+  # Major is only increased changes incompatible with previous versions
+  # Minor is increased for backwards-compatible changes
+  "version": "1.1",
+  # Type of this bundle content
+  # Currently the only valid type is 'snc' (which stands for 'single-node-cluster')
+  "type": "snc",
+  # Name of the bundle
+  "name": "crc_libvirt_4.6.1",
+  "buildInfo": {
+    # Time this bundle was built
+    "buildTime": "2019-04-23T14:55:32+00:00",
+    # Output of 'openshift-install version' from the installer used to generate the bundle
+    "openshiftInstallerVersion": "./openshift-install v0.16.1\nbuilt from commit e3fceacc975953f56cb09931e6be015a36eb6075",
+    # Output of 'git describe' or 'git rev-parse' of the 'snc' script
+    # repository used when generating the bundle
+    "sncVersion": "git9662"
+  },
+  "clusterInfo": {
+    # Version of OpenShift installed in the virtual machine
+    "openshiftVersion": "4.1.11"
+    # Name of the openshift cluster stored in the bundle
+    "clusterName": "crc",
+    # Base domain name used for the openshift cluster
+    "baseDomain": "testing",
+    # Subdomain where the apps will go
+    "appsDomain": "apps-crc.testing",
+    # Name of a file containing an SSH private key which can be used to connect to
+    # the cluster nodes
+    "sshPrivateKeyFile": "id_ecdsa_crc",
+    # Name of the kubeconfig file stored in the bundle
+    "kubeConfig": "kubeconfig",
+    # Name of the file containing the kubeadmin password for use in the
+    # openshift console
+    "kubeadminPasswordFile": "kubeadmin-password"
+    # pull secret that can be used to fetch OpenShift container images (optional)
+    # "openshiftPullSecret": "default-pull-secret"
+  },
+  "nodes": [
+    {
+      # Type of the node, can be 'master', 'worker' or both
+      "kind": [
+        "master",
+        "worker"
+      ],
+      # Hostname of the node
+      "hostname": "crc-88lpx-master-0",
+      # Disk image used by the node, the 'storage' object will contain more
+      # details about its format
+      "diskImage": "crc.qcow2"
+      # Internal IP for which etcd certs are valid
+      "internalIP": "192.168.126.11"
+      # kernel command line of the node
+      "kernelCmdLine": "BOOT_IMAGE=/ostree/rhcos-bf3b38268ddb2a2070dc587b361ce45c46a6f9e3606bbd3b5e15b2e6d3d47e5d/vmlinuz-4.18.0-80.1.2.el8_0.x86_64 console=tty0 console=ttyS0,115200n8 rootflags=defaults,prjquota rw root=UUID=a8fbdcb1-63ea-421e-8f6f-dac9cbbcc822 ostree=/ostree/boot.0/rhcos/bf3b38268ddb2a2070dc587b361ce45c46a6f9e3606bbd3b5e15b2e6d3d47e5d/0 coreos.oem.id=qemu ignition.platform.id=qemu"
+      # initramfs file of the node
+      "initramfs": "initramfs-4.18.0-80.1.2.el8_0.x86_64.img"
+      # kernel file of the node
+      "kernel": "vmlinuz-4.18.0-80.1.2.el8_0.x86_64"
+    }
+  ],
+  "storage": {
+    # List of virtual machine disk images in the bundle
+    "diskImages": [
+      {
+        # Name of the disk image file
+        "name": "crc.qcow2",
+        # Format of the disk image, valid formats are 'qcow2', 'vmdk', 'vhdx'
+        "format": "qcow2"
+	"size": "9129426944"
+	"sha256sum": "49766122a0834d62c1a24fb4e0de30cd7a39b8112083aa5e01fc26f16c15aed3"
+      }
+    ]
+  },
+  "driverInfo": {
+    # Name of driver the bundle supports, valid drivers are 'libvirt', 'hyperkit', 'virtualbox', 'hyperv'
+    "name": "libvirt"
+  }
+}

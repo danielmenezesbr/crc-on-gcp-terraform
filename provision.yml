@@ -184,7 +184,12 @@
       shell: |
         set -exuo pipefail
         mkdir /home/crcuser/snc
-        git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
+        #temp-begin
+        #git clone --branch 4.6 https://github.com/code-ready/snc /home/crcuser/snc
+        git clone --branch renew-certificate https://github.com/danielmenezesbr/crc-on-gcp-terraform
+        rm snc -Rf
+        cp -a /home/crcuser/crc-on-gcp-terraform/snc ~
+        #temp-end
         cd /home/crcuser/snc
         #patch for work with *.nip.io
         sed -i '/if echo $${ping_status}/c\        if false; then' snc-library.sh
