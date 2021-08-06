@@ -212,6 +212,8 @@
         sudo systemctl disable firewalld
       become: yes
       become_user: "crcuser"
+      args:
+        chdir: /home/crcuser
       when: strategy == "snc"
     - name: SNC install
       ansible.builtin.shell: /home/crcuser/snc/install.sh &> install.out &
