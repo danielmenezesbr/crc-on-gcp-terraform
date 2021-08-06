@@ -715,7 +715,7 @@ Recreate environment in case of preemption before the environment <<link-ready,i
 [source,bash]
 ----
 ./terraformDocker.sh destroy -auto-approve
-./terraformDocker.sh -var-file="secrets.tfvars" -auto-approve
+./terraformDocker.sh apply -var-file="secrets.tfvars" -auto-approve
 ----
 
 
