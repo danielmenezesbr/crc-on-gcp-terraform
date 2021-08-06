@@ -203,6 +203,7 @@
         export MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp"
         export OPENSHIFT_PULL_SECRET_PATH="/home/crcuser/pull-secret.txt"
         export CRC_BASE_DOMAIN="127.0.0.1.nip.io"
+        chmod +x ./snc.sh
         ./snc.sh 2>&1
         sudo virsh autostart $(sudo virsh list --all --name | head -n 1)
         EOF
