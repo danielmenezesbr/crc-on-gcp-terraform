@@ -148,7 +148,7 @@ function shutdown_vms {
 }
 
 function start_vms {
-  for i in $(sudo virsh list --all --name);
+  for i in $(sudo virsh list --all --name | grep master);
   do
     retry sudo virsh start $i
   done
