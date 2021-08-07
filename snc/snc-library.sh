@@ -216,7 +216,7 @@ function renew_certificates() {
 
     # After cluster starts kube-apiserver-client-kubelet signer need to be approved
     timeout 300 bash -c -- "until ${OC} get csr | grep Pending; do echo 'Waiting for first CSR request.'; sleep 2; done"
-    ${OC} get csr -ojsonpath='{.items[*].metadata.name}' | xargs oc adm certificate approve
+    ${OC} get csr -ojsonpath='{.items[*].metadata.name}' | xargs ${OC} adm certificate approve
 
     # Retry 5 times to make sure kubelet certs are rotated correctly.
     i=0
@@ -334,7 +334,7 @@ function wait_till_cluster_stable() {
     done
 
     # Wait till all the pods are either running or complete state
-    while oc get pod --no-headers --all-namespaces | grep -v Running | grep -v Completed; do
+    while ${OC} get pod --no-headers --all-namespaces | grep -v Running | grep -v Completed; do
        sleep 2
     done
 }
