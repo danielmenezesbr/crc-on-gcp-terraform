@@ -129,7 +129,7 @@ function get_vm_prefix {
 #}
 
 function shutdown_vms {
-    for i in $(sudo virsh list --name --autostart);
+    for i in $(sudo virsh list --name);
     do
       retry sudo virsh shutdown $i;
       until sudo virsh domstate $i | grep shut; do
