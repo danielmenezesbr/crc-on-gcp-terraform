@@ -154,7 +154,7 @@ function start_vms {
   done
 
   # Wait till ssh connection available
-  until ${SSH} core@api.${CLUSTER_NAME}.${BASE_DOMAIN} -- "exit 0" >/dev/null 2>&1; do
+  until ${SSH} core@api.${CRC_VM_NAME}.${BASE_DOMAIN} -- "exit 0" >/dev/null 2>&1; do
       echo " $i still booting"
       sleep 2
   done
