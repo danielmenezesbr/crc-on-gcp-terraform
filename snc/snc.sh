@@ -129,10 +129,10 @@ ${YQ} eval --inplace ".spec.domain = \"apps-${CRC_VM_NAME}.${BASE_DOMAIN}\"" ${I
 # Add master memory to 12 GB and 6 cpus 
 # This is only valid for openshift 4.3 onwards
 ${YQ} eval --inplace '.spec.providerSpec.value.domainMemory = 14336' ${INSTALL_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml
-###${YQ} eval --inplace '.spec.providerSpec.value.domainVcpu = 6' ${INSTALL_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml
+${YQ} eval --inplace '.spec.providerSpec.value.domainVcpu = 6' ${INSTALL_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml
 # Add master disk size to 31 GiB
 # This is only valid for openshift 4.5 onwards
-###${YQ} eval --inplace '.spec.providerSpec.value.volume.volumeSize = 33285996544' ${INSTALL_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml
+${YQ} eval --inplace '.spec.providerSpec.value.volume.volumeSize = 33285996544' ${INSTALL_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml
 # Add network resource to lower the mtu for CNV
 cp cluster-network-03-config.yaml ${INSTALL_DIR}/manifests/
 # Add patch to mask the chronyd service on master
