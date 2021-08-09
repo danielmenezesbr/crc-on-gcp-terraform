@@ -124,62 +124,62 @@
       become_user: "crcuser"
       when: strategy == "crc"
 #SNC
-    - name: Change PATH SNC
-      shell: |
-        echo 'export PATH="$PATH:/home/crcuser/snc/openshift-clients/linux"' >> /etc/bashrc
-        echo 'export KUBECONFIG="/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig"' >> /etc/bashrc
-        echo 'export K8S_AUTH_KUBECONFIG="/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig"' >> /etc/bashrc
-      when: strategy == "snc"
-    - name: ssh config to enter inside SNC VMs (master and bootstrap)
-      shell: |
-        cat <<EOF > ~/.ssh/config
-        Host master
-            Hostname 192.168.126.11
-            User core
-            IdentityFile /home/crcuser/snc/id_ecdsa_crc
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null
-
-        Host bootstrap
-            Hostname 192.168.126.10
-            User core
-            IdentityFile /home/crcuser/snc/id_ecdsa_crc
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null
-        EOF
-        chmod 600 ~/.ssh/config
-      become: yes
-      become_user: "crcuser"
-      when: strategy == "snc"
-    - name: dnf update
-      shell: dnf update -y
-      register: result
-      retries: 6
-      until: result.rc == 0
-      delay: 30
-      when: strategy == "snc"
-    - name: install virt-filesystems
-      shell: yum -y install /usr/bin/virt-filesystems
-      register: result
-      retries: 6
-      until: result.rc == 0
-      delay: 30
-      when: strategy == "snc"
-    - name: SNC deps pre-install
-      shell: |
-        dnf -y module install virt
-        dnf -y install virt-install virt-viewer
-        echo -e 'listen_tls = 0\nlisten_tcp = 1\ntcp_port = "16509"\nauth_tcp = "none"' | tee -a /etc/libvirt/libvirtd.conf
-        sed -i 's/LIBVIRTD_ARGS="--timeout 120"/#LIBVIRTD_ARGS="--timeout 120"/' /etc/sysconfig/libvirtd
-        sed -i 's/#LIBVIRTD_ARGS="--listen"/LIBVIRTD_ARGS="--listen"/' /etc/sysconfig/libvirtd
-        systemctl mask libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tls.socket libvirtd-tcp.socket
-        echo "net.ipv4.ip_forward = 1" | tee /etc/sysctl.d/99-ipforward.conf
-        sysctl -p /etc/sysctl.d/99-ipforward.conf
-      when: strategy == "snc"
-    - name: restart libvirtd service
-      shell: |
-        sudo systemctl restart libvirtd
-      when: strategy == "snc"
+#    - name: Change PATH SNC
+#      shell: |
+#        echo 'export PATH="$PATH:/home/crcuser/snc/openshift-clients/linux"' >> /etc/bashrc
+#        echo 'export KUBECONFIG="/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig"' >> /etc/bashrc
+#        echo 'export K8S_AUTH_KUBECONFIG="/home/crcuser/snc/crc-tmp-install-data/auth/kubeconfig"' >> /etc/bashrc
+#      when: strategy == "snc"
+#    - name: ssh config to enter inside SNC VMs (master and bootstrap)
+#      shell: |
+#        cat <<EOF > ~/.ssh/config
+#        Host master
+#            Hostname 192.168.126.11
+#            User core
+#            IdentityFile /home/crcuser/snc/id_ecdsa_crc
+#            StrictHostKeyChecking no
+#            UserKnownHostsFile /dev/null
+#
+#        Host bootstrap
+#            Hostname 192.168.126.10
+#            User core
+#            IdentityFile /home/crcuser/snc/id_ecdsa_crc
+#            StrictHostKeyChecking no
+#            UserKnownHostsFile /dev/null
+#        EOF
+#        chmod 600 ~/.ssh/config
+#      become: yes
+#      become_user: "crcuser"
+#      when: strategy == "snc"
+#    - name: dnf update
+#      shell: dnf update -y
+#      register: result
+#      retries: 6
+#      until: result.rc == 0
+#      delay: 30
+#      when: strategy == "snc"
+#    - name: install virt-filesystems
+#      shell: yum -y install /usr/bin/virt-filesystems
+#      register: result
+#      retries: 6
+#      until: result.rc == 0
+#      delay: 30
+#      when: strategy == "snc"
+#    - name: SNC deps pre-install
+#      shell: |
+#        dnf -y module install virt
+#        dnf -y install virt-install virt-viewer
+#        echo -e 'listen_tls = 0\nlisten_tcp = 1\ntcp_port = "16509"\nauth_tcp = "none"' | tee -a /etc/libvirt/libvirtd.conf
+#        sed -i 's/LIBVIRTD_ARGS="--timeout 120"/#LIBVIRTD_ARGS="--timeout 120"/' /etc/sysconfig/libvirtd
+#        sed -i 's/#LIBVIRTD_ARGS="--listen"/LIBVIRTD_ARGS="--listen"/' /etc/sysconfig/libvirtd
+#        systemctl mask libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tls.socket libvirtd-tcp.socket
+#        echo "net.ipv4.ip_forward = 1" | tee /etc/sysctl.d/99-ipforward.conf
+#        sysctl -p /etc/sysctl.d/99-ipforward.conf
+#      when: strategy == "snc"
+#    - name: restart libvirtd service
+#      shell: |
+#        sudo systemctl restart libvirtd
+#      when: strategy == "snc"
 #    - name: SNC pre-install
 #      shell: |
 #        set -exuo pipefail
