@@ -49,6 +49,9 @@ EOL
 cat >/etc/motd <<EOL
 ${file_banner}
 EOL
+###TEMP
+sudo pip3 install 'ansible==2.9.24'
+exit 0
 echo "setting metadata_timer_sync=0" >> /etc/dnf/dnf.conf
 systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
@@ -80,7 +83,6 @@ cp -a /tmp/inadyn.conf .
 cp -a /tmp/ddns.j2 .
 cp -a /tmp/crc.j2 .
 cp -a /tmp/provision.yml .
-exit 0
 ansible-playbook provision.yml
 #to check ansible logs:
 #sudo journalctl -u google-startup-scripts.service -f

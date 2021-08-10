@@ -32,9 +32,9 @@ variable "zone" {
 }
 
 variable "image" {
-  #default = "centos-8-v20210512"
+  default = "centos-8-v20210512"
   #default = "projects/okd4-280016/global/images/packer-1597358211"
-  default = "projects/fedora-cloud/global/images/fedora-cloud-base-gcp-34-1-2-x86-64"
+  #default = "projects/fedora-cloud/global/images/fedora-cloud-base-gcp-34-1-2-x86-64"
 }
 
 variable "project_id" {
