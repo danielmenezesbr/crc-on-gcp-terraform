@@ -96,7 +96,7 @@ resource "google_compute_instance" "crc-build-box" {
     preemptible = var.gcp_vm_preemptible
   }
 
-  advanced_machine_config {
+  advanced_machine_features {
     enable_nested_virtualization = true
   }
 
