@@ -266,7 +266,7 @@
         cd /root
         ansible-galaxy install luisarizmendi.ocp_libvirt_ipi_role
         sed -i 's/mode tcp/mode http/g' .ansible/roles/luisarizmendi.ocp_libvirt_ipi_role/templates/haproxy.cfg.back.j2
-        export KVM="$${HOME}"
+        export KVM="/root"
         cat <<'EOF' > $${KVM}/ocp_libvirt_ipi.yaml
         ---
         - hosts: localhost
