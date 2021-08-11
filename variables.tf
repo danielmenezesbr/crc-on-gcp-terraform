@@ -5,7 +5,7 @@ variable "strategy" {
 
   validation {
     condition     = contains(["crc", "snc", "mnc"], var.strategy)
-    error_message = "Allowed values for input_parameter are \"crc\", \"snc\", or \"mnc\"."
+    error_message = "Allowed values for strategy are \"crc\", \"snc\", or \"mnc\"."
   }
 }
 
@@ -54,22 +54,10 @@ variable "instance-name" {
   default = "crc-build"
 }
 
-#variable "subnetwork-region" {
-#  default = "us-central1"
-#}
-#
-#variable "network" {
-#  default = "crc-network"
-#}
-
-variable "disk-name" {
-  default = "crcdisk"
-}
-
 variable "gcp_vm_disk_size" {
-  # The minimum size is 128GB due to the image (projects/okd4-280016/global/images/packer-1597358211).
-  # You need to generate a new image (https://blog.kevinlin.info/post/google-compute-engine-reducing-the-size-of-a-persistent-disk) if you want to reduce the size.
-  default = "128"
+  # CRC/SNC: 50
+  # MNC: 128
+  default = var.strategy == "mnc" ? "128" : "50"
 }
 
 variable "ddns_enabled" {

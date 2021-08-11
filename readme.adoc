@@ -95,9 +95,6 @@ Below is a summary of the characteristics of each strategy:
 |===
 
 
-Before choosing MNC, be aware of its <<mnc-limitations, limitations>>.
-
-
 == Setting Up Your Development Environment
 
 Go to https://shell.cloud.google.com/?hl=en_US&show=terminal[Cloud
@@ -229,22 +226,19 @@ Set `false` if you want to use a normal VM.
 If you choose mnc strategy, choose a machine with
 more resources like:
 
-`n2-highmem-8` (8 vCPUs and 64 Gib memory)
+`n1-standard-16` (16 vCPUS and 60 Gib memory)
 
 or
 
-`n1-standard-16` (16 vCPUS and 60 Gib memory)
+`n2-highmem-8` (8 vCPUs and 64 Gib memory)
 
 |gcp_vm_disk_type
 |pd-standard
 |pd-standard or pd-ssd
 
 |gcp_vm_disk_size
-|128
-|Disk size (GB). The minimum size is 128GB due to the image
-(projects/okd4-280016/global/images/packer-1597358211).
-You need to generate a new image (https://blog.kevinlin.info/post/google-compute-engine-reducing-the-size-of-a-persistent-disk)
-if you want to reduce the size.
+|50 for CRC/SNC; 128 for MNC
+|Disk size (GB).
 
 |DDNS
 |disabled
@@ -580,7 +574,7 @@ https://console-openshift-console.apps-crc.127.0.0.1.nip.io/[https://console-ope
 
 ==== For MNC
 
-https://console-openshift-console.apps.127.0.0.1.nip.io/[https://console-openshift-console.apps.127.0.0.1.nip.io/]
+https://console-openshift-console.apps.mycluster.127.0.0.1.nip.io[https://console-openshift-console.apps.mycluster.127.0.0.1.nip.io]
 
 == Troubleshooting
 
@@ -727,19 +721,6 @@ Recreate environment in case of preemption before the environment <<link-ready,i
 ./terraformDocker.sh -var-file="secrets.tfvars" -auto-approve
 ----
 
-
-== Limitations
-
-[[mnc-limitations]]
-=== MNC
-
-Certificate renewal as described in this
-https://github.com/redhat-cop/openshift-lab-origin/blob/master/OpenShift4/Stopping_and_Resuming_OCP4_Clusters.adoc[link]
-did https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/master/tools.sh[not work on MNC].
- Therefore, when the machine is restarted
-the status of the nodes will be `NotReady`. In other words, MNC
-cluster is functional even before restarting the GCP instance.
-If you know how to fix it, please create a PR.
 
 [[link-cleanup]]
 == Cleanup

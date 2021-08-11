@@ -6,18 +6,18 @@
   tasks:
 
 #COMMON
-#    - name: Enabled container-tools (skopeo, podman and buildah)
-#      shell: yum module enable -y container-tools:rhel8
-#      register: result
-#      retries: 10
-#      until: result.rc == 0
-#      delay: 30
-#    - name: Install container-tools
-#      shell: yum module install -y container-tools:rhel8
-#      register: result
-#      retries: 10
-#      until: result.rc == 0
-#      delay: 30
+    - name: Enabled container-tools (skopeo, podman and buildah)
+      shell: yum module enable -y container-tools:rhel8
+      register: result
+      retries: 10
+      until: result.rc == 0
+      delay: 30
+    - name: Install container-tools
+      shell: yum module install -y container-tools:rhel8
+      register: result
+      retries: 10
+      until: result.rc == 0
+      delay: 30
     - name: Install yum git
       yum:
         name:
@@ -324,7 +324,7 @@
         while : ; do
           VAR=\$(virsh net-list --name | grep "mycluster") || ""
           if [ ! -z "\$VAR" ]; then
-            virsh net-update \$VAR add dns-host "<host ip='192.168.126.51'><hostname>oauth-openshift.apps.$CLUSTER_NAME.$BASE_DOMAIN</hostname></host>"
+            virsh net-update \$VAR add dns-host "<host ip='192.168.126.51'><hostname>oauth-openshift.apps.$CLUSTER_NAME.$BASE_DOMAIN</hostname></host>" --config --parent-index 0
             virsh net-dumpxml \$VAR
             break;
           fi

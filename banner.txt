@@ -11,7 +11,7 @@ sudo tail -f /home/crcuser/snc/install.out
 2.3) MNC
 sudo tail -f /root/ocp/install/.openshift_install.log
 
-3) login with crcuser/root. Password: password
+3) login with crcuser (CRC/SNC) or root (MNC). Password: password
 su - crcuser / su -
 
 Alias: 0 (show this banner) 1 2 3
