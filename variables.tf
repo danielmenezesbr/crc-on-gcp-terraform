@@ -54,10 +54,10 @@ variable "instance-name" {
   default = "crc-build"
 }
 
-output "gcp_vm_disk_size" {
+locals {
   # CRC/SNC: 50
   # MNC: 128
-  value = var.strategy == "mnc" ? "128" : "50"
+  gcp_vm_disk_size = var.strategy == "mnc" ? "128" : "50"
 }
 
 variable "ddns_enabled" {

@@ -82,7 +82,7 @@ resource "google_compute_instance" "crc-build-box" {
     initialize_params {
       image = var.image
       type  = var.gcp_vm_disk_type
-      size  = var.gcp_vm_disk_size
+      size  = local.gcp_vm_disk_size
     }
   }
 
