@@ -96,10 +96,13 @@ resource "google_compute_instance" "crc-build-box" {
     preemptible = var.gcp_vm_preemptible
   }
 
+  advanced_machine_config {
+    enable_nested_virtualization = true
+  }
+
   boot_disk {
     initialize_params {
-      #image = google_compute_image.crcimg.self_link
-      image = "projects/okd4-280016/global/images/packer-1597358211"
+      image = var.image
       type  = var.gcp_vm_disk_type
       size  = var.gcp_vm_disk_size
     }
