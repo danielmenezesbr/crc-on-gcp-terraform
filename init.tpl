@@ -13,7 +13,7 @@ case $strategy in
                 alias 2='sudo tail -f /home/crcuser/snc/install.out'
                 ;;
         mnc)
-                alias 2='sudo tail -f /home/crcuser/clusters/mycluster/install.out'
+                alias 2='sudo tail -f /root/ocp/install/.openshift_install.log'
                 ;;
         *)
                 alias 2='echo please review /etc/profile.d/env.sh'

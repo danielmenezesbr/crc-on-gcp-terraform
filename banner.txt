@@ -9,7 +9,7 @@ sudo tail -f /var/log/messages -n +1 | grep runuser
 2.2) SNC
 sudo tail -f /home/crcuser/snc/install.out
 2.3) MNC
-sudo tail -f /home/crcuser/clusters/mycluster/install.out
+sudo tail -f /root/ocp/install/.openshift_install.log
 
 3) login with crcuser. Password: password
 su - crcuser

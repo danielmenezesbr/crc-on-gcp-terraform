@@ -10,12 +10,12 @@ variable "strategy" {
 }
 
 variable "gcp_vm_preemptible" {
-  default = "true"
+  default = "false"
 }
 
 variable "gcp_vm_type" {
-  default = "n1-standard-8"
-  description = "crc or snc -> n1-standard-8; mnc ->  n1-standard-16 (recommended) or n2-highmem-8 "
+  default = "n2-highmem-8"
+  description = "crc or snc -> n1-standard-8; mnc ->  n1-standard-16 (recommended) or n2-highmem-8"
 }
 
 variable "gcp_vm_disk_type" {

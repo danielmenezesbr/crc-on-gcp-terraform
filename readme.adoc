@@ -368,12 +368,12 @@ When the machine is rebooted, SNC will be automatically started.
 
 ==== For MNC
 
-The SNC installation is a long process.
+The MNC installation is a long process.
 It can take up to 1h.
 
 [source,bash]
 ----
-sudo tail -f /home/crcuser/clusters/mycluster/install.out
+sudo tail -f /root/ocp/install/.openshift_install.log
 ----
 
 [source,bash]

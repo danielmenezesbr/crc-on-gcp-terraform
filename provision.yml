@@ -217,10 +217,10 @@
       become_user: "crcuser"
       when: strategy == "snc"
 #Multi-Node
-#    - name: Change env
-#      shell: |
-#        echo 'export KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
-#        echo 'export K8S_AUTH_KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
+    - name: Change env
+      shell: |
+        echo 'export KUBECONFIG="/root/ocp/install/auth/kubeconfig"' >> /etc/bashrc
+        echo 'export K8S_AUTH_KUBECONFIG="/root/ocp/install/auth/kubeconfig"' >> /etc/bashrc
 #      when: strategy == "mnc"
 #    - name: dnf update
 #      shell: dnf update -y
@@ -259,7 +259,7 @@
       user:
         name: root
         update_password: always
-        password: $6$rounds=656000$nv6b5eRCf0MA3Uth$YLcyFUT63rTMB8crCejv5IdyOYIpv62l5FVt.jjw4cNuqPX8HyYwmx/w48SFq/LJtYLrEV92mje7jV0Nfm/9g0
+        password: $6$mysecretsalt$MIJffjeQyfrKKrGkprGrDL/g2mCJa53koLmYQuuLmY9y37pDvGKPXU1Ov3RbMi.tpQ9cWvxAzUVtBLe7KrZoU.
     - name: OpenShift install
       shell: |
         set -exuo pipefail
@@ -355,10 +355,3 @@
       become: yes
       become_user: "root"
       when: strategy == "mnc"
-#    - name: OpenShift install
-#      ansible.builtin.shell: /home/crcuser/clusters/mycluster/install.sh &> install.out &
-#      args:
-#        chdir: /home/crcuser/clusters/mycluster
-#      become: yes
-#      become_user: "crcuser"
-#      when: strategy == "mnc"
