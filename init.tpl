@@ -8,6 +8,7 @@ alias 1='sudo journalctl -u google-startup-scripts.service -f'
 case $strategy in
         crc)
                 alias 2='sudo tail -f /var/log/messages -n +1 | grep runuser'
+                alias 3='su - crcuser'
                 ;;
         snc)
                 alias 2='while [ ! -f /home/crcuser/snc/install.out ]
@@ -15,6 +16,7 @@ do
   sleep 2
 done
                 sudo tail -f /home/crcuser/snc/install.out'
+                alias 3='su - crcuser'
                 ;;
         mnc)
                 alias 2='while [ ! -f /root/ocp/install/.openshift_install.log ]
@@ -22,18 +24,12 @@ do
   sleep 2
 done
                 sudo tail -f /root/ocp/install/.openshift_install.log'
+                alias 3='su -';
                 ;;
         *)
                 alias 2='echo please review /etc/profile.d/env.sh'
                 ;;
 esac
-
-if [$strategy == "mnc"]; then
-  alias 3='su -'
-elif
-  alias 3='su - crcuser'
-fi
-
 EOL
 
 function fail {
