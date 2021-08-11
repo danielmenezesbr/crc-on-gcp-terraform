@@ -331,7 +331,7 @@
         publish: External
         pullSecret: $(echo \'"$${PULL_SECRET}"\')
         sshKey: |
-        $(cat "$${PUB_SSH_KEY}")
+          $(cat "$${PUB_SSH_KEY}")
         EOF
 
         cat <<'EOF' > patch_libvirt_network.sh

@@ -77,7 +77,6 @@ EOL
 cat >/tmp/tools.sh <<'EOL'
 ${file_tools_sh}
 EOL
-echo "${file_provision_yml}"
 echo "${file_provision_yml}" | base64 -d > /tmp/provision.yml
 cp -a /tmp/inadyn.conf .
 cp -a /tmp/ddns.j2 .
