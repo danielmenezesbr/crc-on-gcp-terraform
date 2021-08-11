@@ -221,21 +221,6 @@
       shell: |
         echo 'export KUBECONFIG="/root/ocp/install/auth/kubeconfig"' >> /etc/bashrc
         echo 'export K8S_AUTH_KUBECONFIG="/root/ocp/install/auth/kubeconfig"' >> /etc/bashrc
-#      when: strategy == "mnc"
-#    - name: dnf update
-#      shell: dnf update -y
-#      register: result
-#      retries: 6
-#      until: result.rc == 0
-#      delay: 30
-#      when: strategy == "mnc"
-#    - name: install virt-filesystems
-#      shell: yum -y install /usr/bin/virt-filesystems
-#      register: result
-#      retries: 6
-#      until: result.rc == 0
-#      delay: 30
-#      when: strategy == "mnc"
     - name: install wget
       shell: yum -y install wget
       register: result
@@ -243,10 +228,6 @@
       until: result.rc == 0
       delay: 30
       when: strategy == "mnc"
-#    - name: restart libvirtd service
-#      shell: |
-#        sudo systemctl restart libvirtd
-#      when: strategy == "mnc"
     - name: install yq
       shell: |
         wget https://github.com/mikefarah/yq/releases/download/1.15.0/yq_linux_amd64
@@ -288,7 +269,7 @@
         EOF
         mkdir ocp-config
         export CLUSTER_NAME="mycluster"
-        export BASE_DOMAIN="openshift.testing"
+        export BASE_DOMAIN="127.0.0.1.nip.io"
         export CLUSTER_DIR="$${HOME}/ocp-config"
         SSH_KEY="$${HOME}/.ssh/id_rsa"
         if [ ! -f $SSH_KEY ]; then
@@ -334,24 +315,25 @@
           $(cat "$${PUB_SSH_KEY}")
         EOF
 
-        cat <<'EOF' > patch_libvirt_network.sh
+        cat <<EOF > patch_libvirt_network.sh
         set -exuo pipefail
         until virsh net-list --name | grep "mycluster"
         do
         sleep 60
         done
         while : ; do
-          VAR=$(virsh net-list --name | grep "mycluster") || ""
-          if [ ! -z "$${VAR}" ]; then
-            virsh net-update $${VAR} add dns-host "<host ip='192.168.126.51'><hostname>oauth-openshift.apps.mycluster.openshift.testing</hostname></host>"
+          VAR=\$(virsh net-list --name | grep "mycluster") || ""
+          if [ ! -z "\$VAR" ]; then
+            virsh net-update \$VAR add dns-host "<host ip='192.168.126.51'><hostname>oauth-openshift.apps.$CLUSTER_NAME.$BASE_DOMAIN</hostname></host>"
+            virsh net-dumpxml \$VAR
             break;
           fi
           sleep 30;
         done
         EOF
         chmod +x patch_libvirt_network.sh
-        ./patch_libvirt_network.sh &
-        ansible-playbook -vv --tags install $${KVM}/ocp_libvirt_ipi.yaml
+        ./patch_libvirt_network.sh &> path_libvirt_network.out &
+        ansible-playbook -vv --tags install $${KVM}/ocp_libvirt_ipi.yaml &> ansible.install.out &
       become: yes
       become_user: "root"
       when: strategy == "mnc"

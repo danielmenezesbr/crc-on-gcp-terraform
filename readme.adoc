@@ -379,13 +379,22 @@ sudo tail -f /root/ocp/install/.openshift_install.log
 [source,bash]
 ----
 ...
-level=info msg="Waiting up to 10m0s for the openshift-console route to be created..."
-level=info msg="Install complete!"
-level=info msg="To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/home/crcuser/clusters/mycluster/auth/kubeconfig'"
-level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.127.0.0.1.nip.io"
-level=info msg="Login to the console with user: \"kubeadmin\", and password: \"baVNT-dPN5D-vjRhy-4CmhS\""
-level=info msg="Time elapsed: 51m2s"
-...
+time="2021-08-11T20:01:48Z" level=debug msg="Cluster is initialized"
+time="2021-08-11T20:01:48Z" level=info msg="Waiting up to 1h0m0s for the openshift-console route to be created..."
+time="2021-08-11T20:01:48Z" level=debug msg="Route found in openshift-console namespace: console"
+time="2021-08-11T20:01:48Z" level=debug msg="Route found in openshift-console namespace: downloads"
+time="2021-08-11T20:01:48Z" level=debug msg="OpenShift console route is created"
+time="2021-08-11T20:01:48Z" level=info msg="Install complete!"
+time="2021-08-11T20:01:48Z" level=info msg="To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/root/ocp/install/auth/kubeconfig'"
+time="2021-08-11T20:01:48Z" level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.mycluster.openshift.testing"
+time="2021-08-11T20:01:48Z" level=info msg="Login to the console with user: \"kubeadmin\", and password: \"gpZYv-ief2i-asSYv-7diYL\""
+time="2021-08-11T20:01:48Z" level=debug msg="Time elapsed per stage:"
+time="2021-08-11T20:01:48Z" level=debug msg="    Infrastructure: 2m14s"
+time="2021-08-11T20:01:48Z" level=debug msg="Bootstrap Complete: 18m45s"
+time="2021-08-11T20:01:48Z" level=debug msg="               API: 8m14s"
+time="2021-08-11T20:01:48Z" level=debug msg=" Bootstrap Destroy: 10s"
+time="2021-08-11T20:01:48Z" level=debug msg=" Cluster Operators: 31m42s"
+time="2021-08-11T20:01:48Z" level=info msg="Time elapsed: 53m21s"
 ----
 `"Install complete!"` indicates MNC is ready.
 
