@@ -1,7 +1,7 @@
 variable "strategy" {
   type    = string
   description = "crc, snc or mnc"
-  default = "crc"
+  default = "mnc"
 
   validation {
     condition     = contains(["crc", "snc", "mnc"], var.strategy)
