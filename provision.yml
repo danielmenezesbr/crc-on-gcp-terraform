@@ -217,11 +217,11 @@
       become_user: "crcuser"
       when: strategy == "snc"
 #Multi-Node
-    - name: Change env
-      shell: |
-        echo 'export KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
-        echo 'export K8S_AUTH_KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
-      when: strategy == "mnc"
+#    - name: Change env
+#      shell: |
+#        echo 'export KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
+#        echo 'export K8S_AUTH_KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
+#      when: strategy == "mnc"
 #    - name: dnf update
 #      shell: dnf update -y
 #      register: result
