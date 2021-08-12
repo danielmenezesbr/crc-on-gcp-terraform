@@ -52,8 +52,7 @@ data "template_file" "provision_yml" {
 }
 
 resource "google_compute_instance" "crc-build-box" {
-  count = var.vmcount
-  name = "${var.instance-name}-${count.index + 1}"
+  name = "${var.instance-name}-1"
   machine_type = var.gcp_vm_type
 
   zone = var.zone

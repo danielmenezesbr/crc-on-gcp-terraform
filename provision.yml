@@ -199,7 +199,7 @@
         export MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp"
         export OPENSHIFT_PULL_SECRET_PATH="/home/crcuser/pull-secret.txt"
         export CRC_BASE_DOMAIN="127.0.0.1.nip.io"
-        ./snc.sh 2>&1
+        ./snc.sh 2>&1 || true
         sudo virsh autostart $(sudo virsh list --all --name | head -n 1)
         EOF
         chmod +x install.sh
@@ -221,6 +221,7 @@
       shell: |
         echo 'export KUBECONFIG="/root/ocp/install/auth/kubeconfig"' >> /etc/bashrc
         echo 'export K8S_AUTH_KUBECONFIG="/root/ocp/install/auth/kubeconfig"' >> /etc/bashrc
+      when: strategy == "mnc"
     - name: install wget
       shell: yum -y install wget
       register: result

@@ -1,7 +1,7 @@
 variable "strategy" {
   type    = string
   description = "crc, snc or mnc"
-  default = "snc"
+  default = "crc"
 
   validation {
     condition     = contains(["crc", "snc", "mnc"], var.strategy)
@@ -46,17 +46,14 @@ variable "project_id" {
   }
 }
 
-variable "vmcount" {
-  default = "1"
-}
-
 variable "instance-name" {
   default = "crc-build"
 }
 
 locals {
-  # CRC/SNC: 50
-  # MNC: 128
+  # Recomendations:
+  # CRC/SNC: 50 GB
+  # MNC: 128 GB
   gcp_vm_disk_size = var.strategy == "mnc" ? "128" : "50"
 }
 
