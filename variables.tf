@@ -1,7 +1,7 @@
 variable "strategy" {
   type    = string
   description = "crc, snc or mnc"
-  default = "mnc"
+  default = "snc"
 
   validation {
     condition     = contains(["crc", "snc", "mnc"], var.strategy)
@@ -14,7 +14,7 @@ variable "gcp_vm_preemptible" {
 }
 
 variable "gcp_vm_type" {
-  default = "n2-highmem-8"
+  default = "n1-standard-8"
   description = "crc or snc -> n1-standard-8; mnc ->  n1-standard-16 (recommended) or n2-highmem-8"
 }
 

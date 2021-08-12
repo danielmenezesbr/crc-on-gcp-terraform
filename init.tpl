@@ -19,7 +19,12 @@ done
                 alias 3='su - crcuser'
                 ;;
         mnc)
-                alias 2='while [ ! -f /root/ocp/install/.openshift_install.log ]
+                alias 2='while [ ! -f /root/ansible.install.out ]
+do
+  sleep 2
+done
+                sudo tail -f /root/ansible.install.out'
+                alias 21='while [ ! -f /root/ocp/install/.openshift_install.log ]
 do
   sleep 2
 done

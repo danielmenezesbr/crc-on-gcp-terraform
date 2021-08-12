@@ -301,6 +301,9 @@ It can take up to 2h.
 First,
 [source,bash]
 ----
+# use alias 1
+1
+# or
 sudo journalctl -u google-startup-scripts.service -f
 ----
 
@@ -323,6 +326,9 @@ You can monitor the progress of the installation with `/home/crcuser/snc/install
 
 [source,bash]
 ----
+# use alias 2
+2
+# or
 sudo tail -f /home/crcuser/snc/install.out
 ----
 
@@ -367,37 +373,48 @@ It can take up to 1h.
 
 [source,bash]
 ----
-sudo tail -f /root/ocp/install/.openshift_install.log
+# use alias 2
+2
+# or
+sudo tail -f /root/ansible.install.out
 ----
 
 [source,bash]
 ----
 ...
-time="2021-08-11T20:01:48Z" level=debug msg="Cluster is initialized"
-time="2021-08-11T20:01:48Z" level=info msg="Waiting up to 1h0m0s for the openshift-console route to be created..."
-time="2021-08-11T20:01:48Z" level=debug msg="Route found in openshift-console namespace: console"
-time="2021-08-11T20:01:48Z" level=debug msg="Route found in openshift-console namespace: downloads"
-time="2021-08-11T20:01:48Z" level=debug msg="OpenShift console route is created"
-time="2021-08-11T20:01:48Z" level=info msg="Install complete!"
-time="2021-08-11T20:01:48Z" level=info msg="To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/root/ocp/install/auth/kubeconfig'"
-time="2021-08-11T20:01:48Z" level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.mycluster.openshift.testing"
-time="2021-08-11T20:01:48Z" level=info msg="Login to the console with user: \"kubeadmin\", and password: \"gpZYv-ief2i-asSYv-7diYL\""
-time="2021-08-11T20:01:48Z" level=debug msg="Time elapsed per stage:"
-time="2021-08-11T20:01:48Z" level=debug msg="    Infrastructure: 2m14s"
-time="2021-08-11T20:01:48Z" level=debug msg="Bootstrap Complete: 18m45s"
-time="2021-08-11T20:01:48Z" level=debug msg="               API: 8m14s"
-time="2021-08-11T20:01:48Z" level=debug msg=" Bootstrap Destroy: 10s"
-time="2021-08-11T20:01:48Z" level=debug msg=" Cluster Operators: 31m42s"
-time="2021-08-11T20:01:48Z" level=info msg="Time elapsed: 53m21s"
+TASK [luisarizmendi.ocp_libvirt_ipi_role : OpenShift Web Console access] *******
+task path: /root/.ansible/roles/luisarizmendi.ocp_libvirt_ipi_role/tasks/kvm_publish.yml:98
+ok: [localhost] => {
+...
+}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=78   changed=58   unreachable=0    failed=0    skipped=31   rescued=0    ignored=1
 ----
-`"Install complete!"` indicates MNC is ready.
+`"failed=0"` indicates MNC is ready.
+
+
+Detailed information about installing OpenShift install
+can be found in `.openshift_install.log`.
+
+[source,bash]
+----
+# use alias 21
+21
+# or
+sudo tail -f /root/ocp/install/.openshift_install.log
+----
 
 
 == command line tools
 
 === VM
 
-The `crcuser` operating system user runs CRC / SNC. The password for `crcuser`
+The `crcuser` operating system user runs CRC / SNC.
+The `root` operating system user runs CRC / SNC.
+The password for `crcuser` / `root`
 is `password`.
 
 After accessing the VM via gcloud/SSH, change to the `crcuser`
@@ -407,7 +424,13 @@ For example:
 
 [source,bash]
 ----
+# use alias 3
+3
+# or
+# CRC/SNC
 su - crcuser
+# MNC
+su -
 ----
 
 === oc
