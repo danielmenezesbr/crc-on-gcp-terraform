@@ -324,6 +324,7 @@
         while : ; do
           VAR=\$(virsh net-list --name | grep "mycluster") || ""
           if [ ! -z "\$VAR" ]; then
+            virsh net-update \$VAR add dns-host "<host ip='192.168.126.51'><hostname>oauth-openshift.apps.$CLUSTER_NAME.$BASE_DOMAIN</hostname></host>"
             virsh net-update \$VAR add dns-host "<host ip='192.168.126.51'><hostname>oauth-openshift.apps.$CLUSTER_NAME.$BASE_DOMAIN</hostname></host>" --config --parent-index 0
             virsh net-dumpxml \$VAR
             break;
@@ -332,7 +333,7 @@
         done
         EOF
         chmod +x patch_libvirt_network.sh
-        ./patch_libvirt_network.sh &> path_libvirt_network.out &
+        ./patch_libvirt_network.sh &> patch_libvirt_network.out &
         ansible-playbook -vv --tags install $${KVM}/ocp_libvirt_ipi.yaml &> ansible.install.out &
       become: yes
       become_user: "root"
