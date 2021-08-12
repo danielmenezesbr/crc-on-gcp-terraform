@@ -4,14 +4,16 @@ If you prefer, aliases 1 2 3 are available for the following commands:
 sudo journalctl -u google-startup-scripts.service -f
 
 2) wait for CRC/SNC/MNC:
-2.1) CRC
+CRC:
 sudo tail -f /var/log/messages -n +1 | grep runuser
-2.2) SNC
+SNC:
 sudo tail -f /home/crcuser/snc/install.out
-2.3) MNC
-sudo tail -f /home/crcuser/clusters/mycluster/install.out
+MNC:
+sudo tail -f /root/ansible.install.out
+and
+sudo tail -f /root/ocp/install/.openshift_install.log  (alias 21)
 
-3) login with crcuser. Password: password
-su - crcuser
+3) login with crcuser (CRC/SNC) or root (MNC). Password: password
+su - crcuser / su -
 
 Alias: 0 (show this banner) 1 2 3

@@ -8,18 +8,33 @@ alias 1='sudo journalctl -u google-startup-scripts.service -f'
 case $strategy in
         crc)
                 alias 2='sudo tail -f /var/log/messages -n +1 | grep runuser'
+                alias 3='su - crcuser'
                 ;;
         snc)
-                alias 2='sudo tail -f /home/crcuser/snc/install.out'
+                alias 2='while [ ! -f /home/crcuser/snc/install.out ]
+do
+  sleep 2
+done
+                sudo tail -f /home/crcuser/snc/install.out'
+                alias 3='su - crcuser'
                 ;;
         mnc)
-                alias 2='sudo tail -f /home/crcuser/clusters/mycluster/install.out'
+                alias 2='while [ ! -f /root/ansible.install.out ]
+do
+  sleep 2
+done
+                sudo tail -f /root/ansible.install.out'
+                alias 21='while [ ! -f /root/ocp/install/.openshift_install.log ]
+do
+  sleep 2
+done
+                sudo tail -f /root/ocp/install/.openshift_install.log'
+                alias 3='su -';
                 ;;
         *)
                 alias 2='echo please review /etc/profile.d/env.sh'
                 ;;
 esac
-alias 3='su - crcuser'
 EOL
 
 function fail {
@@ -49,6 +64,9 @@ EOL
 cat >/etc/motd <<EOL
 ${file_banner}
 EOL
+pip3 install --upgrade pip
+pip3 install ipaddr
+pip3 install netaddr
 echo "setting metadata_timer_sync=0" >> /etc/dnf/dnf.conf
 systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
@@ -74,7 +92,6 @@ EOL
 cat >/tmp/tools.sh <<'EOL'
 ${file_tools_sh}
 EOL
-echo "${file_provision_yml}"
 echo "${file_provision_yml}" | base64 -d > /tmp/provision.yml
 cp -a /tmp/inadyn.conf .
 cp -a /tmp/ddns.j2 .

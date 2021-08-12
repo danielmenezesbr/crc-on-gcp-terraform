@@ -95,9 +95,6 @@ Below is a summary of the characteristics of each strategy:
 |===
 
 
-Before choosing MNC, be aware of its <<mnc-limitations, limitations>>.
-
-
 == Setting Up Your Development Environment
 
 Go to https://shell.cloud.google.com/?hl=en_US&show=terminal[Cloud
@@ -229,22 +226,19 @@ Set `false` if you want to use a normal VM.
 If you choose mnc strategy, choose a machine with
 more resources like:
 
-`n2-highmem-8` (8 vCPUs and 64 Gib memory)
+`n1-standard-16` (16 vCPUS and 60 Gib memory)
 
 or
 
-`n1-standard-16` (16 vCPUS and 60 Gib memory)
+`n2-highmem-8` (8 vCPUs and 64 Gib memory)
 
 |gcp_vm_disk_type
 |pd-standard
 |pd-standard or pd-ssd
 
 |gcp_vm_disk_size
-|128
-|Disk size (GB). The minimum size is 128GB due to the image
-(projects/okd4-280016/global/images/packer-1597358211).
-You need to generate a new image (https://blog.kevinlin.info/post/google-compute-engine-reducing-the-size-of-a-persistent-disk)
-if you want to reduce the size.
+|50 for CRC/SNC; 128 for MNC
+|Disk size (GB).
 
 |DDNS
 |disabled
@@ -307,6 +301,9 @@ It can take up to 2h.
 First,
 [source,bash]
 ----
+# use alias 1
+1
+# or
 sudo journalctl -u google-startup-scripts.service -f
 ----
 
@@ -329,6 +326,9 @@ You can monitor the progress of the installation with `/home/crcuser/snc/install
 
 [source,bash]
 ----
+# use alias 2
+2
+# or
 sudo tail -f /home/crcuser/snc/install.out
 ----
 
@@ -368,33 +368,53 @@ When the machine is rebooted, SNC will be automatically started.
 
 ==== For MNC
 
-The SNC installation is a long process.
+The MNC installation is a long process.
 It can take up to 1h.
 
 [source,bash]
 ----
-sudo tail -f /home/crcuser/clusters/mycluster/install.out
+# use alias 2
+2
+# or
+sudo tail -f /root/ansible.install.out
 ----
 
 [source,bash]
 ----
 ...
-level=info msg="Waiting up to 10m0s for the openshift-console route to be created..."
-level=info msg="Install complete!"
-level=info msg="To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/home/crcuser/clusters/mycluster/auth/kubeconfig'"
-level=info msg="Access the OpenShift web-console here: https://console-openshift-console.apps.127.0.0.1.nip.io"
-level=info msg="Login to the console with user: \"kubeadmin\", and password: \"baVNT-dPN5D-vjRhy-4CmhS\""
-level=info msg="Time elapsed: 51m2s"
+TASK [luisarizmendi.ocp_libvirt_ipi_role : OpenShift Web Console access] *******
+task path: /root/.ansible/roles/luisarizmendi.ocp_libvirt_ipi_role/tasks/kvm_publish.yml:98
+ok: [localhost] => {
 ...
+}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=78   changed=58   unreachable=0    failed=0    skipped=31   rescued=0    ignored=1
 ----
-`"Install complete!"` indicates MNC is ready.
+`"failed=0"` indicates MNC is ready.
+
+
+Detailed information about installing OpenShift install
+can be found in `.openshift_install.log`.
+
+[source,bash]
+----
+# use alias 21
+21
+# or
+sudo tail -f /root/ocp/install/.openshift_install.log
+----
 
 
 == command line tools
 
 === VM
 
-The `crcuser` operating system user runs CRC / SNC. The password for `crcuser`
+The `crcuser` operating system user runs CRC / SNC.
+The `root` operating system user runs CRC / SNC.
+The password for `crcuser` / `root`
 is `password`.
 
 After accessing the VM via gcloud/SSH, change to the `crcuser`
@@ -404,7 +424,13 @@ For example:
 
 [source,bash]
 ----
+# use alias 3
+3
+# or
+# CRC/SNC
 su - crcuser
+# MNC
+su -
 ----
 
 === oc
@@ -571,7 +597,7 @@ https://console-openshift-console.apps-crc.127.0.0.1.nip.io/[https://console-ope
 
 ==== For MNC
 
-https://console-openshift-console.apps.127.0.0.1.nip.io/[https://console-openshift-console.apps.127.0.0.1.nip.io/]
+https://console-openshift-console.apps.mycluster.127.0.0.1.nip.io[https://console-openshift-console.apps.mycluster.127.0.0.1.nip.io]
 
 == Troubleshooting
 
@@ -718,19 +744,6 @@ Recreate environment in case of preemption before the environment <<link-ready,i
 ./terraformDocker.sh -var-file="secrets.tfvars" -auto-approve
 ----
 
-
-== Limitations
-
-[[mnc-limitations]]
-=== MNC
-
-Certificate renewal as described in this
-https://github.com/redhat-cop/openshift-lab-origin/blob/master/OpenShift4/Stopping_and_Resuming_OCP4_Clusters.adoc[link]
-did https://github.com/danielmenezesbr/crc-on-gcp-terraform/blob/master/tools.sh[not work on MNC].
- Therefore, when the machine is restarted
-the status of the nodes will be `NotReady`. In other words, MNC
-cluster is functional even before restarting the GCP instance.
-If you know how to fix it, please create a PR.
 
 [[link-cleanup]]
 == Cleanup

@@ -55,7 +55,7 @@
           ${crc_pull_secret}
     - name: install ansible collections
       become: "true"
-      become_user: "crcuser"
+      become_user: "{{ (strategy == 'mnc') | ternary('root', 'crcuser') }}"
       shell: |
         ansible-galaxy collection install /etc/ansible-provision/redhat-openshift-2.0.1.tar.gz
         pip3 install --upgrade --user openshift
@@ -199,7 +199,7 @@
         export MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp"
         export OPENSHIFT_PULL_SECRET_PATH="/home/crcuser/pull-secret.txt"
         export CRC_BASE_DOMAIN="127.0.0.1.nip.io"
-        ./snc.sh 2>&1
+        ./snc.sh 2>&1 || true
         sudo virsh autostart $(sudo virsh list --all --name | head -n 1)
         EOF
         chmod +x install.sh
@@ -219,22 +219,8 @@
 #Multi-Node
     - name: Change env
       shell: |
-        echo 'export KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
-        echo 'export K8S_AUTH_KUBECONFIG="/home/crcuser/clusters/mycluster/auth/kubeconfig"' >> /etc/bashrc
-      when: strategy == "mnc"
-    - name: dnf update
-      shell: dnf update -y
-      register: result
-      retries: 6
-      until: result.rc == 0
-      delay: 30
-      when: strategy == "mnc"
-    - name: install virt-filesystems
-      shell: yum -y install /usr/bin/virt-filesystems
-      register: result
-      retries: 6
-      until: result.rc == 0
-      delay: 30
+        echo 'export KUBECONFIG="/root/ocp/install/auth/kubeconfig"' >> /etc/bashrc
+        echo 'export K8S_AUTH_KUBECONFIG="/root/ocp/install/auth/kubeconfig"' >> /etc/bashrc
       when: strategy == "mnc"
     - name: install wget
       shell: yum -y install wget
@@ -242,21 +228,6 @@
       retries: 6
       until: result.rc == 0
       delay: 30
-      when: strategy == "mnc"
-    - name: deps pre-install
-      shell: |
-        #dnf -y module install virt
-        #dnf -y install virt-install virt-viewer
-        #echo -e 'listen_tls = 0\nlisten_tcp = 1\ntcp_port = "16509"\nauth_tcp = "none"' | tee -a /etc/libvirt/libvirtd.conf
-        #sed -i 's/LIBVIRTD_ARGS="--timeout 120"/#LIBVIRTD_ARGS="--timeout 120"/' /etc/sysconfig/libvirtd
-        #sed -i 's/#LIBVIRTD_ARGS="--listen"/LIBVIRTD_ARGS="--listen"/' /etc/sysconfig/libvirtd
-        #systemctl mask libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tls.socket libvirtd-tcp.socket
-        #echo "net.ipv4.ip_forward = 1" | tee /etc/sysctl.d/99-ipforward.conf
-        #sysctl -p /etc/sysctl.d/99-ipforward.conf
-      when: strategy == "mnc"
-    - name: restart libvirtd service
-      shell: |
-        sudo systemctl restart libvirtd
       when: strategy == "mnc"
     - name: install yq
       shell: |
@@ -266,87 +237,60 @@
         mv yq /usr/bin/
         yq -V
       when: strategy == "mnc"
+    - name: Update Root user's Password
+      user:
+        name: root
+        update_password: always
+        password: $6$mysecretsalt$MIJffjeQyfrKKrGkprGrDL/g2mCJa53koLmYQuuLmY9y37pDvGKPXU1Ov3RbMi.tpQ9cWvxAzUVtBLe7KrZoU.
     - name: OpenShift install
       shell: |
         set -exuo pipefail
-        NAME="mycluster"
-        CLUSTER_DIR="$${HOME}/clusters/$${NAME}"
-        INSTALL_DIR=$${CLUSTER_DIR}
-        export BASE_DOMAIN="127.0.0.1.nip.io"
-        #export BASE_DOMAIN="openshift.testing"
-        export CLUSTER_NAME="$${NAME}"
-        CERT_ROTATION=$${SNC_DISABLE_CERT_ROTATION:-enabled}
-        CRC_VM_NAME="$${NAME}"
-        OPENSHIFT_INSTALL="openshift-install"
-        sudo bash -c 'cat >> /etc/modprobe.d/kvm.conf' << EOF
-        options kvm_intel nested=1
+        cd /root
+        ansible-galaxy install luisarizmendi.ocp_libvirt_ipi_role
+        sed -i 's/mode tcp/mode http/g' .ansible/roles/luisarizmendi.ocp_libvirt_ipi_role/templates/haproxy.cfg.back.j2
+        export KVM="/root"
+        export HOME="$${KVM}"
+        cat <<'EOF' > $${KVM}/ocp_libvirt_ipi.yaml
+        ---
+        - hosts: localhost
+          roles:
+            - role: luisarizmendi.ocp_libvirt_ipi_role
+              vars:
+                ocp_install_file_path: "ocp-config/install-config.yaml"
+                ocp_release: "4.6.18"
+                ocp_master_memory: 16
+                ocp_master_cpu: 4
+                ocp_master_disk: 30
+                ocp_worker_memory: 20
+                ocp_worker_cpu: 2
+                ocp_worker_disk: 30
+                kvm_interface: "Wired connection 1"
+                kvm_nestedvirtualization: "true"
+                ansible_user: "root"
+                lb: "false"
+                ocp_machine_network: "192.168.126.0/24"
+                ocp_api_vip: "192.168.126.11"
+                ocp_apps_vip: "192.168.126.51"
         EOF
-        # Ensure nesting is enabled in the kernel
-        # TODO: verify this is still necessary
-        sudo modprobe -r kvm_intel
-        sudo modprobe kvm_intel nested=1
-        sudo systemctl restart libvirtd
-        # Ensure nesting is enabled in the kernel
-        # TODO: verify this is still necessary
-        #sudo modprobe -r kvm_intel
-        #sudo modprobe kvm_intel nested=1
-        #sudo systemctl restart libvirtd
-        # Set up iptables and firewalld
-        # TODO: discover the ports
-        sudo iptables -S
-        sudo firewall-cmd --permanent --add-rich-rule "rule service name="libvirt" reject"
-        sudo firewall-cmd --permanent --zone=libvirt --add-service=libvirt
-        sudo firewall-cmd --zone=libvirt --add-service=libvirt --permanent
-        sudo iptables -S
-        #sudo systemctl stop firewalld
-        #sudo systemctl disable firewalld
-        echo -e "[main]\ndns=dnsmasq" | sudo tee /etc/NetworkManager/conf.d/openshift.conf
-        echo server=/$BASE_DOMAIN/192.168.126.1 | sudo tee /etc/NetworkManager/dnsmasq.d/openshift.conf
-        # Create new domain for ingress to make sure it able to resolve auth route URL
-        echo address=/.apps.$BASE_DOMAIN/192.168.126.51 | sudo tee -a /etc/NetworkManager/dnsmasq.d/openshift.conf
-        sudo systemctl restart NetworkManager
-
-        #if [[ $${CERT_ROTATION} == "enabled" ]]
-        #then
-        #    # Disable the network time sync and set the clock to past (for a day) on host
-        #    sudo timedatectl set-ntp off
-        #    sudo date -s '-1 day'
-        #fi
-
-        cd ~
-        export OPENSHIFT_VERSION="4.6.18"
-        curl -L -o openshift-client-linux.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$${OPENSHIFT_VERSION}/openshift-client-linux.tar.gz
-        tar -zxf openshift-client-linux.tar.gz
-        sudo mv $HOME/oc /usr/bin
-        sudo ln -s /usr/bin/oc /usr/bin/kubectl
-
-        #sudo systemctl stop firewalld # nip.io requires stop firewalld
-        #sudo systemctl disable firewalld
-        if [ -d "$${CLUSTER_DIR}" ]; then
-          echo "WARNING: cluster $${NAME} already exists at $${CLUSTER_DIR}"
-        else
-          mkdir -p $${CLUSTER_DIR}
-        fi
-        cd $CLUSTER_DIR
-        RELEASE_IMAGE="quay.io/openshift-release-dev/ocp-release:$${OPENSHIFT_VERSION}-x86_64"
-        oc adm release extract -a /home/crcuser/pull-secret.txt --command openshift-baremetal-install "$${RELEASE_IMAGE}"
-        sudo mv openshift-baremetal-install /usr/bin/openshift-install
-        #$${OPENSHIFT_INSTALL} --dir $${INSTALL_DIR} destroy cluster || echo "failed to destroy previous cluster.  Continuing anyway"
+        mkdir ocp-config
+        export CLUSTER_NAME="mycluster"
+        export BASE_DOMAIN="127.0.0.1.nip.io"
+        export CLUSTER_DIR="$${HOME}/ocp-config"
         SSH_KEY="$${HOME}/.ssh/id_rsa"
         if [ ! -f $SSH_KEY ]; then
-          ssh-keygen -t rsa -N "" -f $SSH_KEY
+        ssh-keygen -t rsa -N "" -f $SSH_KEY
         fi
         export PUB_SSH_KEY="$${SSH_KEY}.pub"
-        PULL_SECRET=$(cat "$${HOME}/pull-secret.txt")
+        PULL_SECRET=$(cat "/home/crcuser/pull-secret.txt")
         cat > "$${CLUSTER_DIR}/install-config.yaml" << EOF
         apiVersion: v1
         baseDomain: "$${BASE_DOMAIN}"
         compute:
-        - hyperthreading: Enabled
-          architecture: amd64
-          name: worker
-          platform: {}
-          replicas: 2
+          - hyperthreading: Enabled
+            architecture: amd64
+            name: worker
+            platform: {}
+            replicas: 2
         controlPlane:
           hyperthreading: Enabled
           architecture: amd64
@@ -358,15 +302,16 @@
           name: "$${CLUSTER_NAME}"
         networking:
           clusterNetwork:
-          - cidr: 10.128.0.0/14
-            hostPrefix: 23
+            - cidr: 10.128.0.0/14
+              hostPrefix: 23
           machineNetwork:
-          - cidr: 192.168.126.0/24
+            - cidr: 192.168.126.0/24
           networkType: OpenShiftSDN
           serviceNetwork:
-          - 172.30.0.0/16
+            - 172.30.0.0/16
         platform:
           libvirt:
+            URI: qemu+tcp://192.168.122.1/system
             network:
               if: tt0
         publish: External
@@ -374,38 +319,27 @@
         sshKey: |
           $(cat "$${PUB_SSH_KEY}")
         EOF
-        # Create manifests and modify route domain
-        openshift-install --dir="$CLUSTER_DIR" create manifests
-        #sed -i 's/mastersSchedulable: false/mastersSchedulable: true/' $CLUSTER_DIR/manifests/cluster-scheduler-02-config.yml
-        # Workaround for https://github.com/openshift/installer/issues/1007
-        # Add custom domain to cluster-ingress
-        yq write --inplace $CLUSTER_DIR/manifests/cluster-ingress-02-config.yml spec[domain] apps.$BASE_DOMAIN
 
-        # Add master memory to 12 GB
-        # This is only valid for openshift 4.3 onwards
-        yq write --inplace $${CLUSTER_DIR}/openshift/99_openshift-cluster-api_master-machines-0.yaml spec.providerSpec.value[domainMemory] 14336
-        cat <<EOF > install.sh
+        cat <<EOF > patch_libvirt_network.sh
         set -exuo pipefail
-        openshift-install create cluster --dir="$CLUSTER_DIR" || true
-        source /tmp/tools.sh
-        #export SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /home/crcuser/.ssh/id_rsa"
-        #export CLUSTER_NAME=$CLUSTER_NAME
-        #export BASE_DOMAIN=$BASE_DOMAIN
-        #if [[ $${CERT_ROTATION} == "enabled" ]]
-        #then
-        #    renew_certificates
-        #fi
-        openshift-install wait-for install-complete --dir="$CLUSTER_DIR"
-        sudo virsh list --all --name | xargs -L1 sudo virsh autostart
+        until virsh net-list --name | grep "mycluster"
+        do
+        sleep 60
+        done
+        while : ; do
+          VAR=\$(virsh net-list --name | grep "mycluster") || ""
+          if [ ! -z "\$VAR" ]; then
+            virsh net-update \$VAR add dns-host "<host ip='192.168.126.51'><hostname>oauth-openshift.apps.$CLUSTER_NAME.$BASE_DOMAIN</hostname></host>"
+            virsh net-update \$VAR add dns-host "<host ip='192.168.126.51'><hostname>oauth-openshift.apps.$CLUSTER_NAME.$BASE_DOMAIN</hostname></host>" --config --parent-index 0
+            virsh net-dumpxml \$VAR
+            break;
+          fi
+          sleep 30;
+        done
         EOF
-        chmod +x install.sh
+        chmod +x patch_libvirt_network.sh
+        ./patch_libvirt_network.sh &> patch_libvirt_network.out &
+        ansible-playbook -vv --tags install $${KVM}/ocp_libvirt_ipi.yaml &> ansible.install.out &
       become: yes
-      become_user: "crcuser"
-      when: strategy == "mnc"
-    - name: OpenShift install
-      ansible.builtin.shell: /home/crcuser/clusters/mycluster/install.sh &> install.out &
-      args:
-        chdir: /home/crcuser/clusters/mycluster
-      become: yes
-      become_user: "crcuser"
+      become_user: "root"
       when: strategy == "mnc"

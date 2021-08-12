@@ -51,31 +51,8 @@ data "template_file" "provision_yml" {
   }
 }
 
-resource "google_compute_disk" "crcdisk" {
-  name  = var.disk-name
-  type  = "pd-standard"
-  zone  = var.zone
-  image = var.image
-
-  timeouts {
-    create = "60m"
-  }
-}
-
-resource "google_compute_image" "crcimg" {
-  name = "my-centos-8"
-  source_disk = google_compute_disk.crcdisk.self_link
-  licenses = [
-    "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx",
-  ]
-  timeouts {
-    create = "60m"
-  }
-}
-
 resource "google_compute_instance" "crc-build-box" {
-  count = var.vmcount
-  name = "${var.instance-name}-${count.index + 1}"
+  name = "${var.instance-name}-1"
   machine_type = var.gcp_vm_type
 
   zone = var.zone
@@ -96,12 +73,15 @@ resource "google_compute_instance" "crc-build-box" {
     preemptible = var.gcp_vm_preemptible
   }
 
+  advanced_machine_features {
+    enable_nested_virtualization = true
+  }
+
   boot_disk {
     initialize_params {
-      #image = google_compute_image.crcimg.self_link
-      image = "projects/okd4-280016/global/images/packer-1597358211"
+      image = var.image
       type  = var.gcp_vm_disk_type
-      size  = var.gcp_vm_disk_size
+      size  = local.gcp_vm_disk_size
     }
   }
 
