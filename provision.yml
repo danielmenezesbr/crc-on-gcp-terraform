@@ -55,7 +55,7 @@
           ${crc_pull_secret}
     - name: install ansible collections
       become: "true"
-      become_user: "crcuser"
+      become_user: "{{ (strategy == 'mnc') | ternary('root', 'crcuser') }}"
       shell: |
         ansible-galaxy collection install /etc/ansible-provision/redhat-openshift-2.0.1.tar.gz
         pip3 install --upgrade --user openshift
