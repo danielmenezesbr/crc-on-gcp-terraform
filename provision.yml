@@ -267,6 +267,9 @@
                 kvm_nestedvirtualization: "true"
                 ansible_user: "root"
                 lb: "false"
+                ocp_machine_network: "192.168.126.0/24"
+                ocp_api_vip: "192.168.126.11"
+                ocp_apps_vip: "192.168.126.51"
         EOF
         mkdir ocp-config
         export CLUSTER_NAME="mycluster"
