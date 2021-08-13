@@ -56,7 +56,7 @@ with multi node.
 All strategies are deployed on a single GCP instance.
 Also, all strategies use the
 https://github.com/openshift/installer/tree/master/docs/dev/libvirt[Libvirt]
-provider to create nested VMs inside the GCP instance).
+provider to create nested VMs inside the GCP instance.
 
 Below is a summary of the characteristics of each strategy:
 
