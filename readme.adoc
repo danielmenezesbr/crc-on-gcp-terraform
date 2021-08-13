@@ -42,8 +42,8 @@ lowest possible cost.
 
 == Strategies (CRC vs SNC vs MNC)
 
-There are 3 OpenShift development environment (OCP)
-provisioning strategies in GCP
+This project offers 3 strategies for provisioning
+an OpenShift 4 development environment in GCP:
 
 * https://developers.redhat.com/products/codeready-containers/overview[CRC (CodeReady Containers)]
 
@@ -505,7 +505,7 @@ Show kubeadmin password:
 
 [source,bash]
 ----
-cat /home/crcuser/clusters/mycluster/auth/kubeadmin-password
+cat /root/ocp/install/auth/kubeadmin-password
 ----
 
 == Access OpenShift Console from your laptop
@@ -605,7 +605,7 @@ https://console-openshift-console.apps.mycluster.127.0.0.1.nip.io/[https://conso
 
 [source,bash]
 ----
-su - crcuser #Password: password
+3 #alias for "su - crcuser/root" Password: password
 ssh master
 ----
 
@@ -631,8 +631,6 @@ By default this project configures and installs OCP 4.6.18.
 Although this project was only tested on OCP 4.6.18,
 it should probably work on other versions.
 
-You can change the CRC version in the `provision.yml` file.
-
 If you are trying to install a version other than 4.6.x,
 be sure to change the `branch` and `OPENSHIFT_VERSION`
 in the following snippet from `provision.yml`:
@@ -646,6 +644,26 @@ export OPENSHIFT_VERSION="4.6.18"
 ...
 ----
 
+=== Change OpenShift version on MNC environment
+
+By default this project configures and installs OCP 4.6.18.
+Although this project was only tested on OCP 4.6.18,
+it should probably work on other versions.
+
+If you are trying to install a version other than 4.6.x,
+try to change ocp_release var in `provision.yml`:
+
+[source,bash]
+----
+...
+        - hosts: localhost
+          roles:
+            - role: luisarizmendi.ocp_libvirt_ipi_role
+              vars:
+                ocp_install_file_path: "ocp-config/install-config.yaml"
+                ocp_release: "4.6.18"
+...
+----
 
 
 == Advanced configurations
@@ -664,7 +682,7 @@ to install OSSM on OCP 4.6:
 
 [source,bash]
 ----
-su - crcuser #Password: password
+3 #3 is an alias for su - crcuser/root - Password: password
 git clone https://github.com/danielmenezesbr/crc-on-gcp-terraform
 cd crc-on-gcp-terraform
 ./servicemesh-install-OCPv46.sh
@@ -673,6 +691,11 @@ cd crc-on-gcp-terraform
 In case of any network failure during OSSM installation,
 usually re-running the script solves the problem.
 
+=== MNC
+
+MNC uses https://github.com/luisarizmendi/ocp-libvirt-ipi-role[luisarizmendi/ocp-libvirt-ipi-role]
+to provision. Please check https://github.com/luisarizmendi/ocp-libvirt-ipi-role[luisarizmendi/ocp-libvirt-ipi-role]
+for more customization options.
 
 [[link-ddns]]
 
