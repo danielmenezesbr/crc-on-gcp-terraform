@@ -10,7 +10,7 @@ variable "strategy" {
 }
 
 variable "gcp_vm_preemptible" {
-  default = "false"
+  default = "true"
 }
 
 variable "gcp_vm_type" {
