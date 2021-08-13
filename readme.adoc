@@ -581,9 +581,9 @@ TODO: talk about dnsmasq
 
 ==== For SNC and MNC
 
-SNC configuration uses subdomain 127.0.0.1.nip.io. This means that when
-accessing the instance remotely there is no need to change the hosts
-file as * .127.0.0.1.nip.io will be resolved to 127.0.0.1
+SNC/MNC configuration uses subdomain 127.0.0.1.nip.io. This means that when
+accessing the instance remotely (ssh port forwarding) there is no need to change the hosts
+file because *.127.0.0.1.nip.io will be resolved to 127.0.0.1
 
 === OpenShift Web Console
 
@@ -597,7 +597,7 @@ https://console-openshift-console.apps-crc.127.0.0.1.nip.io/[https://console-ope
 
 ==== For MNC
 
-https://console-openshift-console.apps.mycluster.127.0.0.1.nip.io[https://console-openshift-console.apps.mycluster.127.0.0.1.nip.io]
+https://console-openshift-console.apps.mycluster.127.0.0.1.nip.io/[https://console-openshift-console.apps.mycluster.127.0.0.1.nip.io/]
 
 == Troubleshooting
 
