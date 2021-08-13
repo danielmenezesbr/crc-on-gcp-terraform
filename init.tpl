@@ -65,8 +65,8 @@ cat >/etc/motd <<EOL
 ${file_banner}
 EOL
 pip3 install --upgrade pip
-pip3 install ipaddr
-pip3 install netaddr
+#pip3 install ipaddr
+#pip3 install netaddr
 echo "setting metadata_timer_sync=0" >> /etc/dnf/dnf.conf
 systemctl stop dnf-makecache.timer
 systemctl disable dnf-makecache.timer
