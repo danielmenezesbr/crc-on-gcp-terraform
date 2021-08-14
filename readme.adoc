@@ -106,10 +106,9 @@ Create new project:
 ----
 export TF_VAR_PROJECT_ID=$(python3 -c 'import uuid; print("c" + str(uuid.uuid4().hex[:29]))')
 echo "Project ID:" $TF_VAR_PROJECT_ID
+echo "export TF_VAR_PROJECT_ID=\"$TF_VAR_PROJECT_ID\"" >> ~/.profile
 gcloud projects create $TF_VAR_PROJECT_ID --name="CRConGCP" --labels=type=crc --format="json" --quiet
 gcloud config set project $TF_VAR_PROJECT_ID
-echo "export TF_VAR_PROJECT_ID=\"$TF_VAR_PROJECT_ID\"" >> ~/.profile
-source ~/.profile
 ----
 
 Link new project to a first billing account
