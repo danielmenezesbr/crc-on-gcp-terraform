@@ -258,7 +258,11 @@
       register: csv_exists_out
       retries: 5
       delay: 70
-      until: csv_exists_out.resources[0].status.phase == "Succeeded"
+      until:
+        - csv_exists_out is defined
+        - csv_exists_out.resources is defined
+        - csv_exists_out.resources[0] is defined
+        - csv_exists_out.resources[0].status.phase == "Succeeded"
       with_items:
         - "{{ elastic_version }}"
         - "{{ jaeger_version }}"
@@ -409,7 +413,7 @@
         - wait_out.resources[3].status.phase == 'Running'
         - wait_out.resources[4].status.phase == 'Running'
         - wait_out.resources[5].status.phase == 'Running'
-      retries: 10
+      retries: 30
       delay: 30
 
     - name: get bookinfo route
