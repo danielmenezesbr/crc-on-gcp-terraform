@@ -338,6 +338,8 @@
                   persistence:
                     storageClassName: ""
                     accessMode: ReadWriteOnce
+      retries: 3
+      delay: 30
     - name: create ServiceMeshMemberRoll with booknfo
       redhat.openshift.k8s:
         definition:

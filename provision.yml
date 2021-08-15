@@ -260,17 +260,15 @@
                 ocp_release: "4.6.18"
                 ocp_master_memory: 16
                 ocp_master_cpu: 4
-                ocp_master_disk: 30
-                ocp_worker_memory: 20
-                ocp_worker_cpu: 2
-                ocp_worker_disk: 30
+                ocp_master_disk: 50
+                ocp_worker_memory: 16
+                ocp_worker_cpu: 4
+                ocp_worker_disk: 50
                 kvm_interface: "Wired connection 1"
                 kvm_nestedvirtualization: "true"
                 ansible_user: "root"
                 lb: "false"
-                ocp_machine_network: "192.168.126.0/24"
-                ocp_api_vip: "192.168.126.11"
-                ocp_apps_vip: "192.168.126.51"
+                nfs_storage: "false"
         EOF
         mkdir ocp-config
         export CLUSTER_NAME="mycluster"

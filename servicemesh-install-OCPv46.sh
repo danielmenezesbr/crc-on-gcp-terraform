@@ -5,8 +5,5 @@ if [ "$(whoami)" != "crcuser" ] && [ "$strategy" != "mnc" ]; then
 elif [ "$(whoami)" != "root" ] && [ "$strategy" == "mnc" ]; then
     echo "Error. Please log-in with root."
     exit 1
-else
-    echo "Error checking your username and strategy."
-    exit 1
 fi
 ansible-playbook servicemesh-OCPv46.yml
