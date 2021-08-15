@@ -261,7 +261,7 @@
                 ocp_master_memory: 16
                 ocp_master_cpu: 4
                 ocp_master_disk: 50
-                ocp_worker_memory: 16
+                ocp_worker_memory: 10
                 ocp_worker_cpu: 4
                 ocp_worker_disk: 50
                 kvm_interface: "Wired connection 1"
