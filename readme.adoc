@@ -571,6 +571,12 @@ Add at least the following information to the hosts file:
 127.0.0.1 oauth-openshift.apps-crc.testing
 127.0.0.1 console-openshift-console.apps-crc.testing
 127.0.0.1 default-route-openshift-image-registry.apps-crc.testing
+# OpenShift Service Mesh
+127.0.0.1 istio-ingressgateway-istio-system.apps-crc.testing
+127.0.0.1 grafana-istio-system.apps-crc.testing
+127.0.0.1 jaeger-istio-system.apps-crc.testing 
+127.0.0.1 kiali-istio-system.apps-crc.testing 
+127.0.0.1 prometheus-istio-system.apps-crc.testing
 ----
 
 Whenever you create a route on the OCP and you want to access from your
