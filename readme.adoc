@@ -128,7 +128,7 @@ Enable compute API:
 gcloud services enable compute.googleapis.com
 ----
 
-Download and config Terraform:
+Config Terraform:
 
 [source,bash]
 ----
