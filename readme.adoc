@@ -412,7 +412,7 @@ sudo tail -f /root/ocp/install/.openshift_install.log
 === VM
 
 The `crcuser` operating system user runs CRC / SNC.
-The `root` operating system user runs CRC / SNC.
+The `root` operating system user runs MNC.
 The password for `crcuser` / `root`
 is `password`.
 
