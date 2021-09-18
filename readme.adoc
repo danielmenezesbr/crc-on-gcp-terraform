@@ -587,7 +587,9 @@ Add at least the following information to the hosts file:
 Whenever you create a route on the OCP and you want to access from your
 laptop, appropriately change the hosts file.
 
-TODO: talk about dnsmasq
+[NOTE]
+====
+Tip: Mac or Linux users can use Dnsmasq instead of modifying hosts file.
 
 ==== For SNC and MNC
 
