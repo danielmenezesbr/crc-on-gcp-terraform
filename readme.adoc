@@ -268,12 +268,30 @@ gcloud compute ssh crc-build-1 --zone=us-central1-a --quiet --project=$TF_VAR_PR
 
 ==== For CRC
 
-Wait about 25 minutes for the message "Started the OpenShift cluster"
+First,
+[source,bash]
+----
+# use alias 1
+1
+# or
+sudo journalctl -u google-startup-scripts.service -f
+----
+
+At the end of the log `failed = 0` indicates dependencies
+have been successfully installed.
+
+
+You can monitor the progress of the installation with:
 
 [source,bash]
 ----
+# use alias 2
+2
+# or
 sudo tail -f /var/log/messages -n +1 | grep runuser
 ----
+
+Wait about 25 minutes for the message "Started the OpenShift cluster"
 
 [source,bash]
 ----
@@ -306,7 +324,7 @@ First,
 sudo journalctl -u google-startup-scripts.service -f
 ----
 
-At the end of the log `failed = 0` indicates SNC dependencies
+At the end of the log `failed = 0` indicates dependencies
 have been successfully installed.
 
 [source,bash]
